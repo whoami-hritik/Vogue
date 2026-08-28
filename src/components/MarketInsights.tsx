@@ -129,43 +129,44 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
   const selectedData = marketData.find((m) => m.symbol === selectedAsset) || marketData[0] || defaultAsset;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 font-sans text-gray-900">
+    <div className="max-w-6xl mx-auto space-y-6 font-sans text-gray-900 relative z-10">
       {/* Strategy Selector Bar */}
-      <div className="light-glass border border-gray-200/80 rounded-2xl p-5 shadow-sm space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-orange-500" />
-            <h2 className="text-sm font-bold text-gray-900">Active Strategy Selection & Governing Bounds</h2>
+      <div className="light-glass border border-white/60 rounded-[2rem] p-6 shadow-sm space-y-4 relative overflow-hidden group">
+        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent pointer-events-none" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+          <div className="flex items-center gap-3">
+            <Sliders className="w-5 h-5 text-orange-500" />
+            <h2 className="text-lg font-extrabold text-gray-900 tracking-tight">Active Strategy Selection & Bounds</h2>
           </div>
           {currentStrategy && (
-            <span className="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-3 py-0.5 rounded-full self-start sm:self-auto">
+            <span className="text-[11px] font-extrabold tracking-widest bg-emerald-50 text-emerald-800 border border-emerald-100 px-3 py-1 rounded-full self-start sm:self-auto shadow-sm">
               CIRCUIT BOUNDS LOCKED
             </span>
           )}
         </div>
 
         {activeStrategies.length === 0 ? (
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-xs">
-            <span className="text-gray-600">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-white/40 border border-white/60 rounded-[1.5rem] text-sm relative z-10">
+            <span className="text-gray-700 font-medium">
               No active strategy locked on Midnight. You can lock risk boundaries in the Strategy Builder.
             </span>
             {onNavigateTab && (
               <button
                 onClick={() => onNavigateTab('strategy-builder')}
-                className="px-4 py-2 rounded-full bg-gray-900 hover:bg-black text-white font-bold text-xs shrink-0 cursor-pointer shadow-xs"
+                className="px-6 py-2.5 rounded-full bg-gray-900 hover:bg-black text-white font-extrabold tracking-wide text-xs shrink-0 cursor-pointer shadow-md hover:scale-[1.02] transition-all"
               >
-                + Lock Strategy Now
+                Lock Strategy Now
               </button>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 relative z-10">
             <div className="sm:col-span-1">
-              <label className="text-[11px] font-semibold text-gray-600 block mb-1">Select Strategy</label>
+              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Select Strategy</label>
               <select
                 value={currentStrategy?.agentId || ''}
                 onChange={(e) => setSelectedAgentId(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-orange-500 cursor-pointer"
+                className="w-full bg-white/40 border border-white/60 rounded-xl p-3 text-sm font-extrabold text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500/50 cursor-pointer shadow-sm appearance-none"
               >
                 {activeStrategies.map((s, idx) => (
                   <option key={s.agentId} value={s.agentId}>
@@ -175,17 +176,17 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
               </select>
             </div>
 
-            <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-200 flex flex-col justify-between text-xs">
-              <span className="text-[11px] text-gray-500 font-medium">Risk Rules</span>
-              <span className="font-bold text-gray-900">
+            <div className="bg-white/40 p-4 rounded-[1.5rem] border border-white/60 flex flex-col justify-center text-sm shadow-sm">
+              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Risk Rules</span>
+              <span className="font-extrabold text-gray-900">
                 Max {currentStrategy.params.maxPositionPct}% Pos • {currentStrategy.params.stopLossPct}% Stop-Loss
               </span>
             </div>
 
-            <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-200 flex flex-col justify-between text-xs">
-              <span className="text-[11px] text-gray-500 font-medium">Max Allowed Trade Size</span>
-              <span className="font-bold text-emerald-700">
-                ${maxAllowedTradeSize.toLocaleString()} vUSD <span className="text-gray-500 font-normal">(${vaultBalance} vault)</span>
+            <div className="bg-white/40 p-4 rounded-[1.5rem] border border-white/60 flex flex-col justify-center text-sm shadow-sm">
+              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Max Allowed Trade Size</span>
+              <span className="font-extrabold text-emerald-700 text-lg tracking-tight">
+                ${maxAllowedTradeSize.toLocaleString()} <span className="text-xs text-orange-600 uppercase">vUSD</span>
               </span>
             </div>
           </div>
@@ -193,31 +194,32 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
       </div>
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Activity className="w-5 h-5 text-orange-500" />
-            <h1 className="text-xl font-extrabold text-gray-900">Market Insights & AI Signals</h1>
-            <span className="text-[10px] bg-gray-100 text-gray-800 border border-gray-200 px-2.5 py-0.5 rounded-full font-bold">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 light-glass border border-white/60 rounded-[2rem] p-6 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-400/10 blur-3xl rounded-full -mr-10 -mt-10 pointer-events-none" />
+        <div className="space-y-2 relative z-10">
+          <div className="flex items-center gap-3">
+            <Activity className="w-6 h-6 text-orange-500" />
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Market Insights & Signals</h1>
+            <span className="text-[10px] bg-white/60 text-gray-800 border border-white/60 px-3 py-1 rounded-full font-extrabold tracking-widest shadow-sm">
               LIVE FEED
             </span>
           </div>
-          <p className="text-xs text-gray-600">
+          <p className="text-sm text-gray-600 font-medium max-w-xl">
             Off-chain price analytics & Gemini AI technical analysis. Zero private witness data is exposed during price checks.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500 font-medium">Target Asset:</span>
-          <div className="flex bg-gray-100 rounded-xl p-1 border border-gray-200/60">
+        <div className="flex flex-col gap-2 relative z-10 shrink-0">
+          <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Target Asset</span>
+          <div className="flex bg-white/40 rounded-[1rem] p-1.5 border border-white/60 shadow-sm">
             {marketData.map((item) => (
               <button
                 key={item.symbol}
                 onClick={() => setSelectedAsset(item.symbol)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-xl text-xs font-extrabold tracking-wider transition-all cursor-pointer ${
                   selectedAsset === item.symbol
-                    ? 'light-glass text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-gray-900 shadow-sm scale-105'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
                 }`}
               >
                 {item.symbol}
@@ -237,16 +239,17 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
             <button
               key={item.symbol}
               onClick={() => setSelectedAsset(item.symbol)}
-              className={`text-left p-4 rounded-2xl border transition-all cursor-pointer space-y-2 ${
+              className={`text-left p-5 rounded-[1.5rem] border transition-all cursor-pointer space-y-3 relative overflow-hidden ${
                 isSelected
-                  ? 'light-glass border-orange-500 shadow-md ring-1 ring-orange-500/30'
-                  : 'light-glass border-gray-200/80 hover:border-gray-300 shadow-xs'
+                  ? 'bg-white/60 border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.06)] scale-[1.02]'
+                  : 'bg-white/40 border-white/60 hover:bg-white/50 shadow-sm hover:scale-[1.01]'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="font-extrabold text-sm text-gray-900">{item.symbol}</span>
+              {isSelected && <div className="absolute inset-0 bg-gradient-to-br from-orange-400/5 to-transparent pointer-events-none" />}
+              <div className="flex items-center justify-between relative z-10">
+                <span className="font-extrabold text-sm text-gray-900 tracking-wider">{item.symbol}</span>
                 <span
-                  className={`text-xs font-bold flex items-center gap-0.5 ${
+                  className={`text-[11px] font-extrabold flex items-center gap-1 ${
                     isPositive ? 'text-emerald-600' : 'text-red-600'
                   }`}
                 >
@@ -256,19 +259,19 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
                 </span>
               </div>
 
-              <div className="text-xl font-extrabold text-gray-900">
+              <div className="text-2xl font-extrabold text-gray-900 tracking-tight font-mono relative z-10">
                 ${item.price.toLocaleString(undefined, { minimumFractionDigits: item.price < 1 ? 3 : 2 })}
               </div>
 
-              <div className="flex items-center justify-between text-[11px] text-gray-500 pt-1 border-t border-gray-100">
+              <div className="flex items-center justify-between text-[10px] text-gray-500 pt-3 border-t border-white/40 font-bold uppercase tracking-widest relative z-10">
                 <span>Vol: {item.volume24h}</span>
                 <span
-                  className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${
+                  className={`px-2 py-1 rounded-md text-[9px] ${
                     item.sentiment === 'Bullish'
-                      ? 'bg-emerald-100 text-emerald-800'
+                      ? 'bg-emerald-50 text-emerald-700'
                       : item.sentiment === 'Bearish'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-gray-100 text-gray-700'
+                      ? 'bg-red-50 text-red-700'
+                      : 'bg-white/60 text-gray-700'
                   }`}
                 >
                   {item.sentiment}
@@ -280,75 +283,77 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
       </div>
 
       {/* Selected Asset Deep Dive + AI Intelligence */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
         {/* Left 2 Cols: Asset Metrics & AI Signal Panel */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-5 shadow-sm">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-200">
+          <div className="light-glass border border-white/60 rounded-[2rem] p-6 sm:p-8 space-y-6 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-48 h-48 bg-blue-400/5 blur-3xl rounded-full -ml-10 -mt-10 pointer-events-none" />
+            
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/40 relative z-10">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">{selectedData.name} ({selectedData.symbol})</h2>
-                <p className="text-xs text-gray-500">Live 24h High: ${selectedData.high24h} | Low: ${selectedData.low24h}</p>
+                <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">{selectedData.name} ({selectedData.symbol})</h2>
+                <p className="text-sm text-gray-500 font-medium mt-1">Live 24h High: ${selectedData.high24h} | Low: ${selectedData.low24h}</p>
               </div>
 
-              <div className="text-right">
-                <div className="text-2xl font-extrabold text-gray-900">
+              <div className="text-left sm:text-right">
+                <div className="text-4xl font-extrabold text-gray-900 tracking-tight font-mono">
                   ${selectedData.price.toLocaleString(undefined, { minimumFractionDigits: selectedData.price < 1 ? 3 : 2 })}
                 </div>
-                <div className={`text-xs font-bold ${selectedData.change24h >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                <div className={`text-sm font-extrabold mt-1 inline-flex items-center gap-1 px-3 py-1 rounded-full ${selectedData.change24h >= 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
                   {selectedData.change24h >= 0 ? '+' : ''}{selectedData.change24h}% (24h)
                 </div>
               </div>
             </div>
 
             {/* AI Technical Analysis Summary */}
-            <div className="space-y-2.5">
+            <div className="space-y-4 relative z-10">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-orange-500" />
+                <span className="text-sm font-extrabold text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-orange-500" />
                   Vogue AI Market Intelligence
                 </span>
-                <span className="text-xs text-emerald-800 font-bold bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                <span className="text-[10px] text-emerald-800 font-extrabold tracking-widest uppercase bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full shadow-sm">
                   Confidence: {selectedData.confidence}%
                 </span>
               </div>
 
-              <p className="text-xs text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200">
+              <p className="text-sm text-gray-800 font-medium leading-relaxed bg-white/40 p-5 rounded-[1.5rem] border border-white/60 shadow-sm">
                 {selectedData.reasoning}
               </p>
             </div>
 
             {/* Execute Proven ZK Trade Button directly from Market Insights */}
-            <div className="pt-2 flex flex-col gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
-                    <Shield className="w-4 h-4 text-emerald-600" />
+            <div className="pt-4 flex flex-col gap-4 bg-white/40 p-6 rounded-[1.5rem] border border-white/60 shadow-sm relative z-10">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="space-y-1">
+                  <span className="text-sm font-extrabold text-gray-900 flex items-center gap-2 tracking-wide">
+                    <Shield className="w-5 h-5 text-emerald-600" />
                     Execute ZK Trade under {currentStrategy ? `Strategy #${activeStrategies.findIndex(s => s.agentId === currentStrategy.agentId) + 1}` : 'Selected Strategy'}
                   </span>
-                  <p className="text-[11px] text-gray-500">
-                    Triggers 1AM Wallet transaction signing. Proven via Compact <code className="text-gray-900 font-bold">executeTrade</code> circuit.
+                  <p className="text-xs text-gray-600 font-medium">
+                    Triggers 1AM Wallet transaction signing. Proven via Compact <code className="text-gray-900 font-bold bg-white/60 px-1 py-0.5 rounded">executeTrade</code> circuit.
                   </p>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-[10px] text-gray-500 font-semibold block uppercase">Shielded Vault Available</span>
-                  <span className={`text-xs font-extrabold ${vaultBalance >= defaultTradeSize ? 'text-emerald-700' : 'text-amber-600'}`}>
-                    ${vaultBalance.toLocaleString()} vUSD
+                <div className="text-right bg-white/60 p-2.5 rounded-xl border border-white/60">
+                  <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase">Shielded Vault</span>
+                  <span className={`block text-lg font-extrabold font-mono tracking-tight ${vaultBalance >= defaultTradeSize ? 'text-emerald-700' : 'text-amber-600'}`}>
+                    ${vaultBalance.toLocaleString()} <span className="text-xs uppercase font-sans tracking-wide">vUSD</span>
                   </span>
                 </div>
               </div>
 
               {/* Balance Warning if vault balance < defaultTradeSize */}
               {vaultBalance < defaultTradeSize && (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900">
-                  <div className="flex items-center gap-1.5 font-medium">
-                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-amber-50/50 border border-amber-200/80 rounded-[1rem] text-sm text-amber-900 shadow-sm">
+                  <div className="flex items-center gap-2 font-bold">
+                    <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
                     <span>Insufficient Vault Balance (${vaultBalance} available). Please mint vUSD first.</span>
                   </div>
                   {onNavigateTab && (
                     <button
                       onClick={() => onNavigateTab('withdraw')}
-                      className="text-xs font-bold text-amber-800 hover:text-amber-950 underline cursor-pointer shrink-0"
+                      className="text-xs font-extrabold text-amber-800 hover:text-amber-950 uppercase tracking-widest cursor-pointer shrink-0 border border-amber-200/80 bg-amber-100/50 px-3 py-1.5 rounded-lg"
                     >
                       Mint in Vault Tab →
                     </button>
@@ -356,7 +361,7 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
                 </div>
               )}
 
-              <div className="flex justify-end pt-1">
+              <div className="flex justify-end pt-2">
                 <button
                   onClick={() => {
                     if (!walletConnected) {
@@ -366,10 +371,10 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
                     }
                   }}
                   disabled={isProofGenerating || (walletConnected && vaultBalance < defaultTradeSize)}
-                  className={`w-full sm:w-auto px-5 py-2.5 rounded-full font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2 ${
+                  className={`w-full sm:w-auto px-8 py-3.5 rounded-full font-extrabold text-sm uppercase tracking-widest shadow-md transition-all flex items-center justify-center gap-2 ${
                     !walletConnected || vaultBalance >= defaultTradeSize
-                      ? 'bg-[#F26522] hover:bg-[#e05a1a] text-white cursor-pointer'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:scale-[1.02] text-white cursor-pointer shadow-orange-500/20'
+                      : 'bg-white/60 text-gray-400 cursor-not-allowed border border-white/60'
                   }`}
                 >
                   <Zap className="w-4 h-4" />
@@ -389,13 +394,14 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
         </div>
 
         {/* Right Col: Gemini Custom AI Intelligence Query */}
-        <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm flex flex-col justify-between">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-orange-500" />
-              <h3 className="text-sm font-bold text-gray-900">Ask Gemini AI Market Analyst</h3>
+        <div className="light-glass border border-white/60 rounded-[2rem] p-6 sm:p-8 space-y-5 shadow-sm flex flex-col justify-between relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-bl from-white/10 to-transparent pointer-events-none" />
+          <div className="space-y-4 relative z-10">
+            <div className="flex items-center gap-3">
+              <Cpu className="w-5 h-5 text-orange-500" />
+              <h3 className="text-lg font-extrabold text-gray-900 tracking-tight">Ask Gemini AI Market Analyst</h3>
             </div>
-            <p className="text-xs text-gray-600 leading-relaxed">
+            <p className="text-sm text-gray-600 font-medium leading-relaxed">
               Generate real-time AI market reports for {selectedAsset} using Gemini 2.5 Flash.
             </p>
 
@@ -403,32 +409,32 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               placeholder={`e.g. Is ${selectedAsset} suitable for an 8% stop-loss, 30-day timeline trade right now?`}
-              rows={3}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 font-sans resize-none"
+              rows={4}
+              className="w-full bg-white/40 border border-white/60 rounded-[1.5rem] p-4 text-sm font-medium text-gray-900 placeholder-gray-500/70 focus:outline-none focus:ring-2 focus:ring-orange-500/50 font-sans resize-none shadow-sm transition-all"
             />
 
             <button
               onClick={() => handleRunAiAnalysis(selectedAsset)}
               disabled={isAnalyzing}
-              className="w-full py-2.5 rounded-full bg-gray-900 hover:bg-black text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+              className="w-full py-3.5 rounded-full bg-gradient-to-r from-gray-900 to-gray-800 hover:scale-[1.02] text-white font-extrabold tracking-widest text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-gray-900/20 disabled:opacity-70 disabled:hover:scale-100 uppercase"
             >
               {isAnalyzing ? (
                 <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-orange-400" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-orange-400" />
                   <span>Analyzing Market...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5 text-orange-400" />
-                  <span>Run Gemini Technical Analysis</span>
+                  <Sparkles className="w-4 h-4 text-orange-400" />
+                  <span>Run Technical Analysis</span>
                 </>
               )}
             </button>
           </div>
 
           {analysisResult && (
-            <div className="p-3.5 bg-gray-50 border border-gray-200 rounded-xl space-y-1 text-xs text-gray-800 max-h-60 overflow-y-auto">
-              <div className="text-[10px] text-orange-600 font-bold uppercase tracking-wider">GEMINI RESPONSE</div>
+            <div className="p-5 mt-4 bg-white/60 border border-white/80 rounded-[1.5rem] space-y-2 text-sm text-gray-800 max-h-64 overflow-y-auto shadow-inner relative z-10 font-medium">
+              <div className="text-[10px] text-orange-600 font-extrabold uppercase tracking-widest">GEMINI RESPONSE</div>
               <div className="whitespace-pre-wrap leading-relaxed">{analysisResult}</div>
             </div>
           )}

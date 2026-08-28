@@ -80,45 +80,46 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
   });
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 font-sans text-gray-900">
+    <div className="max-w-6xl mx-auto space-y-6 font-sans text-gray-900 relative z-10">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <History className="w-5 h-5 text-orange-500" />
-            <h1 className="text-xl font-extrabold text-gray-900">Midnight Explorer Transaction Logs</h1>
-            <span className="text-[10px] bg-gray-100 text-gray-800 border border-gray-200 px-2.5 py-0.5 rounded-full font-bold uppercase">
-              {networkId} TESTNET LOGS
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 light-glass border border-white/60 rounded-[2rem] p-6 sm:p-8 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-400/10 blur-3xl rounded-full -mr-10 -mt-10 pointer-events-none" />
+        <div className="space-y-2 relative z-10">
+          <div className="flex items-center gap-3">
+            <History className="w-6 h-6 text-orange-500" />
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Midnight Explorer Logs</h1>
+            <span className="text-[10px] bg-white/60 text-gray-800 border border-white/80 px-3 py-1 rounded-full font-extrabold uppercase tracking-widest shadow-sm">
+              {networkId} TESTNET
             </span>
           </div>
-          <p className="text-xs text-gray-600">
+          <p className="text-sm text-gray-600 font-medium">
             Real-time on-chain transaction hashes & strategy commitments logged via Midnight Explorer API.
           </p>
         </div>
 
         {/* View Mode Toggle & Execute Button */}
-        <div className="flex items-center gap-3">
-          <div className="flex bg-gray-100 rounded-xl p-1 border border-gray-200/60">
+        <div className="flex flex-wrap items-center gap-4 relative z-10">
+          <div className="flex bg-white/40 rounded-[1rem] p-1.5 border border-white/60 shadow-sm">
             <button
               onClick={() => setViewMode('zk-circuits')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-xl text-xs font-extrabold tracking-widest uppercase transition-all cursor-pointer flex items-center gap-2 ${
                 viewMode === 'zk-circuits'
-                  ? 'light-glass text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white shadow-sm text-gray-900 scale-105'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
               }`}
             >
-              <Layers className="w-3.5 h-3.5 text-orange-500" />
+              <Layers className="w-4 h-4 text-orange-500" />
               <span>ZK Circuits</span>
             </button>
             <button
               onClick={() => setViewMode('1am-explorer')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-xl text-xs font-extrabold tracking-widest uppercase transition-all cursor-pointer flex items-center gap-2 ${
                 viewMode === '1am-explorer'
-                  ? 'light-glass text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white shadow-sm text-gray-900 scale-105'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
               }`}
             >
-              <Globe className="w-3.5 h-3.5 text-emerald-600" />
+              <Globe className="w-4 h-4 text-emerald-600" />
               <span>Explorer Feed</span>
             </button>
           </div>
@@ -127,13 +128,12 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
             href={networkId === 'preprod' ? 'https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod' : 'https://explorer.1am.xyz/contract/33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30?network=preview'}
             target="_blank"
             rel="noreferrer"
-            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2.5 rounded-full light-glass hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/60 hover:bg-white border border-white/80 text-gray-800 text-xs font-extrabold tracking-widest uppercase transition-all shadow-sm cursor-pointer"
           >
-            <Globe className="w-3.5 h-3.5 text-orange-500" />
+            <Globe className="w-4 h-4 text-orange-500" />
             <span>1AM Contract Explorer</span>
-            <ExternalLink className="w-3 h-3 text-gray-400" />
+            <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
           </a>
-
 
           <button
             onClick={() => {
@@ -146,9 +146,9 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
               }
             }}
             disabled={isProofGenerating || (walletConnected && vaultBalance < 1200 && !onNavigateTab)}
-            className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-full font-bold text-xs shadow-sm transition-all shrink-0 cursor-pointer ${
+            className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full font-extrabold tracking-widest uppercase text-xs shadow-md transition-all shrink-0 cursor-pointer ${
               !walletConnected || vaultBalance >= 1200
-                ? 'bg-[#F26522] hover:bg-[#e05a1a] text-white'
+                ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:scale-[1.02] text-white shadow-orange-500/20'
                 : 'bg-amber-600 hover:bg-amber-700 text-white'
             }`}
           >
@@ -157,7 +157,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
               {!walletConnected
                 ? 'Connect Wallet'
                 : isProofGenerating
-                ? 'Proving ZK Circuit...'
+                ? 'Proving Circuit...'
                 : vaultBalance < 1200
                 ? `Insufficient Vault ($${vaultBalance}/$1,200) — Mint vUSD`
                 : 'Execute $1,200 ZK Trade'}
@@ -167,30 +167,30 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-4 shadow-sm">
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 light-glass border border-white/60 rounded-[2rem] p-5 shadow-sm relative z-10">
+        <div className="relative w-full sm:w-96">
+          <Search className="w-4 h-4 text-gray-500 absolute left-4 top-3.5" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by Trade ID, Asset, or Hash..."
-            className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-4 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 font-sans"
+            className="w-full bg-white/40 border border-white/60 rounded-[1.5rem] pl-11 pr-4 py-3 text-sm font-medium text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 font-sans shadow-inner transition-all"
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Filter className="w-3.5 h-3.5 text-gray-500" />
-          <span className="text-xs text-gray-500 font-medium">Status:</span>
-          <div className="flex bg-gray-100 rounded-xl p-1 border border-gray-200/60">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Filter className="w-4 h-4 text-gray-500" />
+          <span className="text-xs text-gray-600 font-extrabold uppercase tracking-widest">Status:</span>
+          <div className="flex bg-white/40 rounded-[1rem] p-1.5 border border-white/60 shadow-sm">
             {(['all', 'executed', 'rejected'] as const).map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${
+                className={`px-4 py-1.5 rounded-xl text-[11px] font-extrabold uppercase tracking-widest transition-all cursor-pointer ${
                   statusFilter === st
-                    ? 'light-glass text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white shadow-sm text-gray-900 scale-105'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
                 }`}
               >
                 {st}
@@ -202,26 +202,26 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
 
       {/* VIEW MODE 1: ZK CIRCUIT TRADES TABLE */}
       {viewMode === 'zk-circuits' && (
-        <div className="light-glass border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm">
+        <div className="light-glass border border-white/60 rounded-[2rem] overflow-hidden shadow-sm relative z-10">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-gray-50 text-gray-500 border-b border-gray-200 uppercase font-semibold text-[10px]">
+            <table className="w-full text-left whitespace-nowrap">
+              <thead className="bg-white/60 border-b border-white/60 uppercase font-extrabold text-[10px] tracking-widest text-gray-500">
                 <tr>
-                  <th className="p-4">Trade ID</th>
-                  <th className="p-4">Timestamp</th>
-                  <th className="p-4">Asset & Type</th>
-                  <th className="p-4">Size & Price</th>
-                  <th className="p-4">P&L</th>
-                  <th className="p-4">Midnight Explorer URL</th>
-                  <th className="p-4">Proof Time</th>
-                  <th className="p-4">RPC Status</th>
-                  <th className="p-4">Status</th>
+                  <th className="p-5">Trade ID</th>
+                  <th className="p-5">Timestamp</th>
+                  <th className="p-5">Asset & Type</th>
+                  <th className="p-5">Size & Price</th>
+                  <th className="p-5">P&L</th>
+                  <th className="p-5">Midnight Explorer URL</th>
+                  <th className="p-5">Proof Time</th>
+                  <th className="p-5">RPC Status</th>
+                  <th className="p-5">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 text-gray-800 font-medium">
+              <tbody className="divide-y divide-white/40 text-sm font-medium text-gray-800">
                 {filteredTrades.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="p-8 text-center text-gray-400 font-sans">
+                    <td colSpan={9} className="p-10 text-center text-gray-500 font-medium">
                       No trade records matching filter criteria.
                     </td>
                   </tr>
@@ -349,71 +349,72 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
 
       {/* VIEW MODE 2: EXPLORER LIVE NETWORK FEED */}
       {viewMode === '1am-explorer' && (
-        <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
+        <div className="light-glass border border-white/60 rounded-[2rem] p-6 sm:p-8 space-y-6 shadow-sm relative z-10">
           <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                <Globe className="w-4 h-4 text-orange-500" />
-                Live Midnight Explorer Stream ({net})
+            <div className="space-y-1">
+              <h2 className="text-xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
+                <Globe className="w-6 h-6 text-orange-500" />
+                Live Explorer Stream ({net})
               </h2>
-              <p className="text-xs text-gray-600">
-                Direct RPC feed from Midnight Explorer API
+              <p className="text-sm text-gray-600 font-medium">
+                Direct RPC feed from <span className="bg-white/60 px-1 py-0.5 rounded">Midnight Explorer API</span>
               </p>
             </div>
 
             <button
               onClick={loadExplorerTxs}
               disabled={isLoadingExplorer}
-              className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all cursor-pointer"
+              className="p-3 rounded-full bg-white/60 hover:bg-white border border-white/80 text-gray-700 transition-all cursor-pointer shadow-sm disabled:opacity-50"
               title="Refresh Explorer Feed"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoadingExplorer ? 'animate-spin text-orange-500' : ''}`} />
+              <RefreshCw className={`w-5 h-5 ${isLoadingExplorer ? 'animate-spin text-orange-500' : ''}`} />
             </button>
           </div>
 
-          <div className="light-glass border border-gray-200 rounded-xl overflow-hidden text-xs">
-            <table className="w-full text-left font-mono">
-              <thead className="bg-gray-50 text-gray-500 border-b border-gray-200 font-sans uppercase text-[10px]">
-                <tr>
-                  <th className="p-3.5">Transaction Hash</th>
-                  <th className="p-3.5">Block Height</th>
-                  <th className="p-3.5">Circuit Action</th>
-                  <th className="p-3.5">Network Fee</th>
-                  <th className="p-3.5">Midnight Explorer Link</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 text-gray-800">
-                {explorerTxs.map((tx) => {
-                  const cleanTx = tx.txHash.replace(/^0x/, '');
-                  const url = `https://explorer.1am.xyz/tx/${cleanTx}?network=${net}`;
-                  return (
-                    <tr key={tx.txHash} className="hover:bg-gray-50/80 transition-colors">
-                      <td className="p-3.5 font-bold text-gray-900 truncate max-w-[200px]">
-                        {tx.txHash}
-                      </td>
-                      <td className="p-3.5 text-emerald-700 font-bold">
-                        #{tx.blockHeight.toLocaleString()}
-                      </td>
-                      <td className="p-3.5">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-900 border border-gray-200">
-                          {tx.circuitName}
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-orange-700 font-semibold">{tx.fee}</td>
-                      <td className="p-3.5">
-                        <a
-                          href={url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-orange-600 hover:underline font-bold text-[11px]"
-                        >
-                          <span>Open in 1AM Explorer</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </td>
-                    </tr>
-                  );
-                })}
+          <div className="bg-white/40 border border-white/60 rounded-[1.5rem] overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left font-mono">
+                <thead className="bg-white/60 border-b border-white/60 font-sans uppercase text-[10px] tracking-widest font-extrabold text-gray-500">
+                  <tr>
+                    <th className="p-5">Transaction Hash</th>
+                    <th className="p-5">Block Height</th>
+                    <th className="p-5">Circuit Action</th>
+                    <th className="p-5">Network Fee</th>
+                    <th className="p-5">Midnight Explorer Link</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/40 text-sm font-medium text-gray-800">
+                  {explorerTxs.map((tx) => {
+                    const cleanTx = tx.txHash.replace(/^0x/, '');
+                    const url = `https://explorer.1am.xyz/tx/${cleanTx}?network=${net}`;
+                    return (
+                      <tr key={tx.txHash} className="hover:bg-white/50 transition-colors">
+                        <td className="p-5 font-extrabold text-gray-900 truncate max-w-[200px]">
+                          {tx.txHash}
+                        </td>
+                        <td className="p-5 text-emerald-700 font-extrabold">
+                          #{tx.blockHeight.toLocaleString()}
+                        </td>
+                        <td className="p-5">
+                          <span className="px-3 py-1 rounded-md text-[11px] font-extrabold bg-white/60 text-gray-900 border border-white/60 uppercase tracking-widest font-sans">
+                            {tx.circuitName}
+                          </span>
+                        </td>
+                        <td className="p-5 text-orange-700 font-extrabold">{tx.fee}</td>
+                        <td className="p-5">
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 text-orange-600 hover:text-orange-700 hover:underline font-extrabold text-xs font-sans tracking-wide"
+                          >
+                            <span>Open in 1AM Explorer</span>
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </td>
+                      </tr>
+                    );
+                  })}
 
               </tbody>
             </table>

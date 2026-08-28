@@ -108,33 +108,27 @@ export const MarketChart: React.FC<MarketChartProps> = ({
   const displayTime = hoveredPoint ? formatISTDateTime(hoveredPoint.timestamp) : formatISTDateTime(Date.now());
 
   return (
-    <div className="light-glass border border-gray-200/80 rounded-2xl p-5 sm:p-6 space-y-5 shadow-sm font-sans">
-      {/* Header with Asset Selector & Timeframe Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-orange-500" />
-            <h2 className="text-sm font-extrabold text-gray-900 uppercase tracking-wide">
-              Market Price & Volatility Analytics
-            </h2>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold uppercase">
-              LIVE IST FEED
-            </span>
-          </div>
-          <p className="text-xs text-gray-500">
-            Real-time oracle price graph & zero-knowledge position metrics.
-          </p>
+    <div className="light-glass border border-white/60 rounded-[2rem] p-6 sm:p-8 space-y-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden font-sans group">
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-orange-400/10 blur-3xl rounded-full -mr-10 -mt-10 pointer-events-none" />
+
+      {/* Header and Timeframe Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+        <div className="flex items-center gap-3">
+          <Activity className="w-5 h-5 text-orange-500" />
+          <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">
+            Live Market Oracles
+          </h2>
         </div>
 
-        {/* Timeframe selector */}
-        <div className="flex items-center gap-1.5 self-start sm:self-auto bg-gray-100 p-1 rounded-xl border border-gray-200/60">
+        <div className="flex items-center gap-1.5 self-start sm:self-auto bg-white/40 p-1.5 rounded-2xl border border-white/60 shadow-sm">
           {(['1D', '1W', '1M', '1Y'] as const).map((tf) => (
             <button
               key={tf}
               onClick={() => setTimeframe(tf)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 timeframe === tf
-                  ? 'light-glass text-gray-900 shadow-xs'
+                  ? 'bg-white shadow-sm text-gray-900'
                   : 'text-gray-500 hover:text-gray-900'
               }`}
             >
@@ -145,7 +139,7 @@ export const MarketChart: React.FC<MarketChartProps> = ({
       </div>
 
       {/* Asset Selector Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      <div className="flex items-center gap-3 overflow-x-auto pb-2 relative z-10 scrollbar-hide">
         {['ADA', 'BTC', 'ETH', 'SOL', 'tNIGHT'].map((sym) => {
           const isSelected = selectedAsset === sym;
           const aData = marketData.find((m) => m.symbol === sym);
@@ -157,22 +151,22 @@ export const MarketChart: React.FC<MarketChartProps> = ({
                 setSelectedAsset(sym);
                 setHoveredPoint(null);
               }}
-              className={`px-3.5 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 ${
+              className={`px-5 py-2.5 rounded-[1rem] border text-xs font-extrabold tracking-widest transition-all cursor-pointer shrink-0 flex items-center gap-3 ${
                 isSelected
-                  ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
-                  : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
+                  ? 'bg-gray-900 text-white border-gray-900 shadow-md scale-105'
+                  : 'bg-white/40 hover:bg-white/70 text-gray-700 border-white/60 hover:scale-[1.02]'
               }`}
             >
               <span>{sym}</span>
               <span
-                className={`text-[10px] ${
+                className={`text-[10px] px-2 py-0.5 rounded-md ${
                   isSelected
                     ? chg >= 0
-                      ? 'text-emerald-300'
-                      : 'text-red-300'
+                      ? 'bg-emerald-500/20 text-emerald-300'
+                      : 'bg-red-500/20 text-red-300'
                     : chg >= 0
-                    ? 'text-emerald-700'
-                    : 'text-red-600'
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : 'bg-red-50 text-red-600'
                 }`}
               >
                 {chg >= 0 ? '+' : ''}
@@ -184,67 +178,67 @@ export const MarketChart: React.FC<MarketChartProps> = ({
       </div>
 
       {/* Live Metric Display & Price Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 bg-gradient-to-r from-gray-50 via-white to-gray-50 p-4 rounded-2xl border border-gray-200/80">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 bg-white/40 p-6 rounded-[2rem] border border-white/60 relative z-10 shadow-sm">
         <div className="space-y-1">
-          <div className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">
+          <div className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">
             {currentAsset.name} ({selectedAsset}/USD)
           </div>
-          <div className="flex items-baseline gap-3">
-            <span className="text-3xl font-extrabold text-gray-900 tracking-tight font-mono">
+          <div className="flex items-baseline gap-4 pt-1">
+            <span className="text-5xl font-extrabold text-gray-900 tracking-tight font-mono">
               ${displayPrice.toLocaleString(undefined, { minimumFractionDigits: displayPrice < 1 ? 4 : 2 })}
             </span>
             <span
-              className={`text-xs font-bold flex items-center gap-0.5 px-2.5 py-1 rounded-full ${
-                isPositive ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+              className={`text-sm font-extrabold flex items-center gap-1 px-3 py-1 rounded-full ${
+                isPositive ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'
               }`}
             >
-              {isPositive ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+              {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
               {isPositive ? '+' : ''}
               {currentAsset.change24h}% (24h)
             </span>
           </div>
-          <div className="text-[11px] text-gray-500 font-mono flex items-center gap-1.5 pt-0.5">
+          <div className="text-[11px] text-gray-500 font-mono flex items-center gap-2 pt-2">
             <span>Timestamp (IST):</span>
-            <span className="font-semibold text-gray-700">{displayTime}</span>
+            <span className="font-bold text-gray-700 bg-white/60 px-2 py-0.5 rounded-md">{displayTime}</span>
           </div>
         </div>
 
         {/* 24h Mini Stats */}
-        <div className="grid grid-cols-3 gap-2 text-left text-xs light-glass p-2.5 rounded-xl border border-gray-200 shrink-0">
+        <div className="grid grid-cols-3 gap-4 text-left text-xs bg-white/60 p-4 rounded-2xl border border-white/60 shrink-0 shadow-sm">
           <div>
-            <span className="text-[10px] text-gray-400 block font-medium">24h High</span>
-            <span className="font-bold text-gray-900 font-mono">${currentAsset.high24h}</span>
+            <span className="text-[10px] text-gray-500 block font-bold uppercase tracking-widest mb-1">24h High</span>
+            <span className="font-extrabold text-gray-900 font-mono text-sm">${currentAsset.high24h}</span>
           </div>
           <div>
-            <span className="text-[10px] text-gray-400 block font-medium">24h Low</span>
-            <span className="font-bold text-gray-900 font-mono">${currentAsset.low24h}</span>
+            <span className="text-[10px] text-gray-500 block font-bold uppercase tracking-widest mb-1">24h Low</span>
+            <span className="font-extrabold text-gray-900 font-mono text-sm">${currentAsset.low24h}</span>
           </div>
           <div>
-            <span className="text-[10px] text-gray-400 block font-medium">24h Volume</span>
-            <span className="font-bold text-gray-900 font-mono">{currentAsset.volume24h}</span>
+            <span className="text-[10px] text-gray-500 block font-bold uppercase tracking-widest mb-1">24h Vol</span>
+            <span className="font-extrabold text-gray-900 font-mono text-sm">{currentAsset.volume24h}</span>
           </div>
         </div>
       </div>
 
       {/* SVG Interactive Area Chart */}
-      <div className="relative light-glass rounded-xl border border-gray-200/70 p-2 overflow-hidden">
+      <div className="relative bg-white/40 rounded-[2rem] border border-white/60 p-4 overflow-hidden relative z-10 shadow-sm">
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          className="w-full h-48 sm:h-56 cursor-crosshair select-none"
+          className="w-full h-48 sm:h-64 cursor-crosshair select-none"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         >
           <defs>
             <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={isPositive ? '#10B981' : '#F97316'} stopOpacity="0.28" />
+              <stop offset="0%" stopColor={isPositive ? '#10B981' : '#F97316'} stopOpacity="0.35" />
               <stop offset="100%" stopColor={isPositive ? '#10B981' : '#F97316'} stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
           {/* Grid lines */}
-          <line x1={paddingX} y1={paddingY} x2={width - paddingX} y2={paddingY} stroke="#f3f4f6" strokeWidth="1" strokeDasharray="3 3" />
-          <line x1={paddingX} y1={height / 2} x2={width - paddingX} y2={height / 2} stroke="#f3f4f6" strokeWidth="1" strokeDasharray="3 3" />
-          <line x1={paddingX} y1={height - paddingY} x2={width - paddingX} y2={height - paddingY} stroke="#e5e7eb" strokeWidth="1" />
+          <line x1={paddingX} y1={paddingY} x2={width - paddingX} y2={paddingY} stroke="#ffffff" strokeWidth="2" strokeDasharray="4 4" />
+          <line x1={paddingX} y1={height / 2} x2={width - paddingX} y2={height / 2} stroke="#ffffff" strokeWidth="2" strokeDasharray="4 4" />
+          <line x1={paddingX} y1={height - paddingY} x2={width - paddingX} y2={height - paddingY} stroke="#ffffff" strokeWidth="2" />
 
           {/* Area fill */}
           {areaString && <polygon points={areaString} fill="url(#chartGradient)" />}
@@ -255,17 +249,18 @@ export const MarketChart: React.FC<MarketChartProps> = ({
               points={pointsString}
               fill="none"
               stroke={isPositive ? '#059669' : '#EA580C'}
-              strokeWidth="2.5"
+              strokeWidth="3.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              className="drop-shadow-md"
             />
           )}
 
           {/* Min and Max Labels */}
-          <text x={paddingX} y={paddingY - 8} fontSize="9" fill="#9ca3af" fontFamily="monospace">
+          <text x={paddingX} y={paddingY - 12} fontSize="10" fill="#6b7280" fontFamily="monospace" fontWeight="bold">
             MAX: ${maxPrice.toLocaleString()}
           </text>
-          <text x={paddingX} y={height - 6} fontSize="9" fill="#9ca3af" fontFamily="monospace">
+          <text x={paddingX} y={height - 6} fontSize="10" fill="#6b7280" fontFamily="monospace" fontWeight="bold">
             MIN: ${minPrice.toLocaleString()}
           </text>
 
@@ -278,8 +273,8 @@ export const MarketChart: React.FC<MarketChartProps> = ({
                 const y = height - paddingY - ((hoveredPoint.price - minPrice) / priceRange) * (height - 2 * paddingY);
                 return (
                   <>
-                    <line x1={x} y1={paddingY} x2={x} y2={height - paddingY} stroke="#9ca3af" strokeWidth="1" strokeDasharray="2 2" />
-                    <circle cx={x} cy={y} r="5" fill={isPositive ? '#059669' : '#EA580C'} stroke="#ffffff" strokeWidth="2" />
+                    <line x1={x} y1={paddingY} x2={x} y2={height - paddingY} stroke="#9ca3af" strokeWidth="1.5" strokeDasharray="4 4" />
+                    <circle cx={x} cy={y} r="6" fill={isPositive ? '#059669' : '#EA580C'} stroke="#ffffff" strokeWidth="3" className="drop-shadow-sm" />
                   </>
                 );
               })()}
@@ -289,9 +284,9 @@ export const MarketChart: React.FC<MarketChartProps> = ({
       </div>
 
       {/* Chart Footer with Trade CTA */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-        <div className="flex items-center gap-2 text-xs text-gray-600">
-          <Sparkles className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 relative z-10 border-t border-white/40">
+        <div className="flex items-center gap-3 text-sm text-gray-700 bg-white/40 px-4 py-2 rounded-xl border border-white/60 font-semibold shadow-sm">
+          <Sparkles className="w-5 h-5 text-orange-500 shrink-0" />
           <span>
             {currentAsset.reasoning}
           </span>
@@ -300,10 +295,10 @@ export const MarketChart: React.FC<MarketChartProps> = ({
         {onNavigateTab && (
           <button
             onClick={() => onNavigateTab('market-insights')}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-gray-900 hover:bg-black text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs shrink-0"
+            className="w-full sm:w-auto px-6 py-3 rounded-full bg-gradient-to-r from-gray-900 to-gray-800 hover:scale-[1.02] text-white text-[13px] font-extrabold tracking-widest uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-gray-900/20 shrink-0"
           >
             <span>Trade {selectedAsset} in Market Insights</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <ArrowUpRight className="w-4 h-4 text-orange-400" />
           </button>
         )}
       </div>

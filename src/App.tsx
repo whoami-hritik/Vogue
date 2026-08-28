@@ -211,42 +211,47 @@ export function App() {
               )}
 
               {/* Top Balance Cards: Public Wallet vs Shielded Vault */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
-                  <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">WALLET TNIGHT (UNSHIELDED)</span>
-                  <div className="flex items-baseline gap-2 pt-1 min-w-0">
-                    <span className="text-xl sm:text-2xl font-extrabold text-gray-900 truncate">{unshieldedBalance}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="light-glass border border-white/60 rounded-[2rem] p-6 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gray-400/10 blur-2xl rounded-full -mr-8 -mt-8" />
+                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">WALLET TNIGHT</span>
+                  <div className="flex items-baseline gap-2 min-w-0 pt-2">
+                    <span className="text-3xl sm:text-4xl font-extrabold text-gray-900 truncate tracking-tight">{unshieldedBalance}</span>
                   </div>
-                  <span className="text-[11px] text-gray-500 font-medium block pt-1">↑ Public 1AM Wallet</span>
+                  <span className="text-[10px] text-gray-500 font-medium block pt-1 uppercase tracking-wider">↑ Public 1AM Wallet</span>
                 </div>
 
-                <div className="light-glass border border-orange-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
-                  <span className="text-[11px] text-orange-600 font-semibold uppercase tracking-wider flex items-center gap-1">
-                    <Lock className="w-3.5 h-3.5 text-orange-500" /> SHIELDED VAULT (vUSD)
+                <div className="light-glass border border-white/60 rounded-[2rem] p-6 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-400/5 to-transparent pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-orange-400/20 blur-3xl rounded-full -mr-8 -mt-8" />
+                  <span className="text-[10px] text-orange-600 font-bold uppercase tracking-widest flex items-center gap-1.5">
+                    <Lock className="w-3 h-3 text-orange-500" /> SHIELDED VAULT
                   </span>
-                  <div className="flex items-baseline gap-2 pt-1 min-w-0">
-                    <span className="text-xl sm:text-2xl font-extrabold text-gray-900 truncate">${vaultBalance.toLocaleString()}</span>
-                    <span className="text-xs text-orange-600 font-bold shrink-0">vUSD</span>
+                  <div className="flex items-baseline gap-1.5 min-w-0 pt-2">
+                    <span className="text-3xl sm:text-4xl font-extrabold text-gray-900 truncate tracking-tight">${vaultBalance.toLocaleString()}</span>
+                    <span className="text-xs text-orange-600 font-extrabold shrink-0 uppercase">vUSD</span>
                   </div>
-                  <span className="text-[11px] text-emerald-700 font-medium block pt-1">
+                  <span className="text-[10px] text-emerald-700 font-bold block pt-1 uppercase tracking-wider">
                     {vaultBalance > 0 ? '↑ Active Trading Capital' : '↑ Mint via Vault Tab'}
                   </span>
                 </div>
 
-                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
-                  <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">SHIELDED TNIGHT NOTE</span>
-                  <div className="flex items-baseline gap-2 pt-1 min-w-0">
-                    <span className="text-xl sm:text-2xl font-extrabold text-gray-900 truncate">{shieldedBalance}</span>
+                <div className="light-glass border border-white/60 rounded-[2rem] p-6 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-400/10 blur-2xl rounded-full -mr-8 -mt-8" />
+                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">SHIELDED NOTE</span>
+                  <div className="flex items-baseline gap-2 min-w-0 pt-2">
+                    <span className="text-3xl sm:text-4xl font-extrabold text-gray-900 truncate tracking-tight">{shieldedBalance}</span>
                   </div>
-                  <span className="text-[11px] text-emerald-700 font-medium block pt-1">↑ Private ZK Note</span>
+                  <span className="text-[10px] text-emerald-700 font-bold block pt-1 uppercase tracking-wider">↑ Private ZK Note</span>
                 </div>
 
-                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
-                  <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">TDUST FUEL RESERVE</span>
-                  <div className="flex items-baseline gap-2 pt-1 min-w-0">
-                    <span className="text-xl sm:text-2xl font-extrabold text-emerald-700 truncate">{dustBalance}</span>
+                <div className="light-glass border border-white/60 rounded-[2rem] p-6 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-teal-400/10 blur-2xl rounded-full -mr-8 -mt-8" />
+                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">TDUST FUEL</span>
+                  <div className="flex items-baseline gap-2 min-w-0 pt-2">
+                    <span className="text-3xl sm:text-4xl font-extrabold text-emerald-700 truncate tracking-tight">{dustBalance}</span>
                   </div>
-                  <span className="text-[11px] text-emerald-700 font-medium block pt-1">↑ ProofStation Ready</span>
+                  <span className="text-[10px] text-emerald-700 font-bold block pt-1 uppercase tracking-wider">↑ ProofStation Ready</span>
                 </div>
               </div>
 
@@ -340,281 +345,239 @@ export function App() {
         {activeTab === 'withdraw' && (
           <div className="max-w-4xl mx-auto space-y-6 font-sans">
             {/* Top Vault & Wallet Overview Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm">
-              <div className="space-y-1">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+              <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Lock className="w-5 h-5 text-orange-500" />
-                  <h1 className="text-xl font-extrabold text-gray-900">
-                    Shielded Vault & Wallet Token Balances
+                  <Lock className="w-6 h-6 text-orange-500" />
+                  <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+                    Shielded Vault
                   </h1>
-                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-800 font-bold uppercase">
-                    1AM ZERO-KNOWLEDGE LEDGER
-                  </span>
                 </div>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Manage your private USDC-equivalent trading vault (<code className="font-mono font-bold text-gray-900">vUSD</code>) and review all token balances in your connected 1AM wallet.
+                <p className="text-sm text-gray-600 font-medium max-w-xl">
+                  Manage your private USDC-equivalent trading vault and review all token balances in your connected 1AM wallet.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 p-2 rounded-xl text-xs shrink-0 font-mono">
-                <span className="text-gray-500">Wallet:</span>
-                <span className="font-bold text-orange-600">{displayGreetingAddr}</span>
+              <div className="flex items-center gap-3 bg-white/40 border border-white/60 p-3 rounded-2xl text-xs shrink-0 font-mono shadow-sm">
+                <span className="text-gray-500 font-bold uppercase tracking-wider">Wallet</span>
+                <span className="font-extrabold text-orange-600 bg-white/60 px-3 py-1 rounded-xl">{displayGreetingAddr}</span>
               </div>
             </div>
 
             {/* Comprehensive Connected Wallet Token Matrix */}
-            <div className="space-y-3">
+            <div className="space-y-4 mb-10">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Connected Wallet & Shielded Token Balances
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest">
+                  Wallet Balances
                 </h3>
-                <span className="text-[11px] text-gray-500">Auto-synced with 1AM Extension & Midnight {networkId === 'preprod' ? 'Preprod' : 'Preview'}</span>
+                <span className="text-[11px] text-gray-500 font-bold bg-white/40 px-3 py-1 rounded-full border border-white/60 shadow-sm">Auto-synced with 1AM {networkId === 'preprod' ? 'Preprod' : 'Preview'}</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* 1. Public Unshielded tNIGHT */}
-                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-2 shadow-sm overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">WALLET TNIGHT</span>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 font-bold">UNSHIELDED</span>
+                <div className="light-glass border border-white/60 rounded-[2rem] p-6 space-y-4 shadow-sm overflow-hidden relative group">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gray-400/10 blur-2xl rounded-full -mr-6 -mt-6" />
+                  <div className="flex items-center justify-between relative z-10">
+                    <span className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">TNIGHT</span>
+                    <span className="text-[10px] px-2.5 py-1 rounded-full bg-white/60 border border-gray-200 text-gray-800 font-bold shadow-sm">UNSHIELDED</span>
                   </div>
-                  <div className="flex items-baseline gap-1.5 min-w-0">
-                    <span className="text-xl sm:text-2xl font-extrabold text-gray-900 truncate">{unshieldedBalance}</span>
+                  <div className="flex items-baseline gap-1.5 min-w-0 relative z-10">
+                    <span className="text-4xl font-extrabold text-gray-900 truncate tracking-tight">{unshieldedBalance}</span>
                   </div>
-                  <div className="text-[11px] text-gray-500 flex items-center justify-between pt-1 border-t border-gray-100">
-                    <span>Public 1AM Key</span>
+                  <div className="text-[11px] text-gray-500 flex items-center justify-between pt-3 border-t border-white/40 relative z-10">
+                    <span className="font-semibold">Public 1AM Key</span>
                     <button
                       onClick={() => setMintAmount('500')}
-                      className="text-orange-600 hover:underline font-bold text-[10px] cursor-pointer"
+                      className="text-orange-600 hover:text-orange-700 font-bold text-[11px] cursor-pointer flex items-center gap-1 group-hover:translate-x-1 transition-transform"
                     >
-                      Shield →
+                      Shield <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 </div>
 
                 {/* 2. Shielded Private Note */}
-                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-2 shadow-sm overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">SHIELDED TNIGHT</span>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">ZK PRIVATE</span>
+                <div className="light-glass border border-white/60 rounded-[2rem] p-6 space-y-4 shadow-sm overflow-hidden relative">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-400/10 blur-2xl rounded-full -mr-6 -mt-6" />
+                  <div className="flex items-center justify-between relative z-10">
+                    <span className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">TNIGHT</span>
+                    <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold shadow-sm">ZK PRIVATE</span>
                   </div>
-                  <div className="flex items-baseline gap-1.5 min-w-0">
-                    <span className="text-xl sm:text-2xl font-extrabold text-emerald-700 truncate">{shieldedBalance}</span>
+                  <div className="flex items-baseline gap-1.5 min-w-0 relative z-10">
+                    <span className="text-4xl font-extrabold text-emerald-700 truncate tracking-tight">{shieldedBalance}</span>
                   </div>
-                  <div className="text-[11px] text-emerald-700 flex items-center justify-between pt-1 border-t border-gray-100 font-medium">
+                  <div className="text-[11px] text-emerald-700 flex items-center justify-between pt-3 border-t border-white/40 font-semibold relative z-10">
                     <span>Private State Note</span>
                     <span>Encrypted</span>
                   </div>
                 </div>
 
                 {/* 3. Shielded Trading Vault (vUSD) */}
-                <div className="light-glass border border-orange-200 rounded-2xl p-5 space-y-2 shadow-sm ring-1 ring-orange-500/20 overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-orange-600 font-bold uppercase tracking-wider flex items-center gap-1">
-                      <Lock className="w-3 h-3 text-orange-500" /> TRADING VAULT
+                <div className="light-glass border border-orange-300/60 rounded-[2rem] p-6 space-y-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-400/10 to-transparent pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-orange-400/20 blur-2xl rounded-full -mr-6 -mt-6" />
+                  <div className="flex items-center justify-between relative z-10">
+                    <span className="text-[11px] text-orange-600 font-bold uppercase tracking-widest flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-orange-500" /> VAULT
                     </span>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 font-bold">vUSD</span>
+                    <span className="text-[10px] px-2.5 py-1 rounded-full bg-orange-100 border border-orange-200 text-orange-800 font-bold shadow-sm">vUSD</span>
                   </div>
-                  <div className="flex items-baseline gap-1.5 min-w-0">
-                    <span className="text-xl sm:text-2xl font-extrabold text-gray-900 truncate">${vaultBalance.toLocaleString()}</span>
-                    <span className="text-xs text-orange-600 font-bold shrink-0">vUSD</span>
+                  <div className="flex items-baseline gap-1.5 min-w-0 relative z-10">
+                    <span className="text-4xl font-extrabold text-gray-900 truncate tracking-tight">${vaultBalance.toLocaleString()}</span>
                   </div>
-                  <div className="text-[11px] text-emerald-700 flex items-center justify-between pt-1 border-t border-orange-100 font-medium">
+                  <div className="text-[11px] text-emerald-700 flex items-center justify-between pt-3 border-t border-white/40 font-semibold relative z-10">
                     <span>Active Capital</span>
                     <span>ZK Trade Ready</span>
                   </div>
                 </div>
 
                 {/* 4. tDUST Reserve */}
-                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-2 shadow-sm overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">TDUST RESERVE</span>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">GAS FUEL</span>
+                <div className="light-glass border border-white/60 rounded-[2rem] p-6 space-y-4 shadow-sm overflow-hidden relative">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-teal-400/10 blur-2xl rounded-full -mr-6 -mt-6" />
+                  <div className="flex items-center justify-between relative z-10">
+                    <span className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">TDUST</span>
+                    <span className="text-[10px] px-2.5 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 font-bold shadow-sm">GAS FUEL</span>
                   </div>
-                  <div className="flex items-baseline gap-1.5 min-w-0">
-                    <span className="text-xl sm:text-2xl font-extrabold text-emerald-700 truncate">{dustBalance}</span>
+                  <div className="flex items-baseline gap-1.5 min-w-0 relative z-10">
+                    <span className="text-4xl font-extrabold text-teal-700 truncate tracking-tight">{dustBalance}</span>
                   </div>
-                  <div className="text-[11px] text-gray-500 flex items-center justify-between pt-1 border-t border-gray-100">
+                  <div className="text-[11px] text-gray-500 flex items-center justify-between pt-3 border-t border-white/40 font-semibold relative z-10">
                     <span>ProofStation</span>
-                    <span className="text-emerald-700 font-bold">Ready</span>
+                    <span className="text-teal-700 font-bold">Ready</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Vault Mint / Burn Interactive Section */}
-            <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
-              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-                <div className="space-y-0.5">
-                  <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                    <PlusCircle className="w-4 h-4 text-emerald-600" />
-                    Shield & Unshield Vault Collateral
-                  </h2>
-                  <p className="text-xs text-gray-500">
-                    Deposit public collateral into shielded <code className="font-mono text-gray-900">vUSD</code> notes or burn back to public balance.
-                  </p>
-                </div>
-
-                <span className="text-xs font-bold text-gray-900 bg-gray-100 px-3 py-1 rounded-full font-mono">
-                  Vault Balance: ${vaultBalance.toLocaleString()} vUSD
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* 1. MINT CARD */}
-                <div className="bg-gradient-to-br from-emerald-50/40 via-white to-gray-50 p-5 rounded-2xl border border-emerald-200/80 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-emerald-900 flex items-center gap-1.5 uppercase tracking-wide">
-                      <PlusCircle className="w-4 h-4 text-emerald-600" /> Mint to Shielded Vault
+                <div className="light-glass border border-white/60 p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-400/10 blur-3xl rounded-full -mr-10 -mt-10 pointer-events-none" />
+                  
+                  <div className="flex items-center justify-between mb-8 relative z-10">
+                    <span className="text-sm font-extrabold text-emerald-950 flex items-center gap-2 uppercase tracking-widest">
+                      <PlusCircle className="w-5 h-5 text-emerald-600" /> Mint to Vault
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                    <span className="text-[10px] px-3 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-200 text-emerald-800 font-extrabold tracking-widest shadow-sm">
                       DEPOSIT
                     </span>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-semibold text-gray-600 block">Amount to Mint (USD)</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-gray-500 font-bold font-mono">$</span>
+                  <div className="flex-1 flex flex-col items-center justify-center space-y-6 relative z-10">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <span className="text-4xl font-bold text-gray-400">$</span>
                       <input
                         type="number"
                         min="1"
                         value={mintAmount}
                         onChange={(e) => setMintAmount(e.target.value)}
-                        className="w-full light-glass border border-gray-200 rounded-xl pl-7 pr-4 py-2.5 text-xs text-gray-900 font-mono font-bold focus:outline-none focus:border-emerald-500"
-                        placeholder="250"
+                        className="w-48 bg-transparent text-gray-900 font-extrabold text-6xl tracking-tight text-center focus:outline-none appearance-none"
+                        placeholder="0"
                       />
+                    </div>
+                    
+                    {/* Preset Amount Chips */}
+                    <div className="flex items-center justify-center gap-2 w-full">
+                      {['100', '250', '500', '1000'].map((amt) => (
+                        <button
+                          key={amt}
+                          onClick={() => setMintAmount(amt)}
+                          className="px-4 py-2 rounded-xl bg-white/40 hover:bg-white/70 text-xs font-bold text-gray-700 border border-white/60 transition-all cursor-pointer shadow-sm"
+                        >
+                          +${amt}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Preset Amount Chips */}
-                  <div className="flex items-center gap-1.5">
-                    {['100', '250', '500', '1000'].map((amt) => (
-                      <button
-                        key={amt}
-                        onClick={() => setMintAmount(amt)}
-                        className="flex-1 py-1 rounded-lg light-glass hover:bg-emerald-50 text-[11px] font-bold text-gray-700 border border-gray-200 transition-all cursor-pointer"
-                      >
-                        +${amt}
-                      </button>
-                    ))}
+                  <div className="mt-8 relative z-10">
+                    <button
+                      onClick={() => mintVault(parseFloat(mintAmount) || 100)}
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:scale-[1.01] text-white font-extrabold text-[13px] tracking-widest uppercase transition-all cursor-pointer shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                    >
+                      <PlusCircle className="w-5 h-5" />
+                      <span>Mint ${mintAmount || '0'} vUSD</span>
+                    </button>
                   </div>
-
-                  <button
-                    onClick={() => mintVault(parseFloat(mintAmount) || 100)}
-                    className="w-full py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
-                  >
-                    <PlusCircle className="w-4 h-4" />
-                    <span>Mint ${mintAmount || '0'} vUSD to Vault</span>
-                  </button>
                 </div>
 
-                {/* 2. BURN CARD */}
-                <div className="bg-gradient-to-br from-red-50/40 via-white to-gray-50 p-5 rounded-2xl border border-red-200/80 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-red-900 flex items-center gap-1.5 uppercase tracking-wide">
-                      <MinusCircle className="w-4 h-4 text-red-600" /> Burn from Shielded Vault
+                {/* 2. BURN & WITHDRAW CARD */}
+                <div className="light-glass border border-white/60 p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-400/5 to-transparent pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-orange-400/10 blur-3xl rounded-full -mr-10 -mt-10 pointer-events-none" />
+                  
+                  <div className="flex items-center justify-between mb-8 relative z-10">
+                    <span className="text-sm font-extrabold text-gray-900 flex items-center gap-2 uppercase tracking-widest">
+                      <ArrowUpRight className="w-5 h-5 text-orange-500" /> Unshield & Withdraw
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-100 text-red-800 font-bold">
+                    <span className="text-[10px] px-3 py-1.5 rounded-full bg-white/60 border border-gray-200 text-gray-800 font-extrabold tracking-widest shadow-sm">
                       WITHDRAW
                     </span>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-semibold text-gray-600 block">Amount to Burn (USD)</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-gray-500 font-bold font-mono">$</span>
+                  <div className="flex-1 flex flex-col items-center justify-center space-y-6 relative z-10">
+                    <div className="w-full flex items-center justify-center gap-2">
+                      <span className="text-4xl font-bold text-gray-400">$</span>
                       <input
                         type="number"
                         min="1"
                         max={vaultBalance}
                         value={withdrawAmount}
                         onChange={(e) => setWithdrawAmount(e.target.value)}
-                        className="w-full light-glass border border-gray-200 rounded-xl pl-7 pr-4 py-2.5 text-xs text-gray-900 font-mono font-bold focus:outline-none focus:border-red-500"
-                        placeholder="500"
+                        className="w-48 bg-transparent text-gray-900 font-extrabold text-6xl tracking-tight text-center focus:outline-none appearance-none"
+                        placeholder="0"
                       />
+                    </div>
+                    
+                    {/* Preset Amount Chips */}
+                    <div className="flex items-center justify-center gap-2 w-full">
+                      {['100', '250', '500'].map((amt) => (
+                        <button
+                          key={amt}
+                          onClick={() => setWithdrawAmount(amt)}
+                          className="px-4 py-2 rounded-xl bg-white/40 hover:bg-white/70 text-xs font-bold text-gray-700 border border-white/60 transition-all cursor-pointer shadow-sm"
+                        >
+                          -${amt}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => setWithdrawAmount(vaultBalance.toString())}
+                        className="px-4 py-2 rounded-xl bg-orange-100 hover:bg-orange-200 text-xs font-extrabold text-orange-800 border border-orange-200 transition-all cursor-pointer shadow-sm"
+                      >
+                        MAX
+                      </button>
                     </div>
                   </div>
 
-                  {/* Preset Amount Chips */}
-                  <div className="flex items-center gap-1.5">
-                    {['100', '250', '500'].map((amt) => (
+                  <div className="mt-8 relative z-10 space-y-4">
+                    <form onSubmit={handleWithdrawSubmit} className="w-full">
                       <button
-                        key={amt}
-                        onClick={() => setWithdrawAmount(amt)}
-                        className="flex-1 py-1 rounded-lg light-glass hover:bg-red-50 text-[11px] font-bold text-gray-700 border border-gray-200 transition-all cursor-pointer"
+                        type="submit"
+                        disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > vaultBalance}
+                        className={`w-full py-4 rounded-2xl font-extrabold text-[13px] tracking-widest uppercase transition-all flex items-center justify-center gap-2 ${
+                          !withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > vaultBalance
+                            ? 'bg-white/40 border border-white/60 text-gray-400 cursor-not-allowed'
+                            : 'bg-gray-900 hover:bg-black text-white cursor-pointer shadow-lg hover:scale-[1.01]'
+                        }`}
                       >
-                        -${amt}
+                        <ArrowUpRight className={`w-5 h-5 ${(!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > vaultBalance) ? 'text-gray-400' : 'text-orange-400'}`} />
+                        <span>Execute Unshield via 1AM</span>
                       </button>
-                    ))}
-                    <button
-                      onClick={() => setWithdrawAmount(vaultBalance.toString())}
-                      className="flex-1 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-[11px] font-extrabold text-red-800 border border-red-200 transition-all cursor-pointer"
-                    >
-                      Max
-                    </button>
-                  </div>
+                    </form>
 
-                  <button
-                    onClick={() => burnVault(parseFloat(withdrawAmount) || 100)}
-                    disabled={vaultBalance <= 0 || parseFloat(withdrawAmount) > vaultBalance}
-                    className={`w-full py-2.5 rounded-full font-bold text-xs transition-all shadow-xs flex items-center justify-center gap-1.5 ${
-                      vaultBalance > 0 && parseFloat(withdrawAmount) <= vaultBalance
-                        ? 'bg-red-600 hover:bg-red-700 text-white cursor-pointer'
-                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
-                  >
-                    <MinusCircle className="w-4 h-4" />
-                    <span>Burn ${withdrawAmount || '0'} vUSD from Vault</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Unshield & Withdraw Circuit Execution */}
-            <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
-              <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                <ArrowUpRight className="w-5 h-5 text-orange-500" />
-                Unshield & Withdraw (unshieldWithdraw Compact Circuit)
-              </h2>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Executes the on-chain <code className="text-gray-900 font-mono font-semibold">unshieldWithdraw</code> circuit. Proves ownership of a private balance note in zero-knowledge and transfers public tokens back to your 1AM wallet balance.
-              </p>
-
-              <form onSubmit={handleWithdrawSubmit} className="space-y-4 pt-1">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-700">Withdraw Amount (USD Value)</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      value={withdrawAmount}
-                      onChange={(e) => setWithdrawAmount(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-900 font-mono focus:outline-none focus:border-orange-500"
-                    />
-                    <span className="text-xs font-mono text-gray-500 font-bold px-2">vUSD</span>
+                    {withdrawSuccess && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-emerald-50/80 backdrop-blur-md border border-emerald-200 text-emerald-800 p-4 rounded-2xl text-xs flex items-center gap-3 font-semibold shadow-sm"
+                      >
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                        <span>Unshield successful! Value returned to public 1AM wallet balance.</span>
+                      </motion.div>
+                    )}
                   </div>
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > vaultBalance}
-                  className={`w-full py-3 rounded-full font-semibold text-xs transition-all flex items-center justify-center gap-2 ${
-                    !withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > vaultBalance
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-900 hover:bg-black text-white cursor-pointer shadow-sm'
-                  }`}
-                >
-                  <ArrowUpRight className={`w-4 h-4 ${(!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > vaultBalance) ? 'text-gray-400' : 'text-orange-400'}`} />
-                  <span>Execute Unshield Transfer via 1AM</span>
-                </button>
-              </form>
-
-              {withdrawSuccess && (
-                <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-xl text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Unshield circuit execution successful! Value returned to public 1AM wallet balance.</span>
-                </div>
-              )}
             </div>
           </div>
         )}
