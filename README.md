@@ -12,7 +12,7 @@
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![Midnight Network](https://img.shields.io/badge/Midnight-Preprod-blueviolet)](https://midnight.network/)
   [![React](https://img.shields.io/badge/React-Vite-black)](https://react.dev/)
-  [![CI/CD](https://img.shields.io/badge/CI%2FCD-Passing-success)](https://github.com/whoami-hritik/Vogue/actions)
+  [![Vogue CI/CD Pipeline](https://github.com/whoami-hritik/Vogue/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/whoami-hritik/Vogue/actions/workflows/ci.yml)
   [![Status](https://img.shields.io/badge/Status-Live-success)](#)
   
   ### 🌐 [Live Application Demo](http://localhost:5173) | 📄 [Level 4–6 Product Proposal](./PROPOSAL.md)
@@ -108,6 +108,11 @@ Here is the complete showcase of all components of the Vogue platform, from UI d
 ### 8. Continuous Integration & Verification Pipeline
 *Automated GitHub Actions CI/CD pipeline ensuring cryptographic circuits compile cleanly and ZK risk constraints are mathematically validated on every commit.*
 <img src="./screenshots/CI%20CD.png" alt="CI CD Pipeline" width="100%" />
+
+### 9. Vitest Contract & Risk Model Suite
+*All cryptographic circuit tests and EZKL zero-knowledge risk model assertions pass � ensuring every privacy constraint is mathematically verified before deployment.*
+<img src="./screenshots/vite-test.png" alt="Vitest Test Suite" width="100%" />
+
 
 
 ---
