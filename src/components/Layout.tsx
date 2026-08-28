@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { WalletConnect } from './WalletConnect';
 import type { DetectedWallet } from '../lib/lace-wallet';
+import { GradientBackground } from './ui/pipo';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -77,7 +78,10 @@ export const Layout: React.FC<LayoutProps> = ({
   ];
 
   return (
-    <div className="min-h-screen animated-bg-light text-gray-900 flex flex-col font-sans selection:bg-orange-500 selection:text-white">
+    <div className="min-h-screen relative text-gray-900 flex flex-col font-sans selection:bg-orange-500 selection:text-white">
+      <div className="fixed inset-0 z-[-1]">
+        <GradientBackground className="h-full w-full" />
+      </div>
       {/* Top Navbar — Pill Shape Matching Landing Page */}
       <header className="w-full max-w-[1440px] mx-auto p-2 sm:p-3 sticky top-0 z-50">
         <nav className="light-glass rounded-full p-[5px] pl-3 pr-2 flex items-center justify-between shadow-sm border border-gray-200/80">
