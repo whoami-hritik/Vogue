@@ -110,86 +110,74 @@ export default function ShaderShowcase({
         />
       </div>
 
-      <header className="relative z-20 flex items-center justify-between p-6 max-w-[1440px] mx-auto">
-        <motion.div
-          className="flex items-center gap-3 group cursor-pointer"
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 400, damping: 10 }}
-        >
-          <div className="w-10 h-10 rounded-full overflow-hidden border border-white/20 bg-black flex items-center justify-center shrink-0">
-            <img
-              src="/vogue-logo.svg"
-              alt="Vogue Trade"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-extrabold text-white tracking-tight leading-none drop-shadow-md">VOGUE</span>
-            <span className="text-[10px] text-white/70 font-semibold tracking-wider uppercase">TRADE</span>
+      <header className="relative z-50 pt-4 px-4 sm:px-6 max-w-[1440px] mx-auto w-full">
+        <div className="light-glass rounded-full px-2 py-2 flex items-center justify-between shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)] border border-white/60 backdrop-blur-xl bg-white/70">
+          
+          <div className="flex items-center gap-6 pl-2">
+            {/* Logo */}
+            <motion.div
+              className="flex items-center gap-3 group cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200 shadow-sm bg-[#0a0a0b] flex items-center justify-center shrink-0">
+                <img
+                  src="/vogue-logo.svg"
+                  alt="Vogue Trade"
+                  className="w-7 h-7 object-contain group-hover:scale-105 transition-transform"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-extrabold text-gray-900 tracking-tight leading-none drop-shadow-sm">VOGUE</span>
+                <span className="text-[10px] text-gray-500 font-semibold tracking-wider uppercase mt-0.5">TRADE</span>
+              </div>
+            </motion.div>
+
+            {/* Nav Links */}
+            <nav className="hidden md:flex items-center space-x-1 border-l border-gray-300/50 pl-6 ml-2">
+              <a href="#architecture" className="text-gray-700 hover:text-black text-[13px] font-semibold px-3 py-2 rounded-full hover:bg-black/5 transition-all duration-200">
+                Architecture
+              </a>
+              <a href="#modules" className="text-gray-700 hover:text-black text-[13px] font-semibold px-3 py-2 rounded-full hover:bg-black/5 transition-all duration-200">
+                Modules
+              </a>
+              <a href="#circuits" className="text-gray-700 hover:text-black text-[13px] font-semibold px-3 py-2 rounded-full hover:bg-black/5 transition-all duration-200">
+                ZK Circuits
+              </a>
+              <a href="https://explorer.1am.xyz?network=preprod" target="_blank" rel="noreferrer" className="text-gray-700 hover:text-black text-[13px] font-semibold px-3 py-2 rounded-full hover:bg-black/5 transition-all duration-200 flex items-center gap-1.5">
+                1AM Explorer <ArrowRight className="w-3 h-3 -rotate-45 opacity-60" />
+              </a>
+            </nav>
           </div>
 
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-1 h-1 light-glass/60 rounded-full"
-                style={{
-                  left: `${20 + Math.random() * 60}%`,
-                  top: `${20 + Math.random() * 60}%`,
-                }}
-                animate={{
-                  y: [-10, -20, -10],
-                  x: [0, Math.random() * 20 - 10, 0],
-                  opacity: [0, 1, 0],
-                  scale: [0, 1, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Number.POSITIVE_INFINITY,
-                  delay: i * 0.2,
-                  ease: "easeInOut",
-                }}
-              />
-            ))}
+          <div className="flex items-center gap-3 pr-1">
+            {/* Status Pills */}
+            <div className="hidden lg:flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-100 text-emerald-700 text-xs font-semibold backdrop-blur-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Midnight Preprod & Preview Live
+              </div>
+              
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200/60 text-gray-600 text-xs font-medium backdrop-blur-md">
+                <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date())} in London
+              </div>
+            </div>
+
+            {/* Launch Button */}
+            <button 
+              onClick={walletConnected ? onEnterDashboard : onConnectWallet}
+              className="group relative flex items-center gap-3 bg-[#0f1117] hover:bg-[#1a1d27] text-white px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs sm:text-sm transition-all duration-300 shadow-md overflow-hidden"
+            >
+              <span className="relative z-10">{walletConnected ? 'Dashboard' : 'Launch Vogue Trade'}</span>
+              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white flex items-center justify-center shrink-0 relative z-10">
+                <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-black group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </button>
           </div>
-        </motion.div>
 
-        <nav className="hidden md:flex items-center space-x-2">
-          <a
-            href="#architecture"
-            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:light-glass/10 transition-all duration-200"
-          >
-            Architecture
-          </a>
-          <a
-            href="#modules"
-            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:light-glass/10 transition-all duration-200"
-          >
-            Modules
-          </a>
-          <a
-            href="#circuits"
-            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:light-glass/10 transition-all duration-200"
-          >
-            ZK Circuits
-          </a>
-          <a
-            href="https://explorer.1am.xyz?network=preprod"
-            target="_blank"
-            rel="noreferrer"
-            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:light-glass/10 transition-all duration-200 flex items-center gap-1"
-          >
-            1AM Explorer
-          </a>
-        </nav>
-
-        <div id="gooey-btn" className="relative flex items-center group cursor-pointer" style={{ filter: "url(#gooey-filter)" }} onClick={walletConnected ? onEnterDashboard : onConnectWallet}>
-          <button className="absolute right-0 px-2.5 py-2 rounded-full light-glass text-black font-normal text-xs transition-all duration-300 hover:light-glass/90 cursor-pointer h-10 flex items-center justify-center -translate-x-12 group-hover:-translate-x-[90px] z-0">
-            <ArrowRight className="w-4 h-4 text-black" />
-          </button>
-          <button className="px-6 py-2 rounded-full light-glass text-black font-semibold text-sm transition-all duration-300 hover:light-glass/90 cursor-pointer h-10 flex items-center z-10">
-            {walletConnected ? 'Dashboard' : '1AM Wallet'}
-          </button>
         </div>
       </header>
 
