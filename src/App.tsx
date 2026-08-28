@@ -25,8 +25,10 @@ import {
   Lock,
   PlusCircle,
   MinusCircle,
-  Clock
+  Clock,
+  ArrowRight
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('landing');

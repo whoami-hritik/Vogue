@@ -420,6 +420,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
             </table>
           </div>
         </div>
+        </div>
       )}
     </div>
   );
