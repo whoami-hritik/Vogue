@@ -101,15 +101,21 @@ Here is the complete showcase of all components of the Vogue platform, from UI d
 
 ---
 
-## 🔗 Verified On-Chain Transactions & Contracts
+## 🔐 Verified On-Chain Transactions & Contracts
 
 Vogue is fully integrated with the Midnight Network. It generates real zero-knowledge proofs and settles them on-chain.
 
+### Verifiable Deployed Smart Contracts
+
+| Network | Version | Contract Address | Explorer Link | Status |
+|---------|---------|------------------|---------------|--------|
+| Midnight Preprod Testnet | v1.2.0 | `0x2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524` | [View on 1AM Preprod Explorer ↗](https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod) | 🟢 ACTIVE PREPROD MVP |
+| Midnight Preview Testnet | v1.2.0 | `0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30` | [View on 1AM Preview Explorer ↗](https://explorer.1am.xyz/contract/33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30?network=preview) | 🟢 ACTIVE PREVIEW MVP |
+| Historical Deployment | v1.0.0 | `0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3` | [View on 1AM Explorer ↗](https://explorer.1am.xyz/contract/62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3?network=preview) | 🟡 Historical (V1) |
+
 > [!NOTE]
-> **Network & Testnet Details:** 
-> - **Primary Verified Deployment:** Midnight Preprod Testnet (Contract Address: `0x811c9dc5c23a7b9e3e7a0305f2c4166fbc4b256d5e1b206e93297a78363c9d2a`).
-> - **Wallet Integration:** Seamless connection via **1AM Wallet** and **Midnight Lace** supporting dynamic network auto-detection (Preprod & Preview).
-> - **Local Proving Engine:** Client-side proof generation via the local Midnight Proof Server (`http://127.0.0.1:6300`).
+> **Wallet Integration:** Seamless connection via **1AM Wallet** and **Midnight Lace** supporting dynamic network auto-detection (Preprod & Preview).
+> **Local Proving Engine:** Client-side proof generation via the local Midnight Proof Server (`http://127.0.0.1:6300`) or 1AM Proofstation.
 
 ### Real Transaction Hash
 *The user executed a trade that was verified by our ZK circuit and permanently settled on the Midnight network.*

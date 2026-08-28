@@ -1,0 +1,140 @@
+{
+  "circuits": [
+    {
+      "name": "commitStrategy",
+      "pure": false,
+      "arguments": [
+        {
+          "name": "agentId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "executeTrade",
+      "pure": false,
+      "arguments": [
+        {
+          "name": "agentId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "tradeId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "currentTime",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 4294967295
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "mintVaultBalance",
+      "pure": true,
+      "arguments": [
+        {
+          "name": "agentId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "depositId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "burnVaultBalance",
+      "pure": true,
+      "arguments": [
+        {
+          "name": "agentId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "burnId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "withdrawUsdcAmount",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 4294967295
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "unshieldWithdraw",
+      "pure": true,
+      "arguments": [
+        {
+          "name": "agentId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "amountUsd",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 4294967295
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    }
+  ],
+  "witnesses": [
+  ],
+  "contracts": [
+  ]
+}

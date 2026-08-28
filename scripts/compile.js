@@ -6,7 +6,7 @@ console.log('Compiling contracts/vogue.compact...');
 
 try {
   const cwd = process.cwd();
-  const cmd = `docker run --rm -v "${cwd}:/workspace" -w /workspace midnightnetwork/compactc:latest compactc contracts/vogue.compact managed/`;
+  const cmd = `docker run --rm -v "${cwd}:/workspace" -w /workspace --entrypoint compactc midnightnetwork/compactc:v0.25.0 --skip-zk contracts/vogue.compact managed/`;
   execSync(cmd, { stdio: 'inherit' });
   console.log('Compact contract compiled successfully via Docker.');
 } catch (err) {

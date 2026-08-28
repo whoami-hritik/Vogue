@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.cjs",
+  "sourceRoot": "../../",
+  "sources": ["contracts/vogue.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAOA;;;;;;;;;;MAKA,AAAA,cAEC;;;;;cAF6B,SAAkB;;;;;;;;;;;;;;;;;;yCAAlB,SAAkB;;;;;;;;;gDAAlB,SAAkB;;;OAE/C;MAED,AAAA,YAEC;;;;;cAF2B,SAAkB;cAAE,SAAkB;cAAE,aAAqB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;yCAA7D,SAAkB,+BAAE,SAAkB,+BAAE,aAAqB;;;;;;;;;8CAA7D,SAAkB;8CAAE,SAAkB;8CAAE,aAAqB;;;OAExF;MAED,AAAA,gBACC;;OAAA;MAED,AAAA,gBACC;;OAAA;MAED,AAAA,gBACC;;OAAA;;;;;;GAjBA;EAHD;;;;;UAAY,cAAuB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAHnC;;;;;;;;;uDAAyC;IACzC;;;;;;;;;uDAAmC;IAGjC;;;;;;;yGAA2B,cAAY;;uDAAxB;UACf,KAAU;IAAV;;;;;;;yGAAA,KAAU;;uDAAA;;;;;;;GACX;EAED,AAAA,iBAEC,4BAF6B,SAAkB;IAC9C;;;;;;;yGAA2B,SAAO;;uDAAnB;;GAChB;EAED,AAAA,eAEC,4BAF2B,SAAkB,EAAE,SAAkB,EAAE,aAAqB;;UACvF,KAAU;;;;;6CAAI;;;;;;;;;;;gGAAU;;;IAAxB;;;;;;;yGAAA,KAAU;;uDAAA;;GACX;EAED,AAAA,mBACC,CAD+B,SAAkB,EAAE,WAAoB,gBACvE;EAED,AAAA,mBACC,CAD+B,SAAkB,EAAE,QAAiB,EAAE,oBAA4B,gBAClG;EAED,AAAA,mBACC,CAD+B,SAAkB,EAAE,WAAmB,gBACtE;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAvBD;qCAAA;;;;;;;;;;;wFAAyC;KAAA;IACzC;qCAAA;;;;;;;;;;;wFAAmC;KAAA;;;;;;;;;EAenC,AAAA,gBACC;;;;UAD+B,SAAkB;UAAE,WAAoB;;;;;;;;;;;;;;;8CAAxC,SAAkB,EAAE,WAAoB;GACvE;EAED,AAAA,gBACC;;;;UAD+B,SAAkB;UAAE,QAAiB;UAAE,oBAA4B;;;;;;;;;;;;;;;;;;;;;;8CAAnE,SAAkB;8CAAE,QAAiB;8CAAE,oBAA4B;GAClG;EAED,AAAA,gBACC;;;;UAD+B,SAAkB;UAAE,WAAmB;;;;;;;;;;;;;;;8CAAvC,SAAkB,EAAE,WAAmB;GACtE;;;;;;;"
+}
