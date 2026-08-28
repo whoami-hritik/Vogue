@@ -8,13 +8,15 @@ interface ShaderShowcaseProps {
   onEnterDashboard: () => void;
   walletConnected: boolean;
   walletAddress: string | null;
+  children?: React.ReactNode;
 }
 
 export default function ShaderShowcase({
   onConnectWallet,
   onEnterDashboard,
   walletConnected,
-  walletAddress
+  walletAddress,
+  children
 }: ShaderShowcaseProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isActive, setIsActive] = useState(false)
@@ -91,18 +93,20 @@ export default function ShaderShowcase({
         </defs>
       </svg>
 
-      <MeshGradient
-        className="absolute inset-0 w-full h-full"
-        colors={["#000000", "#111111", "#1a1a1a", "#2a1508", "#f26522"]}
-        speed={0.3}
-        {...({ backgroundColor: "#000000" } as any)}
-      />
-      <MeshGradient
-        className="absolute inset-0 w-full h-full opacity-60"
-        colors={["#000000", "#ffffff", "#f26522", "#f97316"]}
-        speed={0.2}
-        {...({ wireframe: true, backgroundColor: "transparent" } as any)}
-      />
+      <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
+        <MeshGradient
+          className="w-full h-full"
+          colors={["#000000", "#111111", "#1a1a1a", "#2a1508", "#f26522"]}
+          speed={0.3}
+          {...({ backgroundColor: "#000000" } as any)}
+        />
+        <MeshGradient
+          className="absolute inset-0 w-full h-full opacity-60"
+          colors={["#000000", "#ffffff", "#f26522", "#f97316"]}
+          speed={0.2}
+          {...({ wireframe: true, backgroundColor: "transparent" } as any)}
+        />
+      </div>
 
       <header className="relative z-20 flex items-center justify-between p-6 max-w-[1440px] mx-auto">
         <motion.div
@@ -321,6 +325,11 @@ export default function ShaderShowcase({
             </text>
           </motion.svg>
         </div>
+      </div>
+      
+      {/* Children Container */}
+      <div className="relative z-20 w-full pb-20">
+        {children}
       </div>
     </div>
   )
