@@ -7,10 +7,29 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
-    name: Build & Verify Compact Contract
+  frontend-build:
+    name: Build Frontend
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
+      - name: Setup Node.js v22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Production Frontend Build
+        run: npm run build
+
+  contract-build:
+    name: Build & Verify Compact Contract
+    needs: frontend-build
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -26,9 +45,6 @@ jobs:
 
       - name: Compile Compact Smart Contract
         run: npm run compile
-
-      - name: Run Production Frontend Build
-        run: npm run build
 
       - name: Run Vitest Contract Privacy Suite
         run: npm test
