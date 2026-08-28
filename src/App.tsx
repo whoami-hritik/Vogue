@@ -136,32 +136,47 @@ export function App() {
           {activeTab === 'overview' && (
             <div className="space-y-6 max-w-6xl mx-auto font-sans">
               {/* Top Greeting Header (Indian Standard Time - IST) */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm">
-                <div className="flex items-center gap-4">
-                  <img
-                    src="/vogue-logo.svg"
-                    alt="Vogue"
-                    className="w-12 h-12 rounded-full object-cover shadow-sm bg-gray-900 shrink-0"
-                  />
-                  <div>
-                    <div className="text-[11px] text-gray-500 uppercase tracking-wider flex items-center gap-2 font-medium">
-                      <Clock className="w-3.5 h-3.5 text-orange-500" />
-                      <span>{formatISTDate()} • {formatISTTime()}</span>
+              {/* Top Greeting Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 light-glass border border-white/40 rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-400/5 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-40 h-40 bg-purple-400/5 blur-3xl rounded-full -ml-10 -mb-10 pointer-events-none" />
+                
+                <div className="flex items-center gap-5 z-10">
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center bg-white/60 border border-white/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] backdrop-blur-md shrink-0">
+                    <img
+                      src="/vogue-logo.svg"
+                      alt="Vogue"
+                      className="w-8 h-8 object-contain"
+                    />
+                  </div>
+                  
+                  <div className="flex flex-col gap-1.5">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center flex-wrap gap-2">
+                      Welcome back,
+                      <span className="font-mono text-gray-700 font-medium text-lg px-3 py-1 rounded-full bg-white/50 border border-white/60 shadow-sm inline-flex items-center mt-1 sm:mt-0">
+                        {displayGreetingAddr}
+                      </span>
+                    </h1>
+                    <div className="text-[11px] sm:text-xs text-gray-500 font-medium tracking-wide flex flex-wrap items-center gap-3 mt-1">
+                      <span className="flex items-center gap-1.5 text-gray-600">
+                        <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />
+                        {formatISTDate()} • {formatISTTime()}
+                      </span>
                       {latestBlock && (
-                        <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                          • <Blocks className="w-3.5 h-3.5" /> Block #{latestBlock.height.toLocaleString()}
+                        <span className="flex items-center gap-1.5 text-emerald-700 bg-emerald-50/50 px-2.5 py-1 rounded-full border border-emerald-200/50">
+                          <Blocks className="w-3.5 h-3.5" /> Block #{latestBlock.height.toLocaleString()}
                         </span>
                       )}
                     </div>
-                    <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
-                      Welcome back, <span className="text-orange-600">{displayGreetingAddr}</span>
-                    </h1>
                   </div>
                 </div>
 
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold shrink-0">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className="uppercase">{networkId} TESTNET (IST)</span>
+                <div className="z-10 inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/40 backdrop-blur-md border border-white/60 text-gray-800 text-xs font-bold tracking-widest shrink-0 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  <span className="uppercase text-[10px] text-gray-600 mt-0.5">{networkId} TESTNET</span>
                 </div>
               </div>
 
