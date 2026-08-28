@@ -22,9 +22,11 @@
 
 ## 📜 Deployed Smart Contract Addresses
 
-| Network | Contract Module | Deployed Contract Address | Explorer Verification | Verification Status |
-| :--- | :--- | :--- | :--- | :---: |
-| **Midnight Preprod** | `VogueTrade` | `0x811c9dc5c23a7b9e3e7a0305f2c4166fbc4b256d5e1b206e93297a78363c9d2a` | [View on Preprod Explorer](https://preprod.midnightexplorer.com/) | `VERIFIED` |
+| Network | Version | Contract Address | Explorer Link | Status |
+|---------|---------|------------------|---------------|--------|
+| Midnight Preprod Testnet | v1.2.0 | `0x2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524` | [View on 1AM Preprod Explorer ↗](https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod) | 🟢 ACTIVE PREPROD MVP |
+| Midnight Preview Testnet | v1.2.0 | `0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30` | [View on 1AM Preview Explorer ↗](https://explorer.1am.xyz/contract/33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30?network=preview) | 🟢 ACTIVE PREVIEW MVP |
+| Historical Deployment | v1.0.0 | `0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3` | [View on 1AM Explorer ↗](https://explorer.1am.xyz/contract/62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3?network=preview) | 🟡 Historical (V1) |
 
 ---
 
