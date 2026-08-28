@@ -83,9 +83,15 @@ export function App() {
     }
   }, [walletConnected]);
 
-  const handleWithdrawSubmit = (e: React.FormEvent) => {
+  const handleWithdrawSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const amt = parseFloat(withdrawAmount) || 0;
+    if (amt <= 0 || amt > vaultBalance) {
+      return; // Validation prevents invalid submits
+    }
+    await burnVault(amt);
     setWithdrawSuccess(true);
+    setWithdrawAmount(''); // Reset input field
     setTimeout(() => setWithdrawSuccess(false), 3000);
   };
 
@@ -591,9 +597,14 @@ export function App() {
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-full bg-gray-900 hover:bg-black text-white font-semibold text-xs transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2"
+                  disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > vaultBalance}
+                  className={`w-full py-3 rounded-full font-semibold text-xs transition-all flex items-center justify-center gap-2 ${
+                    !withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > vaultBalance
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-900 hover:bg-black text-white cursor-pointer shadow-sm'
+                  }`}
                 >
-                  <ArrowUpRight className="w-4 h-4 text-orange-400" />
+                  <ArrowUpRight className={`w-4 h-4 ${(!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > vaultBalance) ? 'text-gray-400' : 'text-orange-400'}`} />
                   <span>Execute Unshield Transfer via 1AM</span>
                 </button>
               </form>
