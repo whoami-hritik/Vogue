@@ -328,6 +328,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
         </div>
       </footer>
+      </ShaderShowcase>
     </div>
   );
 };
