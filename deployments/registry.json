@@ -37,6 +37,19 @@
           "burnVaultBalance",
           "unshieldWithdraw"
         ]
+      },
+      {
+        "version": "1.3.0",
+        "contractAddress": "0xb0ac7d7675212b8e22eed5f601082902be578d49f55c6e0c1062f7168efbd3fc",
+        "deployedAt": "2026-08-28T12:00:01.893Z",
+        "commitHash": "0x4783c8a9518b35a9e4a9801549a858bd",
+        "circuits": [
+          "commitStrategy",
+          "executeTrade",
+          "mintVaultBalance",
+          "burnVaultBalance",
+          "unshieldWithdraw"
+        ]
       }
     ],
     "preprod": [
