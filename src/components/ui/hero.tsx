@@ -329,10 +329,6 @@ export default function ShaderShowcase({
         </div>
       </div>
       
-      {/* Children Container */}
-      <div className="relative z-20 w-full pb-20">
-        {children}
-      </div>
       </div>
 
       {/* Children Container */}
