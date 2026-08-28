@@ -2,7 +2,7 @@
  * Vogue — Supabase Dedicated Backend Database & Public Ledger Sync
  *
  * All strategy commitments, trade executions, and logs are persisted
- * directly in Supabase (https://zzrkbimybbuzrrzdheac.supabase.co).
+ * directly in Supabase (https://brqikkcoalrntxnfolnr.supabase.co).
  *
  * PRIVACY SECURITY MODEL:
  *   Private witness data (strategy risk bounds, private note secrets)
@@ -16,11 +16,11 @@ import type { ProtocolLogEntry } from '../components/ProtocolLog';
 
 const SUPABASE_URL =
   (typeof import.meta !== 'undefined' && import.meta.env?.['VITE_SUPABASE_URL']) ||
-  'https://zzrkbimybbuzrrzdheac.supabase.co';
+  'https://brqikkcoalrntxnfolnr.supabase.co';
 
 const SUPABASE_ANON_KEY =
   (typeof import.meta !== 'undefined' && import.meta.env?.['VITE_SUPABASE_ANON_KEY']) ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6cmtiaW15YmJ1enJyemRoZWFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MTk5OTIsImV4cCI6MjEwMjA5NTk5Mn0.PCo3b4seWwPWO6BO3LImrO_7d4V3xCNdEcWAMyqVzOs';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJycWlra2NvYWxybnR4bmZvbG5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MTA2MjEsImV4cCI6MjEwMzQ4NjYyMX0.7Pf4nmerbWybN2QCBQgneoiZhr-PwNzx_GBquIoHkhQ';
 
 let _supabaseClient: SupabaseClient | null = null;
 
@@ -93,7 +93,7 @@ let _memLogs: ProtocolLogEntry[] = [
     id: 'init_2',
     type: 'info',
     title: 'Supabase Dedicated Database Connected',
-    detail: 'Cloud tables active on zzrkbimybbuzrrzdheac.supabase.co',
+    detail: 'Cloud tables active on brqikkcoalrntxnfolnr.supabase.co',
     timestamp: new Date().toLocaleTimeString(),
   },
 ];

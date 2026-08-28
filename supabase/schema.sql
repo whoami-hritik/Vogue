@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Vogue — Midnight ZK Trade History & Strategy Commitments Database Schema
--- Project URL: https://zzrkbimybbuzrrzdheac.supabase.co
+-- Project URL: https://brqikkcoalrntxnfolnr.supabase.co
 -- Execute this SQL in your Supabase SQL Editor (https://supabase.com/dashboard)
 -- ============================================================================
 
