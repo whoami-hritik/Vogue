@@ -13,9 +13,10 @@
   [![Midnight Network](https://img.shields.io/badge/Midnight-Preprod-blueviolet)](https://midnight.network/)
   [![React](https://img.shields.io/badge/React-Vite-black)](https://react.dev/)
   [![Vogue CI/CD Pipeline](https://github.com/whoami-hritik/Vogue/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/whoami-hritik/Vogue/actions/workflows/ci.yml)
-  [![Status](https://img.shields.io/badge/Status-Live-success)](#)
+  [![Live on Vercel](https://img.shields.io/badge/Live%20Demo-vogue--amber.vercel.app-black?logo=vercel)](https://vogue-amber.vercel.app/)
+  [![Status](https://img.shields.io/badge/Status-Live-success)](https://vogue-amber.vercel.app/)
   
-  ### 🌐 [Live Application Demo](http://localhost:5173) | 📄 [Level 4–6 Product Proposal](./PROPOSAL.md)
+  ### 🚀 [**Live Application → vogue-amber.vercel.app**](https://vogue-amber.vercel.app/) | 📄 [Level 4–6 Product Proposal](./PROPOSAL.md)
 </div>
 
 ---
