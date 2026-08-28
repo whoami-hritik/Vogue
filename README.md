@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/vogue-logo.png" alt="Vogue Trade Logo" width="130" style="border-radius: 20px;" />
+  <img src="./public/vogue-logo.svg" alt="Vogue Trade Logo" width="130" style="border-radius: 20px;" />
 </p>
 
 <h1 align="center">Vogue — Confidential AI-Orchestrated Trading Protocol</h1>

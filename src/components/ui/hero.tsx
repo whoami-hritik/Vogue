@@ -112,7 +112,7 @@ export default function ShaderShowcase({
         >
           <div className="w-10 h-10 rounded-full overflow-hidden border border-white/20 bg-black flex items-center justify-center shrink-0">
             <img
-              src="/vogue-logo.png"
+              src="/vogue-logo.svg"
               alt="Vogue Trade"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
             />

@@ -83,7 +83,7 @@ export const WalletModal: React.FC<WalletModalProps> = ({
         {/* Modal Header */}
         <div className="flex items-center gap-3">
           <img
-            src="/vogue-logo.png"
+            src="/vogue-logo.svg"
             alt="Vogue Logo"
             className="w-10 h-10 rounded-full object-cover shadow-sm bg-gray-900 shrink-0"
           />

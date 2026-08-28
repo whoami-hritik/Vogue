@@ -139,7 +139,7 @@ export function App() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center gap-4">
                   <img
-                    src="/vogue-logo.png"
+                    src="/vogue-logo.svg"
                     alt="Vogue"
                     className="w-12 h-12 rounded-full object-cover shadow-sm bg-gray-900 shrink-0"
                   />

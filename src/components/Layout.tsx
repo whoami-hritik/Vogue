@@ -88,7 +88,7 @@ export const Layout: React.FC<LayoutProps> = ({
             >
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden shadow-sm border border-gray-200/60 shrink-0 bg-gray-900">
                 <img
-                  src="/vogue-logo.png"
+                  src="/vogue-logo.svg"
                   alt="Vogue Logo"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 />
@@ -239,7 +239,7 @@ export const Layout: React.FC<LayoutProps> = ({
         <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
             <div className="flex items-center gap-1.5">
-              <img src="/vogue-logo.png" alt="Vogue" className="w-4 h-4 rounded-full object-cover" />
+              <img src="/vogue-logo.svg" alt="Vogue" className="w-4 h-4 rounded-full object-cover" />
               <span className="font-bold text-gray-900">VOGUE TRADE</span>
             </div>
             <span className="text-gray-300">•</span>
