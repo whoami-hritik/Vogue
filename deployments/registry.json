@@ -1,0 +1,71 @@
+{
+  "vogue": {
+    "preview": [
+      {
+        "version": "1.0.0",
+        "contractAddress": "0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3",
+        "deployedAt": "2026-08-12T00:00:00Z",
+        "commitHash": "0x811c9dc5811c9dc5811c9dc5811c9dc5",
+        "circuits": [
+          "commitStrategy",
+          "executeTrade",
+          "unshieldWithdraw"
+        ]
+      },
+      {
+        "version": "1.1.0",
+        "contractAddress": "0x110f64de15f7f8ae579821999392da4c02c1143cfe7fb4e0572aad52484234d5",
+        "deployedAt": "2026-08-14T07:24:40.878Z",
+        "commitHash": "0xbaf8bce35ac91f5e6fb3c92709836eee",
+        "circuits": [
+          "commitStrategy",
+          "executeTrade",
+          "mintVaultBalance",
+          "burnVaultBalance",
+          "unshieldWithdraw"
+        ]
+      },
+      {
+        "version": "1.2.0",
+        "contractAddress": "0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30",
+        "deployedAt": "2026-08-14T08:43:21.983Z",
+        "commitHash": "0x6f6b07f8e83d3de5273b19755ac3b7e3",
+        "circuits": [
+          "commitStrategy",
+          "executeTrade",
+          "mintVaultBalance",
+          "burnVaultBalance",
+          "unshieldWithdraw"
+        ]
+      }
+    ],
+    "preprod": [
+      {
+        "version": "1.0.0",
+        "contractAddress": "0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3",
+        "deployedAt": "2026-08-12T00:00:00Z",
+        "commitHash": "0x811c9dc5811c9dc5811c9dc5811c9dc5",
+        "circuits": [
+          "commitStrategy",
+          "executeTrade",
+          "unshieldWithdraw"
+        ]
+      },
+      {
+        "version": "1.2.0",
+        "contractAddress": "0x2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524",
+        "deploymentTx": "0x27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645",
+        "block": 2098826,
+        "deployedAt": "2026-08-14T11:03:00.000Z",
+        "commitHash": "0x6f6b07f8e83d3de5273b19755ac3b7e3",
+        "circuits": [
+          "commitStrategy",
+          "executeTrade",
+          "mintVaultBalance",
+          "burnVaultBalance",
+          "unshieldWithdraw"
+        ]
+      }
+    ]
+  }
+}
