@@ -72,7 +72,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 lg:gap-7 px-5 sm:px-8 lg:px-12">
             
             {/* Card 1: Shielded Strategy Builder */}
-            <div className="flex flex-col bg-white/5 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 space-y-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
+            <div className="flex flex-col light-glass/5 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 space-y-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 font-bold text-white">
                   <div className="p-2 bg-orange-100 rounded-lg text-orange-600"><Layers className="w-6 h-6" /></div>
@@ -106,7 +106,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Card 2: 1AM Wallet & Midnight Explorer */}
-            <div className="flex flex-col bg-white/5 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 space-y-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
+            <div className="flex flex-col light-glass/5 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 space-y-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 font-bold text-white">
                   <div className="p-2 bg-blue-100 rounded-lg text-blue-600"><Zap className="w-6 h-6" /></div>
@@ -132,7 +132,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <span className="text-blue-400 font-bold">ProofStation Sponsored (0 tDUST)</span>
                   </div>
                   <div className="mt-4 pt-3 border-t border-gray-700/50">
-                    <a href="https://explorer.1am.xyz?network=preprod" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white">
+                    <a href="https://explorer.1am.xyz?network=preprod" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full py-2 light-glass/10 hover:light-glass/20 rounded-lg transition-colors text-white">
                       View on Explorer <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
@@ -141,7 +141,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Card 3: Shielded Vault (vUSD) */}
-            <div className="flex flex-col bg-white/5 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 space-y-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
+            <div className="flex flex-col light-glass/5 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 space-y-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 font-bold text-white">
                   <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600"><Shield className="w-6 h-6" /></div>
@@ -163,13 +163,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div className="flex gap-2">
                   <div className="flex-1 py-2 bg-emerald-600 text-white text-center text-xs font-bold rounded-lg cursor-pointer hover:bg-emerald-700 transition-colors">Shield</div>
-                  <div className="flex-1 py-2 bg-white/5 backdrop-blur-md border border-gray-200 text-gray-700 text-center text-xs font-bold rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">Unshield</div>
+                  <div className="flex-1 py-2 light-glass/5 backdrop-blur-md border border-gray-200 text-gray-700 text-center text-xs font-bold rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">Unshield</div>
                 </div>
               </div>
             </div>
 
             {/* Card 4: Gemini Market Intelligence */}
-            <div className="flex flex-col bg-white/5 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 space-y-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
+            <div className="flex flex-col light-glass/5 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 space-y-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 font-bold text-white">
                   <div className="p-2 bg-purple-100 rounded-lg text-purple-600"><Activity className="w-6 h-6" /></div>
@@ -183,14 +183,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               
               <div className="flex-1 mt-4 p-5 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border border-purple-100/50">
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-2 bg-white/60 rounded-xl">
+                  <div className="flex items-center gap-3 p-2 light-glass/60 rounded-xl">
                     <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-xs font-bold">BTC</div>
                     <div className="flex-1">
                       <div className="text-xs font-bold text-white">Strong Buy Signal</div>
                       <div className="text-[10px] text-gray-500">RSI oversold • MACD crossover</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-2 bg-white/60 rounded-xl">
+                  <div className="flex items-center gap-3 p-2 light-glass/60 rounded-xl">
                     <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">ETH</div>
                     <div className="flex-1">
                       <div className="text-xs font-bold text-white">Hold Position</div>
@@ -228,7 +228,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 lg:gap-7 px-5 sm:px-8 lg:px-12">
             {/* Card 1: Shielded Strategy Builder */}
-            <div className="flex flex-col bg-white/5 backdrop-blur-md border border-gray-200/80 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm hover:shadow-md transition-all">
+            <div className="flex flex-col light-glass/5 backdrop-blur-md border border-gray-200/80 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-white">
                   <Layers className="w-5 h-5 text-orange-500" />
@@ -246,7 +246,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Card 2: 1AM Wallet & Midnight Explorer */}
-            <div className="flex flex-col bg-white/5 backdrop-blur-md border border-gray-200/80 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm hover:shadow-md transition-all">
+            <div className="flex flex-col light-glass/5 backdrop-blur-md border border-gray-200/80 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-white">
                   <Zap className="w-5 h-5 text-orange-500" />
@@ -264,7 +264,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Card 3: Shielded Vault (vUSD) */}
-            <div className="flex flex-col bg-white/5 backdrop-blur-md border border-gray-200/80 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm hover:shadow-md transition-all">
+            <div className="flex flex-col light-glass/5 backdrop-blur-md border border-gray-200/80 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-white">
                   <Shield className="w-5 h-5 text-orange-500" />
@@ -282,7 +282,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Card 4: Gemini Market Intelligence */}
-            <div className="flex flex-col bg-white/5 backdrop-blur-md border border-gray-200/80 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm hover:shadow-md transition-all">
+            <div className="flex flex-col light-glass/5 backdrop-blur-md border border-gray-200/80 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-white">
                   <Activity className="w-5 h-5 text-orange-500" />

@@ -50,7 +50,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
   return (
     <div className="max-w-6xl mx-auto space-y-6 font-sans text-gray-900">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <PieChart className="w-5 h-5 text-orange-500" />
@@ -76,7 +76,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
       {/* Top P&L Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Estimated Total Value */}
-        <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm">
+        <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm">
           <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">TOTAL PORTFOLIO VALUE</span>
           <div className="text-2xl font-extrabold text-gray-900 pt-1">
             ${estimatedPortfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -88,7 +88,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
         </div>
 
         {/* Realized Profit & Loss */}
-        <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm">
+        <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm">
           <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">REALIZED PROFIT / LOSS</span>
           <div className={`text-2xl font-extrabold pt-1 ${totalRealizedPnl >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
             {totalRealizedPnl >= 0 ? '+' : ''}${totalRealizedPnl.toFixed(2)}
@@ -99,7 +99,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
         </div>
 
         {/* Win Rate */}
-        <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm">
+        <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm">
           <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">AGENT WIN RATE</span>
           <div className="text-2xl font-extrabold text-orange-600 pt-1">
             {winRatePct}%
@@ -110,7 +110,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
         </div>
 
         {/* Active Circuit Risk Exposure */}
-        <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm">
+        <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm">
           <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">ACTIVE RISK ALLOCATION</span>
           <div className="text-2xl font-extrabold text-gray-900 pt-1">
             ${totalTradedVolume.toLocaleString()}
@@ -122,7 +122,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
       </div>
 
       {/* Shielded State Security Banner */}
-      <div className="p-4 bg-white border border-gray-200/80 rounded-2xl flex items-center justify-between gap-4 text-xs shadow-xs">
+      <div className="p-4 light-glass border border-gray-200/80 rounded-2xl flex items-center justify-between gap-4 text-xs shadow-xs">
         <div className="flex items-center gap-3">
           <EyeOff className="w-5 h-5 text-orange-500 shrink-0" />
           <div className="space-y-0.5">
@@ -140,7 +140,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
       </div>
 
       {/* Detailed Holdings & Position Breakdown Table */}
-      <div className="bg-white border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
+      <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <Activity className="w-4 h-4 text-orange-500" />
@@ -149,7 +149,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
           <span className="text-xs text-gray-500">Auto-synced with Midnight Explorer API</span>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden text-xs">
+        <div className="light-glass border border-gray-200 rounded-xl overflow-hidden text-xs">
           <table className="w-full text-left">
             <thead className="bg-gray-50 text-gray-500 border-b border-gray-200 uppercase font-semibold text-[10px]">
               <tr>

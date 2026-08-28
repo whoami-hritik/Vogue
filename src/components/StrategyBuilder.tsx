@@ -130,7 +130,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
   return (
     <div className="max-w-4xl mx-auto space-y-6 font-sans">
       {/* Header Banner */}
-      <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm">
+      <div className="light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold">
@@ -166,7 +166,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
             <button
               key={idx}
               onClick={() => handleSelectPreset(preset)}
-              className="text-left text-xs bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 hover:text-gray-900 p-3.5 rounded-xl transition-all cursor-pointer truncate shadow-xs font-medium"
+              className="text-left text-xs light-glass hover:bg-gray-50 border border-gray-200 text-gray-700 hover:text-gray-900 p-3.5 rounded-xl transition-all cursor-pointer truncate shadow-xs font-medium"
             >
               "{preset}"
             </button>
@@ -175,7 +175,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       </div>
 
       {/* Main Prompt Input Box */}
-      <div className="bg-white border border-gray-200/90 focus-within:border-orange-500 rounded-2xl p-5 shadow-sm transition-all">
+      <div className="light-glass border border-gray-200/90 focus-within:border-orange-500 rounded-2xl p-5 shadow-sm transition-all">
         <div className="flex items-center justify-between mb-3">
           <label className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
             <Cpu className="w-3.5 h-3.5 text-orange-500" />
@@ -196,7 +196,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
           onChange={(e) => handlePromptChange(e.target.value)}
           rows={2}
           placeholder="e.g. Max 20% position size, 8% stop-loss, run for 30 days across all assets"
-          className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:bg-white resize-none font-sans"
+          className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:light-glass resize-none font-sans"
         />
 
         <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
@@ -213,7 +213,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
       </div>
 
       {/* Confirm-Before-Commit Card */}
-      <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm space-y-5">
+      <div className="light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm space-y-5">
         <div className="flex items-center justify-between border-b border-gray-200 pb-3">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
@@ -244,7 +244,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
                 max="100"
                 value={parsedParams.maxPositionPct}
                 onChange={(e) => handleChipChange('maxPositionPct', parseInt(e.target.value) || 1)}
-                className="w-full bg-white text-gray-900 font-bold text-sm px-2.5 py-1.5 rounded-lg border border-gray-200 focus:outline-none focus:border-orange-500 font-mono"
+                className="w-full light-glass text-gray-900 font-bold text-sm px-2.5 py-1.5 rounded-lg border border-gray-200 focus:outline-none focus:border-orange-500 font-mono"
               />
               <span className="text-xs text-gray-500 font-bold">%</span>
             </div>
@@ -265,7 +265,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
                 max="50"
                 value={parsedParams.stopLossPct}
                 onChange={(e) => handleChipChange('stopLossPct', parseInt(e.target.value) || 0)}
-                className="w-full bg-white text-gray-900 font-bold text-sm px-2.5 py-1.5 rounded-lg border border-gray-200 focus:outline-none focus:border-orange-500 font-mono"
+                className="w-full light-glass text-gray-900 font-bold text-sm px-2.5 py-1.5 rounded-lg border border-gray-200 focus:outline-none focus:border-orange-500 font-mono"
               />
               <span className="text-xs text-gray-500 font-bold">%</span>
             </div>
@@ -286,7 +286,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
                 max="365"
                 value={parsedParams.timelineDays}
                 onChange={(e) => handleChipChange('timelineDays', parseInt(e.target.value) || 1)}
-                className="w-full bg-white text-gray-900 font-bold text-sm px-2.5 py-1.5 rounded-lg border border-gray-200 focus:outline-none focus:border-orange-500 font-mono"
+                className="w-full light-glass text-gray-900 font-bold text-sm px-2.5 py-1.5 rounded-lg border border-gray-200 focus:outline-none focus:border-orange-500 font-mono"
               />
               <span className="text-xs text-gray-500 font-bold">Days</span>
             </div>
@@ -348,7 +348,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
             id="confirm-bounds"
             checked={isConfirmed}
             onChange={(e) => setIsConfirmed(e.target.checked)}
-            className="w-4 h-4 rounded bg-white border-gray-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
+            className="w-4 h-4 rounded light-glass border-gray-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
           />
           <label htmlFor="confirm-bounds" className="text-xs text-gray-800 font-medium cursor-pointer select-none">
             I have reviewed the AI risk assessment and confirm these boundaries are ready to lock on-chain.
@@ -366,7 +366,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
                 </span>
                 <span className="text-gray-500 font-mono text-[11px]">compact v0.24</span>
               </div>
-              <p className="text-xs text-gray-700 font-mono bg-white p-3 rounded-xl border border-gray-200">
+              <p className="text-xs text-gray-700 font-mono light-glass p-3 rounded-xl border border-gray-200">
                 {proofStep}
               </p>
             </div>
@@ -391,7 +391,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
 
       {/* Success State — Visible Commitment Hash */}
       {committedHash && (
-        <div className="bg-white border border-emerald-300 rounded-2xl p-6 shadow-sm space-y-4 font-sans">
+        <div className="light-glass border border-emerald-300 rounded-2xl p-6 shadow-sm space-y-4 font-sans">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-emerald-800">
               <CheckCircle className="w-5 h-5 text-emerald-600" />
@@ -419,7 +419,7 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
             </div>
             <button
               onClick={copyToClipboard}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-bold transition-all cursor-pointer shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full light-glass hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-bold transition-all cursor-pointer shrink-0"
             >
               {copied ? (
                 <>

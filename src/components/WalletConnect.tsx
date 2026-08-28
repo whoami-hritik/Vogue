@@ -65,7 +65,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
             </span>
           )}
           {displayAddress && isNetworkAligned && (
-            <span className="text-[11px] font-mono text-gray-600 bg-white px-2 py-0.5 rounded-full border border-gray-200 shadow-2xs">
+            <span className="text-[11px] font-mono text-gray-600 light-glass px-2 py-0.5 rounded-full border border-gray-200 shadow-2xs">
               {displayAddress}
             </span>
           )}

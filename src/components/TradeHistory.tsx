@@ -82,7 +82,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
   return (
     <div className="max-w-6xl mx-auto space-y-6 font-sans text-gray-900">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <History className="w-5 h-5 text-orange-500" />
@@ -103,7 +103,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
               onClick={() => setViewMode('zk-circuits')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 viewMode === 'zk-circuits'
-                  ? 'bg-white text-gray-900 shadow-sm'
+                  ? 'light-glass text-gray-900 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -114,7 +114,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
               onClick={() => setViewMode('1am-explorer')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 viewMode === '1am-explorer'
-                  ? 'bg-white text-gray-900 shadow-sm'
+                  ? 'light-glass text-gray-900 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -127,7 +127,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
             href={networkId === 'preprod' ? 'https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod' : 'https://explorer.1am.xyz/contract/33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30?network=preview'}
             target="_blank"
             rel="noreferrer"
-            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-white hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2.5 rounded-full light-glass hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
             <Globe className="w-3.5 h-3.5 text-orange-500" />
             <span>1AM Contract Explorer</span>
@@ -167,7 +167,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-gray-200/80 rounded-2xl p-4 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-4 shadow-sm">
         <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
           <input
@@ -189,7 +189,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
                 onClick={() => setStatusFilter(st)}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${
                   statusFilter === st
-                    ? 'bg-white text-gray-900 shadow-sm'
+                    ? 'light-glass text-gray-900 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -202,7 +202,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
 
       {/* VIEW MODE 1: ZK CIRCUIT TRADES TABLE */}
       {viewMode === 'zk-circuits' && (
-        <div className="bg-white border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm">
+        <div className="light-glass border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-gray-50 text-gray-500 border-b border-gray-200 uppercase font-semibold text-[10px]">
@@ -349,7 +349,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
 
       {/* VIEW MODE 2: EXPLORER LIVE NETWORK FEED */}
       {viewMode === '1am-explorer' && (
-        <div className="bg-white border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
+        <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
@@ -371,7 +371,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
             </button>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden text-xs">
+          <div className="light-glass border border-gray-200 rounded-xl overflow-hidden text-xs">
             <table className="w-full text-left font-mono">
               <thead className="bg-gray-50 text-gray-500 border-b border-gray-200 font-sans uppercase text-[10px]">
                 <tr>

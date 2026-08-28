@@ -9,7 +9,7 @@ export const PreprodCounter: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 shadow-sm flex items-center gap-3">
+      <div className="light-glass border border-gray-200/80 rounded-2xl p-4 sm:p-5 shadow-sm flex items-center gap-3">
         <Loader2 className="w-4 h-4 text-gray-400 animate-spin shrink-0" />
         <span className="text-xs text-gray-500">Loading Preprod metrics…</span>
       </div>
@@ -18,7 +18,7 @@ export const PreprodCounter: React.FC = () => {
 
   if (unavailable) {
     return (
-      <div className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 shadow-sm flex items-center gap-3">
+      <div className="light-glass border border-gray-200/80 rounded-2xl p-4 sm:p-5 shadow-sm flex items-center gap-3">
         <AlertCircle className="w-4 h-4 text-gray-400 shrink-0" />
         <span className="text-xs text-gray-400">Preprod metrics unavailable</span>
       </div>
@@ -29,7 +29,7 @@ export const PreprodCounter: React.FC = () => {
   const reached = preprodUsers >= TARGET;
 
   return (
-    <div className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+    <div className="light-glass border border-gray-200/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-orange-500" />

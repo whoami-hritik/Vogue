@@ -131,7 +131,7 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
   return (
     <div className="max-w-6xl mx-auto space-y-6 font-sans text-gray-900">
       {/* Strategy Selector Bar */}
-      <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm space-y-3">
+      <div className="light-glass border border-gray-200/80 rounded-2xl p-5 shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Sliders className="w-4 h-4 text-orange-500" />
@@ -193,7 +193,7 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
       </div>
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Activity className="w-5 h-5 text-orange-500" />
@@ -216,7 +216,7 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
                 onClick={() => setSelectedAsset(item.symbol)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   selectedAsset === item.symbol
-                    ? 'bg-white text-gray-900 shadow-sm'
+                    ? 'light-glass text-gray-900 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -239,8 +239,8 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
               onClick={() => setSelectedAsset(item.symbol)}
               className={`text-left p-4 rounded-2xl border transition-all cursor-pointer space-y-2 ${
                 isSelected
-                  ? 'bg-white border-orange-500 shadow-md ring-1 ring-orange-500/30'
-                  : 'bg-white border-gray-200/80 hover:border-gray-300 shadow-xs'
+                  ? 'light-glass border-orange-500 shadow-md ring-1 ring-orange-500/30'
+                  : 'light-glass border-gray-200/80 hover:border-gray-300 shadow-xs'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -283,7 +283,7 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Asset Metrics & AI Signal Panel */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white border border-gray-200/80 rounded-2xl p-6 space-y-5 shadow-sm">
+          <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-5 shadow-sm">
             <div className="flex items-center justify-between pb-4 border-b border-gray-200">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">{selectedData.name} ({selectedData.symbol})</h2>
@@ -389,7 +389,7 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
         </div>
 
         {/* Right Col: Gemini Custom AI Intelligence Query */}
-        <div className="bg-white border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm flex flex-col justify-between">
+        <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm flex flex-col justify-between">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Cpu className="w-4 h-4 text-orange-500" />

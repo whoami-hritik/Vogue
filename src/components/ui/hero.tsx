@@ -132,7 +132,7 @@ export default function ShaderShowcase({
             {[...Array(6)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-1 h-1 bg-white/60 rounded-full"
+                className="absolute w-1 h-1 light-glass/60 rounded-full"
                 style={{
                   left: `${20 + Math.random() * 60}%`,
                   top: `${20 + Math.random() * 60}%`,
@@ -157,19 +157,19 @@ export default function ShaderShowcase({
         <nav className="hidden md:flex items-center space-x-2">
           <a
             href="#architecture"
-            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:bg-white/10 transition-all duration-200"
+            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:light-glass/10 transition-all duration-200"
           >
             Architecture
           </a>
           <a
             href="#modules"
-            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:bg-white/10 transition-all duration-200"
+            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:light-glass/10 transition-all duration-200"
           >
             Modules
           </a>
           <a
             href="#circuits"
-            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:bg-white/10 transition-all duration-200"
+            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:light-glass/10 transition-all duration-200"
           >
             ZK Circuits
           </a>
@@ -177,17 +177,17 @@ export default function ShaderShowcase({
             href="https://explorer.1am.xyz?network=preprod"
             target="_blank"
             rel="noreferrer"
-            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:bg-white/10 transition-all duration-200 flex items-center gap-1"
+            className="text-white/80 hover:text-white text-sm font-light px-4 py-2 rounded-full hover:light-glass/10 transition-all duration-200 flex items-center gap-1"
           >
             1AM Explorer
           </a>
         </nav>
 
         <div id="gooey-btn" className="relative flex items-center group cursor-pointer" style={{ filter: "url(#gooey-filter)" }} onClick={walletConnected ? onEnterDashboard : onConnectWallet}>
-          <button className="absolute right-0 px-2.5 py-2 rounded-full bg-white text-black font-normal text-xs transition-all duration-300 hover:bg-white/90 cursor-pointer h-10 flex items-center justify-center -translate-x-12 group-hover:-translate-x-[90px] z-0">
+          <button className="absolute right-0 px-2.5 py-2 rounded-full light-glass text-black font-normal text-xs transition-all duration-300 hover:light-glass/90 cursor-pointer h-10 flex items-center justify-center -translate-x-12 group-hover:-translate-x-[90px] z-0">
             <ArrowRight className="w-4 h-4 text-black" />
           </button>
-          <button className="px-6 py-2 rounded-full bg-white text-black font-semibold text-sm transition-all duration-300 hover:bg-white/90 cursor-pointer h-10 flex items-center z-10">
+          <button className="px-6 py-2 rounded-full light-glass text-black font-semibold text-sm transition-all duration-300 hover:light-glass/90 cursor-pointer h-10 flex items-center z-10">
             {walletConnected ? 'Dashboard' : '1AM Wallet'}
           </button>
         </div>
@@ -196,7 +196,7 @@ export default function ShaderShowcase({
       <main className="absolute bottom-8 left-8 md:bottom-16 md:left-16 lg:left-24 z-20 max-w-3xl pr-8">
         <div className="text-left">
           <motion.div
-            className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm mb-6 relative border border-white/10"
+            className="inline-flex items-center px-4 py-2 rounded-full light-glass/5 backdrop-blur-sm mb-6 relative border border-white/10"
             style={{
               filter: "url(#glass-effect)",
             }}
@@ -268,7 +268,7 @@ export default function ShaderShowcase({
               href="https://midnight.network"
               target="_blank"
               rel="noreferrer"
-              className="px-8 py-4 rounded-full bg-transparent border border-white/30 text-white font-medium text-sm transition-all duration-300 hover:bg-white/10 hover:border-orange-400/50 hover:text-orange-100 cursor-pointer backdrop-blur-sm flex items-center gap-2"
+              className="px-8 py-4 rounded-full bg-transparent border border-white/30 text-white font-medium text-sm transition-all duration-300 hover:light-glass/10 hover:border-orange-400/50 hover:text-orange-100 cursor-pointer backdrop-blur-sm flex items-center gap-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

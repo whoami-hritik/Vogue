@@ -28,7 +28,7 @@ export const OverviewStrategies: React.FC<OverviewStrategiesProps> = ({
   const displayedStrategies = showAll ? activeStrategies : activeStrategies.slice(0, 3);
 
   return (
-    <div className="bg-white border border-gray-200/80 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm font-sans">
+    <div className="light-glass border border-gray-200/80 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
         <div className="space-y-1">
@@ -58,7 +58,7 @@ export const OverviewStrategies: React.FC<OverviewStrategiesProps> = ({
       {/* Strategies List */}
       {activeStrategies.length === 0 ? (
         <div className="p-8 text-center space-y-3 bg-gray-50 rounded-2xl border border-gray-200/80">
-          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mx-auto text-gray-600 shadow-xs border border-gray-200">
+          <div className="w-12 h-12 rounded-full light-glass flex items-center justify-center mx-auto text-gray-600 shadow-xs border border-gray-200">
             <Cpu className="w-6 h-6 text-orange-500" />
           </div>
           <div className="space-y-1">
@@ -85,7 +85,7 @@ export const OverviewStrategies: React.FC<OverviewStrategiesProps> = ({
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white text-gray-900 border border-gray-200 shadow-2xs">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold light-glass text-gray-900 border border-gray-200 shadow-2xs">
                       Strategy #{idx + 1}
                     </span>
                     <span className="text-xs font-bold text-gray-900">
@@ -102,7 +102,7 @@ export const OverviewStrategies: React.FC<OverviewStrategiesProps> = ({
                 </div>
 
                 {/* Risk Parameters Matrix */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs bg-white p-3 rounded-xl border border-gray-200/70">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs light-glass p-3 rounded-xl border border-gray-200/70">
                   <div>
                     <span className="text-[10px] text-gray-400 block font-medium">Max Position Size</span>
                     <span className="font-extrabold text-gray-900">{strat.params.maxPositionPct}% of Vault</span>

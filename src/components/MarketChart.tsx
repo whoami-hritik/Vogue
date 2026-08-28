@@ -108,7 +108,7 @@ export const MarketChart: React.FC<MarketChartProps> = ({
   const displayTime = hoveredPoint ? formatISTDateTime(hoveredPoint.timestamp) : formatISTDateTime(Date.now());
 
   return (
-    <div className="bg-white border border-gray-200/80 rounded-2xl p-5 sm:p-6 space-y-5 shadow-sm font-sans">
+    <div className="light-glass border border-gray-200/80 rounded-2xl p-5 sm:p-6 space-y-5 shadow-sm font-sans">
       {/* Header with Asset Selector & Timeframe Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100">
         <div className="space-y-1">
@@ -134,7 +134,7 @@ export const MarketChart: React.FC<MarketChartProps> = ({
               onClick={() => setTimeframe(tf)}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 timeframe === tf
-                  ? 'bg-white text-gray-900 shadow-xs'
+                  ? 'light-glass text-gray-900 shadow-xs'
                   : 'text-gray-500 hover:text-gray-900'
               }`}
             >
@@ -210,7 +210,7 @@ export const MarketChart: React.FC<MarketChartProps> = ({
         </div>
 
         {/* 24h Mini Stats */}
-        <div className="grid grid-cols-3 gap-2 text-left text-xs bg-white p-2.5 rounded-xl border border-gray-200 shrink-0">
+        <div className="grid grid-cols-3 gap-2 text-left text-xs light-glass p-2.5 rounded-xl border border-gray-200 shrink-0">
           <div>
             <span className="text-[10px] text-gray-400 block font-medium">24h High</span>
             <span className="font-bold text-gray-900 font-mono">${currentAsset.high24h}</span>
@@ -227,7 +227,7 @@ export const MarketChart: React.FC<MarketChartProps> = ({
       </div>
 
       {/* SVG Interactive Area Chart */}
-      <div className="relative bg-white rounded-xl border border-gray-200/70 p-2 overflow-hidden">
+      <div className="relative light-glass rounded-xl border border-gray-200/70 p-2 overflow-hidden">
         <svg
           viewBox={`0 0 ${width} ${height}`}
           className="w-full h-48 sm:h-56 cursor-crosshair select-none"

@@ -77,10 +77,10 @@ export const Layout: React.FC<LayoutProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-[#EFEFEF] text-gray-900 flex flex-col font-sans selection:bg-orange-500 selection:text-white">
+    <div className="min-h-screen animated-bg-light text-gray-900 flex flex-col font-sans selection:bg-orange-500 selection:text-white">
       {/* Top Navbar — Pill Shape Matching Landing Page */}
       <header className="w-full max-w-[1440px] mx-auto p-2 sm:p-3 sticky top-0 z-50">
-        <nav className="bg-white rounded-full p-[5px] pl-3 pr-2 flex items-center justify-between shadow-sm border border-gray-200/80">
+        <nav className="light-glass rounded-full p-[5px] pl-3 pr-2 flex items-center justify-between shadow-sm border border-gray-200/80">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setActiveTab('landing')}
@@ -157,7 +157,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-all flex items-center gap-1.5 cursor-pointer ${
                   isActive
                     ? 'bg-gray-900 text-white shadow-sm'
-                    : 'bg-white text-gray-700 border border-gray-200/80 hover:bg-gray-50'
+                    : 'light-glass text-gray-700 border border-gray-200/80 hover:bg-gray-50'
                 }`}
               >
                 <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-orange-400' : 'text-gray-500'}`} />
@@ -171,7 +171,7 @@ export const Layout: React.FC<LayoutProps> = ({
       {/* Main Container with Sidebar + Content */}
       <div className="w-full max-w-[1440px] mx-auto flex-1 flex overflow-hidden px-2 sm:px-4 pb-4 gap-4">
         {/* Sidebar (Desktop) */}
-        <aside className="w-64 bg-white border border-gray-200/80 rounded-2xl hidden md:flex flex-col justify-between p-4 shrink-0 shadow-sm">
+        <aside className="w-64 light-glass border border-gray-200/80 rounded-2xl hidden md:flex flex-col justify-between p-4 shrink-0 shadow-sm">
           <div className="space-y-1.5">
             <div className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
               Protocol Modules
@@ -207,7 +207,7 @@ export const Layout: React.FC<LayoutProps> = ({
               <span className="text-gray-600 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-[#F26522]" /> ZK Engine
               </span>
-              <span className="text-gray-900 font-bold text-[10px] bg-white px-2 py-0.5 rounded border border-gray-200">
+              <span className="text-gray-900 font-bold text-[10px] light-glass px-2 py-0.5 rounded border border-gray-200">
                 Compact v0.24
               </span>
             </div>
@@ -235,7 +235,7 @@ export const Layout: React.FC<LayoutProps> = ({
       </div>
 
       {/* Footer Ticker Matching Landing Page */}
-      <footer className="bg-white border-t border-gray-200 py-2.5 px-4 sm:px-6 text-xs text-gray-600 font-mono">
+      <footer className="light-glass border-t border-gray-200 py-2.5 px-4 sm:px-6 text-xs text-gray-600 font-mono">
         <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
             <div className="flex items-center gap-1.5">

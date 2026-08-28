@@ -37,7 +37,7 @@ export const ProtocolLog: React.FC<ProtocolLogProps> = ({ logs, networkId = 'pre
   });
 
   return (
-    <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-4 font-sans shadow-sm sticky top-6">
+    <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-4 font-sans shadow-sm sticky top-6">
       {/* Log Header */}
       <div className="space-y-3 pb-3 border-b border-gray-100">
         <div className="flex items-center justify-between">
@@ -74,7 +74,7 @@ export const ProtocolLog: React.FC<ProtocolLogProps> = ({ logs, networkId = 'pre
               onClick={() => setFilter(item.key)}
               className={`flex-1 py-1 rounded-lg font-bold transition-all cursor-pointer text-center ${
                 filter === item.key
-                  ? 'bg-white text-gray-900 shadow-xs border border-gray-200/70'
+                  ? 'light-glass text-gray-900 shadow-xs border border-gray-200/70'
                   : 'text-gray-500 hover:text-gray-900'
               }`}
             >

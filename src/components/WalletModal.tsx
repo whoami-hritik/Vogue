@@ -71,7 +71,7 @@ export const WalletModal: React.FC<WalletModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
-      <div className="w-full max-w-lg bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-6 relative text-gray-900 font-sans">
+      <div className="w-full max-w-lg light-glass border border-gray-200/90 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-6 relative text-gray-900 font-sans">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -201,7 +201,7 @@ export const WalletModal: React.FC<WalletModalProps> = ({
                     onClick={() => onSelectNetwork(net)}
                     className={`py-1.5 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${
                       networkId === net
-                        ? 'bg-white text-gray-900 shadow-sm border border-gray-200 font-bold'
+                        ? 'light-glass text-gray-900 shadow-sm border border-gray-200 font-bold'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
@@ -312,7 +312,7 @@ export const WalletModal: React.FC<WalletModalProps> = ({
                       onClick={() => onSelectNetwork(net)}
                       className={`py-1.5 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${
                         networkId === net
-                          ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                          ? 'light-glass text-gray-900 shadow-sm border border-gray-200'
                           : 'text-gray-600 hover:text-gray-900'
                       }`}
                     >
@@ -333,7 +333,7 @@ export const WalletModal: React.FC<WalletModalProps> = ({
 
                   <button
                     onClick={handleClearCache}
-                    className="w-full py-2 rounded-full bg-white hover:bg-gray-100 border border-gray-200 text-gray-600 text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full py-2 rounded-full light-glass hover:bg-gray-100 border border-gray-200 text-gray-600 text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Trash2 className="w-3.5 h-3.5 text-gray-400" />
                     <span>{cacheCleared ? 'Wallet Cache Cleared!' : 'Clear All Wallet Cache & Reset'}</span>

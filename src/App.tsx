@@ -136,7 +136,7 @@ export function App() {
           {activeTab === 'overview' && (
             <div className="space-y-6 max-w-6xl mx-auto font-sans">
               {/* Top Greeting Header (Indian Standard Time - IST) */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center gap-4">
                   <img
                     src="/vogue-logo.svg"
@@ -191,7 +191,7 @@ export function App() {
 
               {/* Top Balance Cards: Public Wallet vs Shielded Vault */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
+                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
                   <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">WALLET TNIGHT (UNSHIELDED)</span>
                   <div className="flex items-baseline gap-2 pt-1 min-w-0">
                     <span className="text-xl sm:text-2xl font-extrabold text-gray-900 truncate">{unshieldedBalance}</span>
@@ -199,7 +199,7 @@ export function App() {
                   <span className="text-[11px] text-gray-500 font-medium block pt-1">↑ Public 1AM Wallet</span>
                 </div>
 
-                <div className="bg-white border border-orange-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
+                <div className="light-glass border border-orange-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
                   <span className="text-[11px] text-orange-600 font-semibold uppercase tracking-wider flex items-center gap-1">
                     <Lock className="w-3.5 h-3.5 text-orange-500" /> SHIELDED VAULT (vUSD)
                   </span>
@@ -212,7 +212,7 @@ export function App() {
                   </span>
                 </div>
 
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
+                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
                   <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">SHIELDED TNIGHT NOTE</span>
                   <div className="flex items-baseline gap-2 pt-1 min-w-0">
                     <span className="text-xl sm:text-2xl font-extrabold text-gray-900 truncate">{shieldedBalance}</span>
@@ -220,7 +220,7 @@ export function App() {
                   <span className="text-[11px] text-emerald-700 font-medium block pt-1">↑ Private ZK Note</span>
                 </div>
 
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
+                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-1 shadow-sm overflow-hidden">
                   <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">TDUST FUEL RESERVE</span>
                   <div className="flex items-baseline gap-2 pt-1 min-w-0">
                     <span className="text-xl sm:text-2xl font-extrabold text-emerald-700 truncate">{dustBalance}</span>
@@ -319,7 +319,7 @@ export function App() {
         {activeTab === 'withdraw' && (
           <div className="max-w-4xl mx-auto space-y-6 font-sans">
             {/* Top Vault & Wallet Overview Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 light-glass border border-gray-200/80 rounded-2xl p-6 shadow-sm">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Lock className="w-5 h-5 text-orange-500" />
@@ -352,7 +352,7 @@ export function App() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* 1. Public Unshielded tNIGHT */}
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-2 shadow-sm overflow-hidden">
+                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-2 shadow-sm overflow-hidden">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">WALLET TNIGHT</span>
                     <span className="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 font-bold">UNSHIELDED</span>
@@ -372,7 +372,7 @@ export function App() {
                 </div>
 
                 {/* 2. Shielded Private Note */}
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-2 shadow-sm overflow-hidden">
+                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-2 shadow-sm overflow-hidden">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">SHIELDED TNIGHT</span>
                     <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">ZK PRIVATE</span>
@@ -387,7 +387,7 @@ export function App() {
                 </div>
 
                 {/* 3. Shielded Trading Vault (vUSD) */}
-                <div className="bg-white border border-orange-200 rounded-2xl p-5 space-y-2 shadow-sm ring-1 ring-orange-500/20 overflow-hidden">
+                <div className="light-glass border border-orange-200 rounded-2xl p-5 space-y-2 shadow-sm ring-1 ring-orange-500/20 overflow-hidden">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-orange-600 font-bold uppercase tracking-wider flex items-center gap-1">
                       <Lock className="w-3 h-3 text-orange-500" /> TRADING VAULT
@@ -405,7 +405,7 @@ export function App() {
                 </div>
 
                 {/* 4. tDUST Reserve */}
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-5 space-y-2 shadow-sm overflow-hidden">
+                <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-2 shadow-sm overflow-hidden">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">TDUST RESERVE</span>
                     <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">GAS FUEL</span>
@@ -422,7 +422,7 @@ export function App() {
             </div>
 
             {/* Vault Mint / Burn Interactive Section */}
-            <div className="bg-white border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
+            <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
               <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                 <div className="space-y-0.5">
                   <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
@@ -460,7 +460,7 @@ export function App() {
                         min="1"
                         value={mintAmount}
                         onChange={(e) => setMintAmount(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-xl pl-7 pr-4 py-2.5 text-xs text-gray-900 font-mono font-bold focus:outline-none focus:border-emerald-500"
+                        className="w-full light-glass border border-gray-200 rounded-xl pl-7 pr-4 py-2.5 text-xs text-gray-900 font-mono font-bold focus:outline-none focus:border-emerald-500"
                         placeholder="250"
                       />
                     </div>
@@ -472,7 +472,7 @@ export function App() {
                       <button
                         key={amt}
                         onClick={() => setMintAmount(amt)}
-                        className="flex-1 py-1 rounded-lg bg-white hover:bg-emerald-50 text-[11px] font-bold text-gray-700 border border-gray-200 transition-all cursor-pointer"
+                        className="flex-1 py-1 rounded-lg light-glass hover:bg-emerald-50 text-[11px] font-bold text-gray-700 border border-gray-200 transition-all cursor-pointer"
                       >
                         +${amt}
                       </button>
@@ -509,7 +509,7 @@ export function App() {
                         max={vaultBalance}
                         value={withdrawAmount}
                         onChange={(e) => setWithdrawAmount(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-xl pl-7 pr-4 py-2.5 text-xs text-gray-900 font-mono font-bold focus:outline-none focus:border-red-500"
+                        className="w-full light-glass border border-gray-200 rounded-xl pl-7 pr-4 py-2.5 text-xs text-gray-900 font-mono font-bold focus:outline-none focus:border-red-500"
                         placeholder="500"
                       />
                     </div>
@@ -521,7 +521,7 @@ export function App() {
                       <button
                         key={amt}
                         onClick={() => setWithdrawAmount(amt)}
-                        className="flex-1 py-1 rounded-lg bg-white hover:bg-red-50 text-[11px] font-bold text-gray-700 border border-gray-200 transition-all cursor-pointer"
+                        className="flex-1 py-1 rounded-lg light-glass hover:bg-red-50 text-[11px] font-bold text-gray-700 border border-gray-200 transition-all cursor-pointer"
                       >
                         -${amt}
                       </button>
@@ -551,7 +551,7 @@ export function App() {
             </div>
 
             {/* Unshield & Withdraw Circuit Execution */}
-            <div className="bg-white border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
+            <div className="light-glass border border-gray-200/80 rounded-2xl p-6 space-y-4 shadow-sm">
               <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <ArrowUpRight className="w-5 h-5 text-orange-500" />
                 Unshield & Withdraw (unshieldWithdraw Compact Circuit)
