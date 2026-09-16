@@ -10,6 +10,7 @@ import { TradeHistory } from './components/TradeHistory';
 import { MarketChart } from './components/MarketChart';
 import { OverviewStrategies } from './components/OverviewStrategies';
 import { DarkIntentMonitor } from './components/DarkIntentMonitor';
+import { AlphaMarketplace } from './components/AlphaMarketplace';
 import { formatISTDate, formatISTTime } from './utils/time';
 import { useMidnight } from './hooks/useMidnight';
 import { PreprodCounter } from './components/PreprodCounter';
@@ -299,6 +300,17 @@ export function App() {
             walletConnected={walletConnected}
             onConnectWallet={() => setIsModalOpen(true)}
             networkId={networkId}
+            onNavigateTab={setActiveTab}
+          />
+        )}
+
+        {/* 2.5 ALPHA MARKETPLACE (PROOF OF ALPHA & BLIND COPY-TRADING) */}
+        {activeTab === 'alpha-marketplace' && (
+          <AlphaMarketplace
+            walletConnected={walletConnected}
+            walletAddress={walletAddress}
+            vaultBalance={vaultBalance}
+            onConnectWallet={() => setIsModalOpen(true)}
             onNavigateTab={setActiveTab}
           />
         )}

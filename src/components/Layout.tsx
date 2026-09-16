@@ -8,7 +8,8 @@ import {
   ArrowUpRight,
   Sparkles,
   Blocks,
-  Clock
+  Clock,
+  Award
 } from 'lucide-react';
 import { WalletConnect } from './WalletConnect';
 import type { DetectedWallet } from '../lib/lace-wallet';
@@ -71,6 +72,7 @@ export const Layout: React.FC<LayoutProps> = ({
     { id: 'landing', label: 'Studio Home', icon: Sparkles },
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'strategy-builder', label: 'Strategy Builder', icon: Cpu, highlight: true },
+    { id: 'alpha-marketplace', label: 'Alpha Market', icon: Award, highlight: true },
     { id: 'market-insights', label: 'Market Insights', icon: LineChart },
     { id: 'portfolio', label: 'Portfolio', icon: PieChart },
     { id: 'trade-history', label: 'Trade History', icon: History },
