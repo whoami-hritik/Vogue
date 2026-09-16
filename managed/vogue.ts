@@ -28,6 +28,10 @@ export interface StrategyWitnesses {
   getAuditorScopeBitmask?: () => number;
   getAuditorExpiry?: () => bigint;
   getSolvencyRatioBps?: () => bigint;
+  getSignalAsset?: () => string;
+  getSignalDirection?: () => number;
+  getSignalPriceLimitUsd?: () => bigint;
+  getProportionalAllocationBps?: () => number;
 }
 
 export class VogueContractSimulator {
@@ -41,6 +45,9 @@ export class VogueContractSimulator {
   public alphaStrategyRegistry = new Map<string, string>(); // strategyId -> profile hash
   public alphaSubscriptionStatus = new Map<string, number>(); // subscriptionId -> 1=active, 2=cancelled
   public alphaStrategyCount: number = 0;
+  public alphaSignalCommitment = new Map<string, string>(); // signalId -> signalHash
+  public alphaSignalCount: number = 0;
+  public alphaMirroredTradeStatus = new Map<string, number>(); // mirrorTradeId -> 1=executed, 2=rejected
   public complianceAttestationRegistry = new Map<string, string>(); // fundId -> compliance hash
   public auditorAccessRegistry = new Map<string, { auditorPubKey: string; scopeBitmask: number; expiry: bigint; active: boolean }>();
   public auditorDelegationCount: number = 0;
@@ -315,6 +322,52 @@ export class VogueContractSimulator {
     const feeAmount = (netGain * feeBps) / 10000n;
 
     return { status: 'settled', feeAmountUsd: feeAmount };
+  }
+
+  public emitAlphaSignal(
+    strategyId: string,
+    signalId: string
+  ): { status: 'emitted' | 'rejected'; signalHash?: string; reason?: string } {
+    if (!this.alphaStrategyRegistry.has(strategyId)) {
+      return { status: 'rejected', reason: 'strategy not registered' };
+    }
+    const priceLimit = this.witnesses.getSignalPriceLimitUsd ? this.witnesses.getSignalPriceLimitUsd() : 50000n;
+    if (priceLimit <= 0n) {
+      return { status: 'rejected', reason: 'invalid signal limit price' };
+    }
+    const direction = this.witnesses.getSignalDirection ? this.witnesses.getSignalDirection() : 1;
+    if (direction !== 1 && direction !== 2) {
+      return { status: 'rejected', reason: 'invalid direction' };
+    }
+
+    const asset = this.witnesses.getSignalAsset ? this.witnesses.getSignalAsset() : 'BTC';
+    const signalHash = `0xsignal_${strategyId}_${asset}_dir${direction}_lim${priceLimit}`;
+    this.alphaSignalCommitment.set(signalId, signalHash);
+    this.alphaSignalCount++;
+    return { status: 'emitted', signalHash };
+  }
+
+  public mirrorAlphaTrade(
+    subscriptionId: string,
+    signalId: string,
+    mirrorTradeId: string
+  ): { status: 'mirrored' | 'rejected'; reason?: string } {
+    if (this.alphaSubscriptionStatus.get(subscriptionId) !== 1) {
+      return { status: 'rejected', reason: 'subscription not active' };
+    }
+    if (!this.alphaSignalCommitment.has(signalId)) {
+      return { status: 'rejected', reason: 'trade signal not registered on-chain' };
+    }
+    const allocationBps = this.witnesses.getProportionalAllocationBps ? this.witnesses.getProportionalAllocationBps() : 2500;
+    if (allocationBps <= 0) {
+      return { status: 'rejected', reason: 'allocation must be positive' };
+    }
+    if (allocationBps > 10000) {
+      return { status: 'rejected', reason: 'allocation cannot exceed 100%' };
+    }
+
+    this.alphaMirroredTradeStatus.set(mirrorTradeId, 1);
+    return { status: 'mirrored' };
   }
 
   // ============================================================================

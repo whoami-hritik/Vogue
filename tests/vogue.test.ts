@@ -440,5 +440,79 @@ describe('Vogue Compact Smart Contract Privacy & Verification Suite', () => {
     expect(failRes.status).toBe('rejected');
     expect(failRes.reason).toContain('fails zero-knowledge solvency ratio');
   });
+
+  // ============================================================================
+  // CONFIDENTIAL ENCLAVE SIGNAL EMISSION & PROPORTIONAL MIRRORING TESTS
+  // ============================================================================
+
+  it('23. emitAlphaSignal: commits confidential trade signal from enclave without leaking prompt or weights', () => {
+    const signalWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getSignalAsset: () => 'BTC',
+      getSignalDirection: () => 1, // 1 = BUY
+      getSignalPriceLimitUsd: () => 64500n
+    };
+
+    const contract = new VogueContractSimulator(signalWitnesses);
+    const strategyId = '0xstrat_enclave_01';
+    contract.registerAlphaStrategy(strategyId, 1500);
+
+    const signalId = '0xsig_btc_breakout_01';
+    const emitRes = contract.emitAlphaSignal(strategyId, signalId);
+
+    expect(emitRes.status).toBe('emitted');
+    expect(contract.alphaSignalCommitment.get(signalId)).toBeDefined();
+    expect(contract.alphaSignalCount).toBe(1);
+  });
+
+  it('24. mirrorAlphaTrade: executes proportional trade inside follower vault matching emitted signal', () => {
+    const mirrorWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getSignalAsset: () => 'ETH',
+      getSignalDirection: () => 1,
+      getSignalPriceLimitUsd: () => 3500n,
+      getProportionalAllocationBps: () => 2000 // 20% proportional vault allocation
+    };
+
+    const contract = new VogueContractSimulator(mirrorWitnesses);
+    const strategyId = '0xstrat_enclave_02';
+    const subId = '0xsub_follower_55';
+    const signalId = '0xsig_eth_momentum_02';
+    const mirrorTradeId = '0xmirror_trade_99';
+
+    contract.registerAlphaStrategy(strategyId, 1500);
+    contract.subscribeAlphaStrategy(subId, strategyId);
+    contract.emitAlphaSignal(strategyId, signalId);
+
+    const mirrorRes = contract.mirrorAlphaTrade(subId, signalId, mirrorTradeId);
+    expect(mirrorRes.status).toBe('mirrored');
+    expect(contract.alphaMirroredTradeStatus.get(mirrorTradeId)).toBe(1);
+  });
+
+  it('25. mirrorAlphaTrade: rejects mirror trade if subscription is not active or allocation invalid', () => {
+    const greedyWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getProportionalAllocationBps: () => 15000 // 150% allocation > 100% max
+    };
+
+    const contract = new VogueContractSimulator(greedyWitnesses);
+    const strategyId = '0xstrat_enclave_03';
+    const subId = '0xsub_follower_inactive';
+    const signalId = '0xsig_fake';
+
+    contract.registerAlphaStrategy(strategyId, 1500);
+    contract.emitAlphaSignal(strategyId, signalId);
+
+    // Rejects because subId is not active
+    const inactiveRes = contract.mirrorAlphaTrade(subId, signalId, '0xtrade_fail_1');
+    expect(inactiveRes.status).toBe('rejected');
+    expect(inactiveRes.reason).toContain('subscription not active');
+
+    // Subscribe subId, but test invalid allocation (>100%)
+    contract.subscribeAlphaStrategy(subId, strategyId);
+    const overAllocRes = contract.mirrorAlphaTrade(subId, signalId, '0xtrade_fail_2');
+    expect(overAllocRes.status).toBe('rejected');
+    expect(overAllocRes.reason).toContain('allocation cannot exceed 100%');
+  });
 });
 

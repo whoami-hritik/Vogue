@@ -34,6 +34,9 @@ export ledger darkIntentCount: Counter;
 export ledger alphaStrategyRegistry: Map<Bytes<32>, Bytes<32>>;   // strategyId -> profile commitment hash
 export ledger alphaSubscriptionStatus: Map<Bytes<32>, Uint<8>>;   // subscriptionId -> 1=active, 2=cancelled
 export ledger alphaStrategyCount: Counter;
+export ledger alphaSignalCommitment: Map<Bytes<32>, Bytes<32>>;   // signalId -> private signal commitment hash
+export ledger alphaSignalCount: Counter;
+export ledger alphaMirroredTradeStatus: Map<Bytes<32>, Uint<8>>;  // mirrorTradeId -> 1=executed, 2=rejected
 export ledger complianceAttestationRegistry: Map<Bytes<32>, Bytes<32>>; // fundId -> compliance proof commitment hash
 export ledger auditorAccessRegistry: Map<Bytes<32>, Bytes<32>>;         // delegationId -> delegation commitment hash
 export ledger auditorDelegationCount: Counter;
@@ -59,6 +62,10 @@ witness getAlphaFeeBps(): Uint<16>;
 witness getAlphaMinStakeUsd(): Uint<64>;
 witness getAlphaProfitUsd(): Uint<64>;
 witness getAlphaHighWaterMarkUsd(): Uint<64>;
+witness getSignalAsset(): Bytes<32>;
+witness getSignalDirection(): Uint<8>;
+witness getSignalPriceLimitUsd(): Uint<64>;
+witness getProportionalAllocationBps(): Uint<16>;
 witness getComplianceRiskScore(): Uint<16>;
 witness getKycTier(): Uint<8>;
 witness getAuditorScopeBitmask(): Uint<8>;
@@ -200,6 +207,34 @@ export circuit settlePerformanceFee(strategyId: Bytes<32>, subscriptionId: Bytes
   assert(profitUsd > (0 as Uint<64>), "zero profit cannot be fee-settled");
   assert(profitUsd > currentHwm, "profit does not breach High-Water Mark threshold");
   assert(getAlphaFeeBps() <= (5000 as Uint<16>), "invalid fee percentage");
+}
+
+// Emit confidential trade signal commitment from strategy enclave to Midnight
+export circuit emitAlphaSignal(strategyId: Bytes<32>, signalId: Bytes<32>): [] {
+  assert(alphaStrategyRegistry.member(disclose(strategyId)), "strategy not registered");
+  assert(getSignalPriceLimitUsd() > (0 as Uint<64>), "invalid signal limit price");
+  assert(getSignalDirection() == (1 as Uint<8>) || getSignalDirection() == (2 as Uint<8>), "invalid direction");
+
+  const signalHash = disclose(
+    persistentHash<Vector<4, Bytes<32>>>([
+      strategyId,
+      getSignalAsset(),
+      getSignalDirection() as Field as Bytes<32>,
+      getSignalPriceLimitUsd() as Field as Bytes<32>
+    ])
+  );
+  alphaSignalCommitment.insert(disclose(signalId), signalHash);
+  alphaSignalCount.increment(1);
+}
+
+// Mirror trade proportionally into follower's private vault in Zero-Knowledge
+export circuit mirrorAlphaTrade(subscriptionId: Bytes<32>, signalId: Bytes<32>, mirrorTradeId: Bytes<32>): [] {
+  assert(alphaSubscriptionStatus.lookup(disclose(subscriptionId)) == (1 as Uint<8>), "subscription not active");
+  assert(alphaSignalCommitment.member(disclose(signalId)), "trade signal not registered on-chain");
+  assert(getProportionalAllocationBps() > (0 as Uint<16>), "allocation must be positive");
+  assert(getProportionalAllocationBps() <= (10000 as Uint<16>), "allocation cannot exceed 100%");
+
+  alphaMirroredTradeStatus.insert(disclose(mirrorTradeId), disclose(1 as Uint<8>));
 }
 
 // ============================================================================
