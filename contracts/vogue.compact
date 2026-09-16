@@ -28,6 +28,9 @@ import CompactStandardLibrary;
 export ledger agentCommitment: Map<Bytes<32>, Bytes<32>>;   // agentId -> strategy hash
 export ledger tradeStatus: Map<Bytes<32>, Uint<8>>;         // tradeId -> 0=pending, 1=executed, 2=rejected, 3=withdrawn
 export ledger tradeCount: Counter;
+export ledger darkIntentCommitment: Map<Bytes<32>, Bytes<32>>;   // intentId -> private intent hash
+export ledger darkIntentStatus: Map<Bytes<32>, Uint<8>>;         // intentId -> 0=none, 1=committed, 2=filled, 3=refunded
+export ledger darkIntentCount: Counter;
 
 // ---------- PRIVATE WITNESSES ----------
 witness getMaxPositionPct(): Uint<8>;
@@ -41,6 +44,11 @@ witness getRiskCheckPassed(): Boolean;
 witness getDepositTNightAmount(): Uint<64>;
 witness getBurnTNightAmount(): Uint<64>;
 witness getTNightPriceUsd(): Uint<64>;
+witness getIntentAsset(): Bytes<32>;
+witness getMinFillAmount(): Uint<64>;
+witness getMaxPriceLimit(): Uint<64>;
+witness getIntentExpiry(): Uint<64>;
+witness getEscrowVusdAmount(): Uint<64>;
 
 // ---------- CIRCUITS ----------
 
@@ -97,3 +105,52 @@ export circuit unshieldWithdraw(agentId: Bytes<32>, amountUsd: Uint<64>): [] {
   assert(amountUsd <= getPortfolioValue(), "insufficient private balance");
   tradeStatus.insert(disclose(agentId), disclose(3 as Uint<8>));
 }
+
+// ============================================================================
+// DARK INTENT NETWORK (DIN) — CROSS-CHAIN SOLVER CIRCUITS
+// ============================================================================
+
+// Commit a private dark intent with locked escrow vUSD and private limit price / asset bounds
+export circuit commitDarkIntent(agentId: Bytes<32>, intentId: Bytes<32>): [] {
+  assert(getEscrowVusdAmount() > (0 as Uint<64>), "invalid escrow amount");
+  assert(getEscrowVusdAmount() <= getPortfolioValue(), "insufficient vault collateral for intent");
+
+  const intentHash = disclose(
+    persistentHash<Vector<4, Bytes<32>>>([
+      getIntentAsset(),
+      getMinFillAmount() as Field as Bytes<32>,
+      getMaxPriceLimit() as Field as Bytes<32>,
+      getIntentExpiry() as Field as Bytes<32>
+    ])
+  );
+  darkIntentCommitment.insert(disclose(intentId), intentHash);
+  darkIntentStatus.insert(disclose(intentId), disclose(1 as Uint<8>));
+  darkIntentCount.increment(1);
+}
+
+// Atomically fulfill dark intent when external solver provides verified fill within price bounds
+export circuit fulfillDarkIntent(intentId: Bytes<32>, solverId: Bytes<32>, fillPriceUsd: Uint<64>, currentTime: Uint<64>): [] {
+  assert(darkIntentStatus.lookup(disclose(intentId)) == (1 as Uint<8>), "intent not in committed state");
+  assert(currentTime <= getIntentExpiry(), "intent expired");
+  assert(fillPriceUsd <= getMaxPriceLimit(), "fill price exceeds max price limit");
+
+  const recomputedIntentHash = disclose(
+    persistentHash<Vector<4, Bytes<32>>>([
+      getIntentAsset(),
+      getMinFillAmount() as Field as Bytes<32>,
+      getMaxPriceLimit() as Field as Bytes<32>,
+      getIntentExpiry() as Field as Bytes<32>
+    ])
+  );
+  assert(darkIntentCommitment.lookup(disclose(intentId)) == recomputedIntentHash, "intent parameters mismatch");
+
+  darkIntentStatus.insert(disclose(intentId), disclose(2 as Uint<8>));
+}
+
+// Refund escrowed vUSD if intent remains unfilled past intent expiry timeline
+export circuit refundDarkIntent(intentId: Bytes<32>, currentTime: Uint<64>): [] {
+  assert(darkIntentStatus.lookup(disclose(intentId)) == (1 as Uint<8>), "intent not eligible for refund");
+  assert(currentTime > getIntentExpiry(), "intent not yet expired");
+  darkIntentStatus.insert(disclose(intentId), disclose(3 as Uint<8>));
+}
+

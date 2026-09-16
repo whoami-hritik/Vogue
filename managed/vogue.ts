@@ -14,6 +14,11 @@ export interface StrategyWitnesses {
   getDepositTNightAmount?: () => bigint;
   getBurnTNightAmount?: () => bigint;
   getTNightPriceUsd?: () => bigint;
+  getIntentAsset?: () => string;
+  getMinFillAmount?: () => bigint;
+  getMaxPriceLimit?: () => bigint;
+  getIntentExpiry?: () => bigint;
+  getEscrowVusdAmount?: () => bigint;
 }
 
 export class VogueContractSimulator {
@@ -21,6 +26,9 @@ export class VogueContractSimulator {
   public agentCommitment = new Map<string, string>(); // agentId -> strategyHash
   public tradeStatus = new Map<string, number>();      // tradeId -> status (1=executed, 2=rejected, 3=withdrawn)
   public tradeCount: number = 0;
+  public darkIntentCommitment = new Map<string, string>(); // intentId -> intentHash
+  public darkIntentStatus = new Map<string, number>();     // intentId -> status (1=committed, 2=filled, 3=refunded)
+  public darkIntentCount: number = 0;
 
   private witnesses: StrategyWitnesses;
 
@@ -141,5 +149,106 @@ export class VogueContractSimulator {
     }
     this.tradeStatus.set(agentId, 3);
     return { success: true };
+  }
+
+  // ============================================================================
+  // DARK INTENT NETWORK (DIN) — SIMULATED CIRCUITS
+  // ============================================================================
+
+  public calculateIntentHash(
+    asset: string,
+    minFill: bigint,
+    maxPrice: bigint,
+    expiry: bigint
+  ): string {
+    const rawStr = `intent:${asset}:${minFill.toString()}:${maxPrice.toString()}:${expiry.toString()}`;
+    let hash = 0x2428cd4a;
+    for (let i = 0; i < rawStr.length; i++) {
+      hash ^= rawStr.charCodeAt(i);
+      hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+    const hex = (hash >>> 0).toString(16).padStart(8, '0');
+    return `0xintent_${hex}${hex}${hex}`;
+  }
+
+  public commitDarkIntent(agentId: string, intentId: string): { status: 'committed' | 'rejected'; intentHash?: string; reason?: string } {
+    try {
+      const escrow = this.witnesses.getEscrowVusdAmount ? this.witnesses.getEscrowVusdAmount() : 0n;
+      const portfolioVal = this.witnesses.getPortfolioValue();
+
+      if (escrow <= 0n) {
+        throw new Error('invalid escrow amount');
+      }
+      if (escrow > portfolioVal) {
+        throw new Error('insufficient vault collateral for intent');
+      }
+
+      const asset = this.witnesses.getIntentAsset ? this.witnesses.getIntentAsset() : 'ADA';
+      const minFill = this.witnesses.getMinFillAmount ? this.witnesses.getMinFillAmount() : 100n;
+      const maxPrice = this.witnesses.getMaxPriceLimit ? this.witnesses.getMaxPriceLimit() : 1000n;
+      const expiry = this.witnesses.getIntentExpiry ? this.witnesses.getIntentExpiry() : 1800000000n;
+
+      const intentHash = this.calculateIntentHash(asset, minFill, maxPrice, expiry);
+      this.darkIntentCommitment.set(intentId, intentHash);
+      this.darkIntentStatus.set(intentId, 1); // 1 = COMMITTED
+      this.darkIntentCount++;
+
+      return { status: 'committed', intentHash };
+    } catch (err: any) {
+      this.darkIntentStatus.set(intentId, 0);
+      return { status: 'rejected', reason: err.message };
+    }
+  }
+
+  public fulfillDarkIntent(intentId: string, solverId: string, fillPriceUsd: bigint, currentTime: bigint): { status: 'filled' | 'rejected'; reason?: string } {
+    try {
+      const status = this.darkIntentStatus.get(intentId);
+      if (status !== 1) {
+        throw new Error('intent not in committed state');
+      }
+
+      const expiry = this.witnesses.getIntentExpiry ? this.witnesses.getIntentExpiry() : 1800000000n;
+      if (currentTime > expiry) {
+        throw new Error('intent expired');
+      }
+
+      const maxPrice = this.witnesses.getMaxPriceLimit ? this.witnesses.getMaxPriceLimit() : 1000n;
+      if (fillPriceUsd > maxPrice) {
+        throw new Error('fill price exceeds max price limit');
+      }
+
+      const asset = this.witnesses.getIntentAsset ? this.witnesses.getIntentAsset() : 'ADA';
+      const minFill = this.witnesses.getMinFillAmount ? this.witnesses.getMinFillAmount() : 100n;
+      const recomputedHash = this.calculateIntentHash(asset, minFill, maxPrice, expiry);
+      const committedHash = this.darkIntentCommitment.get(intentId);
+
+      if (!committedHash || committedHash !== recomputedHash) {
+        throw new Error('intent parameters mismatch');
+      }
+
+      this.darkIntentStatus.set(intentId, 2); // 2 = FILLED
+      return { status: 'filled' };
+    } catch (err: any) {
+      return { status: 'rejected', reason: err.message };
+    }
+  }
+
+  public refundDarkIntent(intentId: string, currentTime: bigint): { status: 'refunded' | 'rejected'; reason?: string } {
+    try {
+      const status = this.darkIntentStatus.get(intentId);
+      if (status !== 1) {
+        throw new Error('intent not eligible for refund');
+      }
+
+      const expiry = this.witnesses.getIntentExpiry ? this.witnesses.getIntentExpiry() : 1800000000n;
+      if (currentTime <= expiry) {
+        throw new Error('intent not yet expired');
+      }
+
+      this.darkIntentStatus.set(intentId, 3); // 3 = REFUNDED
+      return { status: 'refunded' };
+    } catch (err: any) {
+      return { status: 'rejected', reason: err.message };
+    }
   }
 }

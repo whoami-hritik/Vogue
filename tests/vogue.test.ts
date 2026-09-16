@@ -177,4 +177,102 @@ describe('Vogue Compact Smart Contract Privacy & Verification Suite', () => {
     expect(res.status).toBe('rejected');
     expect(res.reason).toContain('exceeds max position size');
   });
+
+  it('10. commitDarkIntent: locks escrow vUSD & commits private limit intent bounds to ledger', () => {
+    const intentWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getPortfolioValue: () => 10000n,
+      getEscrowVusdAmount: () => 2000n, // $2,000 locked in escrow
+      getIntentAsset: () => 'ADA',
+      getMinFillAmount: () => 4000n,    // Min 4,000 ADA
+      getMaxPriceLimit: () => 50n,      // Max $0.50 per ADA
+      getIntentExpiry: () => 1760000000n
+    };
+
+    const contract = new VogueContractSimulator(intentWitnesses);
+    const agentId = '0xagent_din_1';
+    const intentId = '0xintent_101';
+
+    const res = contract.commitDarkIntent(agentId, intentId);
+    expect(res.status).toBe('committed');
+    expect(res.intentHash).toBeDefined();
+    expect(contract.darkIntentStatus.get(intentId)).toBe(1); // 1 = COMMITTED
+    expect(contract.darkIntentCount).toBe(1);
+    expect(contract.darkIntentCommitment.get(intentId)).toBe(res.intentHash);
+  });
+
+  it('11. fulfillDarkIntent: verifies external solver fill meets ZK price bound (fillPrice <= maxPriceLimit) and settles atomically', () => {
+    const intentWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getPortfolioValue: () => 10000n,
+      getEscrowVusdAmount: () => 2000n,
+      getIntentAsset: () => 'ADA',
+      getMinFillAmount: () => 4000n,
+      getMaxPriceLimit: () => 50n,      // Max $0.50 per ADA
+      getIntentExpiry: () => 1760000000n
+    };
+
+    const contract = new VogueContractSimulator(intentWitnesses);
+    const intentId = '0xintent_102';
+    const solverId = '0xsolver_hyperliquid_01';
+
+    contract.commitDarkIntent('0xagent_1', intentId);
+
+    // Solver provides fill at $0.45 (<= $0.50 max price limit)
+    const fillRes = contract.fulfillDarkIntent(intentId, solverId, 45n, 1750000000n);
+    expect(fillRes.status).toBe('filled');
+    expect(contract.darkIntentStatus.get(intentId)).toBe(2); // 2 = FILLED
+  });
+
+  it('12. fulfillDarkIntent: rejects solver fill if external price exceeds trader maxPriceLimit', () => {
+    const intentWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getPortfolioValue: () => 10000n,
+      getEscrowVusdAmount: () => 2000n,
+      getIntentAsset: () => 'ADA',
+      getMinFillAmount: () => 4000n,
+      getMaxPriceLimit: () => 50n,      // Max $0.50 per ADA
+      getIntentExpiry: () => 1760000000n
+    };
+
+    const contract = new VogueContractSimulator(intentWitnesses);
+    const intentId = '0xintent_103';
+    const solverId = '0xsolver_greedy';
+
+    contract.commitDarkIntent('0xagent_1', intentId);
+
+    // Solver attempts to overcharge at $0.55 (> $0.50 max price limit)
+    const overchargeRes = contract.fulfillDarkIntent(intentId, solverId, 55n, 1750000000n);
+    expect(overchargeRes.status).toBe('rejected');
+    expect(overchargeRes.reason).toContain('fill price exceeds max price limit');
+    expect(contract.darkIntentStatus.get(intentId)).toBe(1); // Stays COMMITTED
+  });
+
+  it('13. refundDarkIntent: allows escrow refund after intentExpiry timeout, rejecting premature refund attempts', () => {
+    const expiryTime = 1760000000n;
+    const intentWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getPortfolioValue: () => 10000n,
+      getEscrowVusdAmount: () => 1000n,
+      getIntentAsset: () => 'ETH',
+      getMinFillAmount: () => 1n,
+      getMaxPriceLimit: () => 3500n,
+      getIntentExpiry: () => expiryTime
+    };
+
+    const contract = new VogueContractSimulator(intentWitnesses);
+    const intentId = '0xintent_104';
+
+    contract.commitDarkIntent('0xagent_1', intentId);
+
+    // Premature refund before expiry
+    const prematureRes = contract.refundDarkIntent(intentId, expiryTime - 500n);
+    expect(prematureRes.status).toBe('rejected');
+    expect(prematureRes.reason).toContain('intent not yet expired');
+
+    // Valid refund after expiry
+    const validRefundRes = contract.refundDarkIntent(intentId, expiryTime + 100n);
+    expect(validRefundRes.status).toBe('refunded');
+    expect(contract.darkIntentStatus.get(intentId)).toBe(3); // 3 = REFUNDED
+  });
 });
