@@ -275,4 +275,68 @@ describe('Vogue Compact Smart Contract Privacy & Verification Suite', () => {
     expect(validRefundRes.status).toBe('refunded');
     expect(contract.darkIntentStatus.get(intentId)).toBe(3); // 3 = REFUNDED
   });
+
+  it('14. registerAlphaStrategy: registers strategy for blind copy-trading with performance fee bounds', () => {
+    const alphaWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getAlphaFeeBps: () => 1500, // 15% performance fee
+      getAlphaMinStakeUsd: () => 250n
+    };
+
+    const contract = new VogueContractSimulator(alphaWitnesses);
+    const strategyId = '0xstrategy_alpha_01';
+
+    const res = contract.registerAlphaStrategy(strategyId, 1500);
+    expect(res.status).toBe('registered');
+    expect(contract.alphaStrategyRegistry.get(strategyId)).toBeDefined();
+    expect(contract.alphaStrategyCount).toBe(1);
+  });
+
+  it('15. registerAlphaStrategy: rejects predatory performance fees exceeding 50% ceiling', () => {
+    const contract = new VogueContractSimulator(defaultWitnesses);
+    const strategyId = '0xstrategy_greedy';
+
+    // 60% fee (6000 bps > 5000 max)
+    const res = contract.registerAlphaStrategy(strategyId, 6000);
+    expect(res.status).toBe('rejected');
+    expect(res.reason).toContain('performance fee cannot exceed 50%');
+  });
+
+  it('16. subscribeAlphaStrategy: registers shielded follower subscription to a verified strategy', () => {
+    const contract = new VogueContractSimulator(defaultWitnesses);
+    const strategyId = '0xstrategy_alpha_02';
+    const subId = '0xsub_follower_99';
+
+    // Must be registered first
+    contract.registerAlphaStrategy(strategyId, 1500);
+
+    const subRes = contract.subscribeAlphaStrategy(subId, strategyId);
+    expect(subRes.status).toBe('subscribed');
+    expect(contract.alphaSubscriptionStatus.get(subId)).toBe(1); // 1 = ACTIVE
+  });
+
+  it('17. settlePerformanceFee: enforces High-Water Mark guarantee (only deducts fee on net new profit above HWM)', () => {
+    const alphaWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getAlphaFeeBps: () => 1500 // 15%
+    };
+
+    const contract = new VogueContractSimulator(alphaWitnesses);
+    const strategyId = '0xstrategy_alpha_03';
+    const subId = '0xsub_follower_100';
+
+    contract.registerAlphaStrategy(strategyId, 1500);
+    contract.subscribeAlphaStrategy(subId, strategyId);
+
+    // Trade profit = $1,000, Previous High-Water Mark = $600
+    // Net new gain = $400. 15% of $400 = $60 fee
+    const feeRes = contract.settlePerformanceFee(strategyId, subId, 1000n, 600n);
+    expect(feeRes.status).toBe('settled');
+    expect(feeRes.feeAmountUsd).toBe(60n);
+
+    // Trade in drawdown: profit $500 <= HWM $600 -> Rejects fee deduction
+    const drawdownRes = contract.settlePerformanceFee(strategyId, subId, 500n, 600n);
+    expect(drawdownRes.status).toBe('rejected');
+    expect(drawdownRes.reason).toContain('High-Water Mark');
+  });
 });

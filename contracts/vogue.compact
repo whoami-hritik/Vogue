@@ -31,6 +31,9 @@ export ledger tradeCount: Counter;
 export ledger darkIntentCommitment: Map<Bytes<32>, Bytes<32>>;   // intentId -> private intent hash
 export ledger darkIntentStatus: Map<Bytes<32>, Uint<8>>;         // intentId -> 0=none, 1=committed, 2=filled, 3=refunded
 export ledger darkIntentCount: Counter;
+export ledger alphaStrategyRegistry: Map<Bytes<32>, Bytes<32>>;   // strategyId -> profile commitment hash
+export ledger alphaSubscriptionStatus: Map<Bytes<32>, Uint<8>>;   // subscriptionId -> 1=active, 2=cancelled
+export ledger alphaStrategyCount: Counter;
 
 // ---------- PRIVATE WITNESSES ----------
 witness getMaxPositionPct(): Uint<8>;
@@ -49,6 +52,10 @@ witness getMinFillAmount(): Uint<64>;
 witness getMaxPriceLimit(): Uint<64>;
 witness getIntentExpiry(): Uint<64>;
 witness getEscrowVusdAmount(): Uint<64>;
+witness getAlphaFeeBps(): Uint<16>;
+witness getAlphaMinStakeUsd(): Uint<64>;
+witness getAlphaProfitUsd(): Uint<64>;
+witness getAlphaHighWaterMarkUsd(): Uint<64>;
 
 // ---------- CIRCUITS ----------
 
@@ -153,4 +160,38 @@ export circuit refundDarkIntent(intentId: Bytes<32>, currentTime: Uint<64>): [] 
   assert(currentTime > getIntentExpiry(), "intent not yet expired");
   darkIntentStatus.insert(disclose(intentId), disclose(3 as Uint<8>));
 }
+
+// ============================================================================
+// PROOF OF ALPHA (POA) — BLIND COPY-TRADING & PERFORMANCE CIRCUITS
+// ============================================================================
+
+// Register strategy for public blind marketplace discovery with performance fee bounds
+export circuit registerAlphaStrategy(strategyId: Bytes<32>, feeBps: Uint<16>): [] {
+  assert(feeBps <= (5000 as Uint<16>), "performance fee cannot exceed 50%");
+  assert(getAlphaMinStakeUsd() >= (0 as Uint<64>), "invalid min stake");
+
+  const profileHash = disclose(
+    persistentHash<Vector<2, Bytes<32>>>([
+      feeBps as Field as Bytes<32>,
+      getAlphaMinStakeUsd() as Field as Bytes<32>
+    ])
+  );
+  alphaStrategyRegistry.insert(disclose(strategyId), profileHash);
+  alphaStrategyCount.increment(1);
+}
+
+// Subscribe to a verified Alpha strategy with shielded follower collateral
+export circuit subscribeAlphaStrategy(subscriptionId: Bytes<32>, strategyId: Bytes<32>): [] {
+  assert(alphaStrategyRegistry.member(disclose(strategyId)), "strategy not registered in alpha registry");
+  alphaSubscriptionStatus.insert(disclose(subscriptionId), disclose(1 as Uint<8>));
+}
+
+// Settle performance fee on net new profits above High-Water Mark in Zero-Knowledge
+export circuit settlePerformanceFee(strategyId: Bytes<32>, subscriptionId: Bytes<32>, profitUsd: Uint<64>, currentHwm: Uint<64>): [] {
+  assert(alphaSubscriptionStatus.lookup(disclose(subscriptionId)) == (1 as Uint<8>), "subscription not active");
+  assert(profitUsd > (0 as Uint<64>), "zero profit cannot be fee-settled");
+  assert(profitUsd > currentHwm, "profit does not breach High-Water Mark threshold");
+  assert(getAlphaFeeBps() <= (5000 as Uint<16>), "invalid fee percentage");
+}
+
 

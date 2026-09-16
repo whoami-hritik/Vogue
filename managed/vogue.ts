@@ -19,6 +19,10 @@ export interface StrategyWitnesses {
   getMaxPriceLimit?: () => bigint;
   getIntentExpiry?: () => bigint;
   getEscrowVusdAmount?: () => bigint;
+  getAlphaFeeBps?: () => number;
+  getAlphaMinStakeUsd?: () => bigint;
+  getAlphaProfitUsd?: () => bigint;
+  getAlphaHighWaterMarkUsd?: () => bigint;
 }
 
 export class VogueContractSimulator {
@@ -29,6 +33,9 @@ export class VogueContractSimulator {
   public darkIntentCommitment = new Map<string, string>(); // intentId -> intentHash
   public darkIntentStatus = new Map<string, number>();     // intentId -> status (1=committed, 2=filled, 3=refunded)
   public darkIntentCount: number = 0;
+  public alphaStrategyRegistry = new Map<string, string>(); // strategyId -> profile hash
+  public alphaSubscriptionStatus = new Map<string, number>(); // subscriptionId -> 1=active, 2=cancelled
+  public alphaStrategyCount: number = 0;
 
   private witnesses: StrategyWitnesses;
 
@@ -250,5 +257,55 @@ export class VogueContractSimulator {
     } catch (err: any) {
       return { status: 'rejected', reason: err.message };
     }
+  }
+
+  // ============================================================================
+  // PROOF OF ALPHA (POA) — SIMULATED CIRCUITS
+  // ============================================================================
+
+  public registerAlphaStrategy(strategyId: string, feeBps: number): { status: 'registered' | 'rejected'; reason?: string } {
+    if (feeBps > 5000) {
+      return { status: 'rejected', reason: 'performance fee cannot exceed 50%' };
+    }
+    const minStake = this.witnesses.getAlphaMinStakeUsd ? this.witnesses.getAlphaMinStakeUsd() : 100n;
+    if (minStake < 0n) {
+      return { status: 'rejected', reason: 'invalid min stake' };
+    }
+    const profileHash = `0xalpha_${feeBps}_${minStake}`;
+    this.alphaStrategyRegistry.set(strategyId, profileHash);
+    this.alphaStrategyCount++;
+    return { status: 'registered' };
+  }
+
+  public subscribeAlphaStrategy(subscriptionId: string, strategyId: string): { status: 'subscribed' | 'rejected'; reason?: string } {
+    if (!this.alphaStrategyRegistry.has(strategyId)) {
+      return { status: 'rejected', reason: 'strategy not registered in alpha registry' };
+    }
+    this.alphaSubscriptionStatus.set(subscriptionId, 1);
+    return { status: 'subscribed' };
+  }
+
+  public settlePerformanceFee(
+    strategyId: string,
+    subscriptionId: string,
+    profitUsd: bigint,
+    currentHwm: bigint
+  ): { status: 'settled' | 'rejected'; feeAmountUsd?: bigint; reason?: string } {
+    const subStatus = this.alphaSubscriptionStatus.get(subscriptionId);
+    if (subStatus !== 1) {
+      return { status: 'rejected', reason: 'subscription not active' };
+    }
+    if (profitUsd <= 0n) {
+      return { status: 'rejected', reason: 'zero profit cannot be fee-settled' };
+    }
+    if (profitUsd <= currentHwm) {
+      return { status: 'rejected', reason: 'profit does not breach High-Water Mark threshold' };
+    }
+
+    const feeBps = this.witnesses.getAlphaFeeBps ? BigInt(this.witnesses.getAlphaFeeBps()!) : 1500n; // 15% default
+    const netGain = profitUsd - currentHwm;
+    const feeAmount = (netGain * feeBps) / 10000n;
+
+    return { status: 'settled', feeAmountUsd: feeAmount };
   }
 }
