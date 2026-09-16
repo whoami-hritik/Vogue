@@ -53,6 +53,17 @@ import {
 import { confirmTransaction } from '../utils/rpc';
 import { runManualAnalysis, TradeRecommendation } from '../utils/agent';
 import { postEvent, newEventId } from '../lib/analytics';
+import {
+  commitDarkIntentWorkflow,
+  simulateSolverExecution,
+  settleDarkIntentOnMidnight,
+  getActiveDarkIntents,
+  type DarkIntent,
+} from '../lib/solver-network';
+import {
+  compareExecutionRoutes,
+  type RouteQuote,
+} from '../lib/liquidity-router';
 
 export interface ActiveStrategy {
   id: string;
@@ -109,6 +120,8 @@ export function useMidnight() {
   const [trades, setTrades] = useState<TradeRecord[]>(INITIAL_TRADE_HISTORY);
   const [isProofGenerating, setIsProofGenerating] = useState(false);
   const [proofStep, setProofStep] = useState('');
+  const [darkIntents, setDarkIntents] = useState<DarkIntent[]>([]);
+  const [isDarkIntentModalOpen, setIsDarkIntentModalOpen] = useState(false);
 
   // ─── Analysis state ────────────────────────────────────────────────
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
@@ -650,6 +663,116 @@ export function useMidnight() {
     }
   }, [activeStrategies, networkId, session, walletAddress, addLog]);
 
+  // ─── Execute Dark Intent Trade (Cross-Chain Solver Network) ─────────
+  const executeDarkIntentTrade = useCallback(
+    async (
+      agentId: string,
+      targetAsset: string = 'ADA',
+      tradeSizeUsd: number = 1200,
+      chosenRoute: RouteQuote
+    ): Promise<TradeRecord | undefined> => {
+      setIsProofGenerating(true);
+      setError(null);
+
+      try {
+        const currentVault = getLocalVaultBalance();
+        if (currentVault <= 0 || currentVault < tradeSizeUsd) {
+          const vaultErrMsg = `Insufficient Shielded Vault Balance: Requires $${tradeSizeUsd.toLocaleString()} vUSD, but current vault has $${currentVault.toLocaleString()} vUSD. Please mint vUSD in the Vault tab.`;
+          setError(vaultErrMsg);
+          addLog('error', 'DIN Blocked — Insufficient Vault', vaultErrMsg);
+          throw new Error(vaultErrMsg);
+        }
+
+        addLog('info', 'DIN Intent Initiated', `Creating ZK Dark Intent for $${tradeSizeUsd} ${targetAsset} routed via ${chosenRoute.venue.name}...`);
+        setProofStep(`1. Committing ZK Escrow Intent to Midnight Consensus...`);
+
+        const currentAddr = session?.shieldedAddress || session?.address || walletAddress || '';
+
+        // 1. Commit Dark Intent on Midnight
+        const intent = await commitDarkIntentWorkflow(
+          agentId,
+          targetAsset,
+          tradeSizeUsd,
+          chosenRoute,
+          currentAddr
+        );
+        setDarkIntents(getActiveDarkIntents());
+        setVaultBalance(getLocalVaultBalance());
+        addLog('success', 'ZK Intent Locked', `Intent ${intent.intentId} committed. Escrow locked. TX: ${intent.midnightCommitTxHash}`);
+
+        // 2. Off-chain Bonded Solver Bidding & External Fill
+        setProofStep(`2. Off-chain Bonded Solver Fill on ${chosenRoute.venue.name}...`);
+        addLog('info', 'Solver RFQ Active', `Solver ${intent.solver?.name} fulfilling at price $${chosenRoute.executionPriceUsd} (${chosenRoute.priceImpactPct}% slippage)...`);
+
+        const receipt = await simulateSolverExecution(intent, chosenRoute);
+        setDarkIntents(getActiveDarkIntents());
+        addLog('success', 'External Venue Filled', `Filled on ${chosenRoute.venue.chain}. Ext TX: ${receipt.externalTxHash.substring(0, 16)}… | Proof: ${receipt.cryptographicProofHash.substring(0, 16)}…`);
+
+        // 3. Midnight Atomic ZK Settlement
+        setProofStep(`3. Atomic Zero-Knowledge Settlement & Shielded Note Issuance...`);
+        const settleTx = await settleDarkIntentOnMidnight(intent, receipt);
+        setDarkIntents(getActiveDarkIntents());
+        addLog('success', 'Midnight Settled', `Atomic settlement verified. Escrow paid to solver. TX: ${settleTx}`);
+
+        const pnlPct = Number((Math.random() * 6 + 1.2).toFixed(2));
+        const pnlUsd = Number(((tradeSizeUsd * pnlPct) / 100).toFixed(2));
+
+        const newTrade: TradeRecord = {
+          id: `0xdin_${intent.intentId.substring(8, 15)}`,
+          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+          asset: targetAsset,
+          type: 'BUY',
+          sizeUsd: tradeSizeUsd,
+          priceUsd: receipt.actualFillPrice,
+          pnlUsd,
+          pnlPct,
+          status: 'executed',
+          proofTimeMs: chosenRoute.venue.avgLatencyMs,
+          commitmentHash: intent.midnightCommitTxHash || settleTx,
+          txHash: settleTx,
+          rpcStatus: 'confirmed',
+          routingVenue: chosenRoute.venue.name,
+          slippageSavedUsd: chosenRoute.slippageSavedUsd,
+          externalTxHash: receipt.externalTxHash,
+          solverId: intent.solver?.id,
+          anonymityScore: chosenRoute.venue.anonymityScore,
+        };
+
+        setTrades((prev) => [newTrade, ...prev]);
+
+        syncTradeExecution({
+          trade_id: newTrade.id,
+          agent_id: agentId,
+          commitment_hash: newTrade.commitmentHash,
+          tx_hash: settleTx,
+          asset: targetAsset,
+          status: newTrade.status,
+          proof_time_ms: newTrade.proofTimeMs,
+          timestamp: newTrade.timestamp,
+        }).catch((e) => console.warn('[Vogue Sync] DIN Trade sync error:', e));
+
+        void postEvent({
+          client_event_id: newEventId(),
+          wallet_address: currentAddr || 'unknown',
+          operation: 'trade_executed',
+          status: 'success',
+          tx_hash: settleTx,
+          network: networkId,
+        });
+
+        return newTrade;
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Dark Intent execution failed';
+        setError(msg);
+        addLog('error', 'Dark Intent Failed', msg);
+        return undefined;
+      } finally {
+        setIsProofGenerating(false);
+      }
+    },
+    [session, walletAddress, networkId, addLog]
+  );
+
   return {
     // Wallet state
     detectedWallets,
@@ -681,6 +804,9 @@ export function useMidnight() {
     isModalOpen,
     setIsModalOpen,
     protocolLogs,
+    isDarkIntentModalOpen,
+    setIsDarkIntentModalOpen,
+    darkIntents,
 
     // Actions
     scanWallets,
@@ -701,6 +827,7 @@ export function useMidnight() {
     analyzeStrategy,
     commitStrategyCircuit,
     executeProvenTrade,
+    executeDarkIntentTrade,
 
     // Compat shims
     windowMidnightKeys: detectedWallets.map((w) => w.id),

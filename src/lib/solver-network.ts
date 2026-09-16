@@ -1,5 +1,5 @@
 /**
- * Vogue — Bonded Solver Network & Atomic Intent Execution Engine (DIN)
+ * Vogue ï¿½ Bonded Solver Network & Atomic Intent Execution Engine (DIN)
  *
  * Coordinates decentralized solvers that compete to fill private Midnight intents
  * across external deep liquidity venues (Hyperliquid, Uniswap, Cardano) and settle

@@ -15,7 +15,7 @@ import {
   DarkIntent,
 } from '../src/lib/solver-network';
 
-describe('Vogue Dark Intent Network (DIN) — Liquidity Router & Solver Suite', () => {
+describe('Vogue Dark Intent Network (DIN) ï¿½ Liquidity Router & Solver Suite', () => {
   it('1. calculateIsolatedVaultSlippage: demonstrates significant price impact scaling on isolated vaults', () => {
     const smallSlip = calculateIsolatedVaultSlippage(500);
     const midSlip = calculateIsolatedVaultSlippage(25000);

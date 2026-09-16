@@ -24,6 +24,11 @@ export interface TradeRecord {
   commitmentHash: string;
   txHash?: string;
   rpcStatus?: 'pending' | 'confirmed' | 'failed';
+  routingVenue?: string;
+  slippageSavedUsd?: number;
+  externalTxHash?: string;
+  solverId?: string;
+  anonymityScore?: number;
 }
 
 export interface MarketTicker {

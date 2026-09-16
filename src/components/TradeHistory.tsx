@@ -250,7 +250,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
                           {formatISTDateTime(trade.timestamp)}
                         </td>
 
-                        {/* Asset & Type */}
+                        {/* Asset & Type & Liquidity Route */}
                         <td className="p-4">
                           <div className="flex items-center gap-1.5">
                             <span className="font-bold text-gray-900">{trade.asset}</span>
@@ -266,6 +266,22 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
                               {trade.type || 'BUY'}
                             </span>
                           </div>
+                          {trade.routingVenue ? (
+                            <div className="mt-1 flex items-center gap-1">
+                              <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-orange-50 border border-orange-200 text-orange-800 uppercase">
+                                DIN: {trade.routingVenue}
+                              </span>
+                              {trade.slippageSavedUsd && trade.slippageSavedUsd > 0 && (
+                                <span className="text-[9px] font-bold text-emerald-700">
+                                  +${trade.slippageSavedUsd.toFixed(1)} saved
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-[9px] text-gray-500 font-mono mt-0.5">
+                              Isolated Vault
+                            </div>
+                          )}
                         </td>
 
                         {/* Size & Price */}

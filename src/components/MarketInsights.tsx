@@ -11,14 +11,24 @@ import {
   AlertCircle,
   ExternalLink,
   Sliders,
-  CheckCircle2
+  CheckCircle2,
+  Layers,
+  EyeOff,
+  Globe
 } from 'lucide-react';
 import { createGeminiLLM } from '../utils/agent';
 import { fetchLiveMarketData, type LiveMarketAsset } from '../utils/marketData';
 import type { ActiveStrategy } from '../hooks/useMidnight';
+import {
+  compareExecutionRoutes,
+  type RouteQuote,
+  type LiquidityVenueId,
+} from '../lib/liquidity-router';
 
 interface MarketInsightsProps {
   onExecuteTrade: (asset: string, amountUsd: number, agentId?: string) => Promise<unknown>;
+  onExecuteDarkIntentTrade?: (agentId: string, asset: string, amountUsd: number, route: RouteQuote) => Promise<unknown>;
+  onOpenDarkIntentMonitor?: () => void;
   isProofGenerating: boolean;
   walletConnected: boolean;
   onConnectWallet: () => void;
@@ -29,6 +39,8 @@ interface MarketInsightsProps {
 
 export const MarketInsights: React.FC<MarketInsightsProps> = ({
   onExecuteTrade,
+  onExecuteDarkIntentTrade,
+  onOpenDarkIntentMonitor,
   isProofGenerating,
   walletConnected,
   onConnectWallet,
@@ -127,6 +139,18 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
   };
 
   const selectedData = marketData.find((m) => m.symbol === selectedAsset) || marketData[0] || defaultAsset;
+
+  const [executionMode, setExecutionMode] = useState<'din_solver' | 'standard'>('din_solver');
+  const [selectedVenueId, setSelectedVenueId] = useState<LiquidityVenueId>('hyperliquid');
+
+  const routeComparison = compareExecutionRoutes(
+    selectedData.symbol,
+    defaultTradeSize,
+    selectedData.price
+  );
+  const activeRoute =
+    routeComparison.routes.find((r) => r.venue.id === selectedVenueId) ||
+    routeComparison.optimalRoute;
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 font-sans text-gray-900 relative z-10">
@@ -322,7 +346,7 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
               </p>
             </div>
 
-            {/* Execute Proven ZK Trade Button directly from Market Insights */}
+              {/* Execute Proven ZK Trade Button directly from Market Insights */}
             <div className="pt-4 flex flex-col gap-4 bg-white/40 p-6 rounded-[1.5rem] border border-white/60 shadow-sm relative z-10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="space-y-1">
@@ -342,6 +366,108 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
                   </span>
                 </div>
               </div>
+
+              {/* Execution Mode Selector (Standard vs DIN Solver) */}
+              <div className="bg-white/50 p-1.5 rounded-2xl border border-white/70 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setExecutionMode('din_solver')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    executionMode === 'din_solver'
+                      ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-white/60'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Cross-Chain Solver (DIN)</span>
+                  <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-black/20 uppercase tracking-widest">
+                    DEEP LIQUIDITY
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setExecutionMode('standard')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    executionMode === 'standard'
+                      ? 'bg-gray-900 text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-white/60'
+                  }`}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>Standard Isolated Vault</span>
+                </button>
+              </div>
+
+              {/* Cross-Chain DIN Liquidity Routing Details */}
+              {executionMode === 'din_solver' && (
+                <div className="space-y-3 p-3.5 rounded-2xl bg-gradient-to-br from-orange-50/60 via-white/60 to-amber-50/40 border border-orange-200/60">
+                  {/* Dynamic Slippage Savings Bar */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-orange-100 text-xs">
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <TrendingDown className="w-4 h-4 text-emerald-600" />
+                      <span>
+                        Isolated Vault Slippage: <strong className="text-red-700">{routeComparison.isolatedVaultBaseline.slippagePct}%</strong>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-emerald-700 font-bold bg-emerald-100/70 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[11px]">
+                        DIN Slippage: {activeRoute.priceImpactPct}% (Save +${activeRoute.slippageSavedUsd} vUSD)
+                      </span>
+                      {onOpenDarkIntentMonitor && (
+                        <button
+                          type="button"
+                          onClick={onOpenDarkIntentMonitor}
+                          className="text-[10px] font-black text-orange-700 hover:text-orange-950 uppercase tracking-widest cursor-pointer underline flex items-center gap-1"
+                        >
+                          Monitor Solvers
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Venues Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                    {routeComparison.routes.map((route) => {
+                      const isSelected = route.venue.id === selectedVenueId;
+                      return (
+                        <button
+                          type="button"
+                          key={route.venue.id}
+                          onClick={() => setSelectedVenueId(route.venue.id)}
+                          className={`p-2.5 rounded-xl text-left border transition-all cursor-pointer relative ${
+                            isSelected
+                              ? 'bg-white border-orange-400 shadow-md ring-1 ring-orange-400'
+                              : 'bg-white/40 border-white/80 hover:bg-white/70'
+                          }`}
+                        >
+                          {route.isOptimal && (
+                            <span className="absolute -top-1.5 right-1.5 px-1.5 py-0.2 rounded-full text-[8px] font-black bg-emerald-500 text-white tracking-widest uppercase shadow-sm">
+                              OPTIMAL
+                            </span>
+                          )}
+                          <span className="text-[11px] font-extrabold text-gray-900 block truncate">
+                            {route.venue.shortLabel}
+                          </span>
+                          <span className="text-[9px] text-gray-500 block truncate">
+                            {route.venue.chain}
+                          </span>
+                          <div className="flex items-center justify-between mt-1 text-[10px] font-mono">
+                            <span className="text-emerald-600 font-bold">{route.priceImpactPct}% slip</span>
+                            <span className="text-gray-400">{route.venue.avgLatencyMs}ms</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="text-[10px] text-gray-500 flex items-center gap-1.5 font-medium pt-1">
+                    <EyeOff className="w-3 h-3 text-orange-500" />
+                    <span>External venue only sees the bonded solver. Your Midnight identity & alpha stay 100% private.</span>
+                  </div>
+                </div>
+              )}
 
               {/* Balance Warning if vault balance < defaultTradeSize */}
               {vaultBalance < defaultTradeSize && (
@@ -366,6 +492,13 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
                   onClick={() => {
                     if (!walletConnected) {
                       onConnectWallet();
+                    } else if (executionMode === 'din_solver' && onExecuteDarkIntentTrade) {
+                      onExecuteDarkIntentTrade(
+                        currentStrategy?.agentId || '0xagent_default',
+                        selectedData.symbol,
+                        defaultTradeSize,
+                        activeRoute
+                      );
                     } else {
                       onExecuteTrade(selectedData.symbol, defaultTradeSize, currentStrategy?.agentId);
                     }
@@ -385,7 +518,9 @@ export const MarketInsights: React.FC<MarketInsightsProps> = ({
                       ? 'Proving ZK Circuit...'
                       : vaultBalance < defaultTradeSize
                       ? `Insufficient Balance ($${vaultBalance} / $${defaultTradeSize} vUSD)`
-                      : `Execute $${defaultTradeSize} ${selectedData.symbol} Trade`}
+                      : executionMode === 'din_solver'
+                      ? `Execute $${defaultTradeSize} ${selectedData.symbol} via ${activeRoute.venue.shortLabel}`
+                      : `Execute $${defaultTradeSize} ${selectedData.symbol} (Standard)`}
                   </span>
                 </button>
               </div>

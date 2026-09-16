@@ -9,6 +9,7 @@ import { Portfolio } from './components/Portfolio';
 import { TradeHistory } from './components/TradeHistory';
 import { MarketChart } from './components/MarketChart';
 import { OverviewStrategies } from './components/OverviewStrategies';
+import { DarkIntentMonitor } from './components/DarkIntentMonitor';
 import { formatISTDate, formatISTTime } from './utils/time';
 import { useMidnight } from './hooks/useMidnight';
 import { PreprodCounter } from './components/PreprodCounter';
@@ -71,7 +72,10 @@ export function App() {
     recommendationMap,
     analyzeStrategy,
     commitStrategyCircuit,
-    executeProvenTrade
+    executeProvenTrade,
+    executeDarkIntentTrade,
+    isDarkIntentModalOpen,
+    setIsDarkIntentModalOpen,
   } = useMidnight();
 
   const [withdrawAmount, setWithdrawAmount] = useState<string>('500');
@@ -305,6 +309,10 @@ export function App() {
             onExecuteTrade={(asset, amount, agentId) =>
               executeProvenTrade(agentId || activeStrategies[0]?.agentId || '0xagent_1', amount, asset, 'BUY')
             }
+            onExecuteDarkIntentTrade={(agentId, asset, amount, route) =>
+              executeDarkIntentTrade(agentId || activeStrategies[0]?.agentId || '0xagent_1', asset, amount, route)
+            }
+            onOpenDarkIntentMonitor={() => setIsDarkIntentModalOpen(true)}
             isProofGenerating={isProofGenerating}
             walletConnected={walletConnected}
             onConnectWallet={() => setIsModalOpen(true)}
@@ -604,6 +612,13 @@ export function App() {
         onConnect={connectWallet}
         onDisconnect={disconnectWallet}
         onClearCache={clearWalletCache}
+      />
+
+      {/* DARK INTENT NETWORK (DIN) SOLVER MONITOR */}
+      <DarkIntentMonitor
+        isOpen={isDarkIntentModalOpen}
+        onClose={() => setIsDarkIntentModalOpen(false)}
+        networkId={networkId}
       />
     </>
   );

@@ -1,5 +1,5 @@
 /**
- * Vogue — Cross-Chain Liquidity & Solver Router (DIN Engine)
+ * Vogue ï¿½ Cross-Chain Liquidity & Solver Router (DIN Engine)
  *
  * Solves the "Island Liquidity" trap by dynamically routing private trade intents
  * to the deepest execution venues (Hyperliquid, Uniswap v3, Minswap, and Midnight P2P Dark Pool)
