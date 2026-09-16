@@ -18,7 +18,8 @@ import {
   Play,
   RotateCcw,
   PlusCircle,
-  X
+  X,
+  Cpu
 } from 'lucide-react';
 import {
   AlphaStrategy,
@@ -31,6 +32,7 @@ import {
   FeeSettlementResult
 } from '../lib/alpha-engine';
 import { AlphaPublisherModal } from './AlphaPublisherModal';
+import { AlphaEnclaveFeed } from './AlphaEnclaveFeed';
 
 interface AlphaMarketplaceProps {
   walletConnected: boolean;
@@ -49,7 +51,7 @@ export const AlphaMarketplace: React.FC<AlphaMarketplaceProps> = ({
 }) => {
   const [strategies, setStrategies] = useState<AlphaStrategy[]>([]);
   const [subscriptions, setSubscriptions] = useState<AlphaSubscription[]>([]);
-  const [activeSubTab, setActiveSubTab] = useState<'marketplace' | 'my-subscriptions'>('marketplace');
+  const [activeSubTab, setActiveSubTab] = useState<'marketplace' | 'my-subscriptions' | 'enclave-feed'>('marketplace');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState<'sharpe' | 'roi' | 'drawdown' | 'capital'>('sharpe');
 
@@ -206,6 +208,18 @@ export const AlphaMarketplace: React.FC<AlphaMarketplaceProps> = ({
                   {subscriptions.length}
                 </span>
               )}
+            </button>
+            <button
+              onClick={() => setActiveSubTab('enclave-feed')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeSubTab === 'enclave-feed'
+                  ? 'bg-orange-600 text-white shadow-xs'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Cpu className="w-3.5 h-3.5" />
+              <span>Enclave Feed</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </button>
           </div>
 
@@ -594,6 +608,17 @@ export const AlphaMarketplace: React.FC<AlphaMarketplaceProps> = ({
             </div>
           )}
         </div>
+      )}
+
+      {/* ─── TAB 3: CONFIDENTIAL ENCLAVE LIVE FEED & MONITOR ─────────────── */}
+      {activeSubTab === 'enclave-feed' && (
+        <AlphaEnclaveFeed
+          walletAddress={walletAddress}
+          walletConnected={walletConnected}
+          vaultBalance={vaultBalance}
+          onConnectWallet={onConnectWallet}
+          onRefreshVault={loadData}
+        />
       )}
 
       {/* ─── MODAL 1: VERIFY CRYPTOGRAPHIC ALPHA ─────────────────────────── */}
