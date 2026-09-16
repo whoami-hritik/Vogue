@@ -339,4 +339,106 @@ describe('Vogue Compact Smart Contract Privacy & Verification Suite', () => {
     expect(drawdownRes.status).toBe('rejected');
     expect(drawdownRes.reason).toContain('High-Water Mark');
   });
+
+  // ============================================================================
+  // INSTITUTIONAL COMPLIANCE & SELECTIVE AUDITABILITY TESTS
+  // ============================================================================
+
+  it('18. registerComplianceAttestation: registers institutional compliance when AML risk score is clean', () => {
+    const complianceWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getComplianceRiskScore: () => 5, // Pristine AML score (0-15 allowed)
+      getKycTier: () => 2 // Tier 2 = Institutional Hedge Fund
+    };
+
+    const contract = new VogueContractSimulator(complianceWitnesses);
+    const fundId = '0xfund_brevan_howard_alpha';
+    const kycProviderId = '0xoracle_chainalysis_kyc';
+
+    const res = contract.registerComplianceAttestation(fundId, kycProviderId);
+    expect(res.status).toBe('registered');
+    expect(contract.complianceAttestationRegistry.get(fundId)).toBeDefined();
+  });
+
+  it('19. registerComplianceAttestation: rejects high-risk capital exceeding institutional threshold', () => {
+    const taintedWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getComplianceRiskScore: () => 65, // High AML risk (e.g. mixer tainted)
+      getKycTier: () => 2
+    };
+
+    const contract = new VogueContractSimulator(taintedWitnesses);
+    const fundId = '0xfund_tainted_origin';
+    const kycProviderId = '0xoracle_chainalysis_kyc';
+
+    const res = contract.registerComplianceAttestation(fundId, kycProviderId);
+    expect(res.status).toBe('rejected');
+    expect(res.reason).toContain('compliance risk score exceeds institutional threshold');
+  });
+
+  it('20. delegateAuditorAccess: delegates time-locked, scoped viewing key to accredited auditor', () => {
+    const now = 1750000000n;
+    const auditorExpiry = now + 86400n * 90n; // 90-day time-lock
+    const auditorWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getComplianceRiskScore: () => 4,
+      getKycTier: () => 2,
+      getAuditorScopeBitmask: () => 0x05, // Scope: NAV (0x01) + Risk Limits (0x04)
+      getAuditorExpiry: () => auditorExpiry
+    };
+
+    const contract = new VogueContractSimulator(auditorWitnesses);
+    const fundId = '0xfund_millennium_vault';
+    contract.registerComplianceAttestation(fundId, '0xoracle_chainalysis');
+
+    const delegationId = '0xdelegation_deloitte_q3';
+    const auditorPubKey = '0xdeloitte_auditor_pubkey_001';
+
+    const res = contract.delegateAuditorAccess(delegationId, fundId, auditorPubKey, now);
+    expect(res.status).toBe('delegated');
+    expect(contract.auditorDelegationCount).toBe(1);
+
+    const record = contract.auditorAccessRegistry.get(delegationId);
+    expect(record).toBeDefined();
+    expect(record?.auditorPubKey).toBe(auditorPubKey);
+    expect(record?.scopeBitmask).toBe(0x05);
+    expect(record?.active).toBe(true);
+  });
+
+  it('21. revokeAuditorAccess: immediately terminates auditor viewing privileges on-chain', () => {
+    const now = 1750000000n;
+    const contract = new VogueContractSimulator(defaultWitnesses);
+    const fundId = '0xfund_citadel_crypto';
+    contract.registerComplianceAttestation(fundId, '0xoracle_chainalysis');
+
+    const delegationId = '0xdelegation_kpmg_temp';
+    contract.delegateAuditorAccess(delegationId, fundId, '0xkpmg_pk', now);
+    expect(contract.auditorAccessRegistry.get(delegationId)?.active).toBe(true);
+
+    const revokeRes = contract.revokeAuditorAccess(delegationId);
+    expect(revokeRes.status).toBe('revoked');
+    expect(contract.auditorAccessRegistry.get(delegationId)?.active).toBe(false);
+  });
+
+  it('22. verifyProofOfSolvency: proves reserve solvency in ZK without disclosing absolute balances', () => {
+    const solvencyWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getComplianceRiskScore: () => 3,
+      getSolvencyRatioBps: () => 14850n // 148.5% solvency ratio
+    };
+
+    const contract = new VogueContractSimulator(solvencyWitnesses);
+    const fundId = '0xfund_solvency_vault_01';
+    contract.registerComplianceAttestation(fundId, '0xoracle_chainalysis');
+
+    // Requires at least 100% solvency (10000 bps) -> Passes
+    const passRes = contract.verifyProofOfSolvency(fundId, 10000n);
+    expect(passRes.status).toBe('verified');
+
+    // Requires 200% solvency (20000 bps) -> Rejects (fund has 148.5%)
+    const failRes = contract.verifyProofOfSolvency(fundId, 20000n);
+    expect(failRes.status).toBe('rejected');
+    expect(failRes.reason).toContain('fails zero-knowledge solvency ratio');
+  });
 });
+

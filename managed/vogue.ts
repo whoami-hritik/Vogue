@@ -23,6 +23,11 @@ export interface StrategyWitnesses {
   getAlphaMinStakeUsd?: () => bigint;
   getAlphaProfitUsd?: () => bigint;
   getAlphaHighWaterMarkUsd?: () => bigint;
+  getComplianceRiskScore?: () => number;
+  getKycTier?: () => number;
+  getAuditorScopeBitmask?: () => number;
+  getAuditorExpiry?: () => bigint;
+  getSolvencyRatioBps?: () => bigint;
 }
 
 export class VogueContractSimulator {
@@ -36,6 +41,9 @@ export class VogueContractSimulator {
   public alphaStrategyRegistry = new Map<string, string>(); // strategyId -> profile hash
   public alphaSubscriptionStatus = new Map<string, number>(); // subscriptionId -> 1=active, 2=cancelled
   public alphaStrategyCount: number = 0;
+  public complianceAttestationRegistry = new Map<string, string>(); // fundId -> compliance hash
+  public auditorAccessRegistry = new Map<string, { auditorPubKey: string; scopeBitmask: number; expiry: bigint; active: boolean }>();
+  public auditorDelegationCount: number = 0;
 
   private witnesses: StrategyWitnesses;
 
@@ -307,5 +315,79 @@ export class VogueContractSimulator {
     const feeAmount = (netGain * feeBps) / 10000n;
 
     return { status: 'settled', feeAmountUsd: feeAmount };
+  }
+
+  // ============================================================================
+  // INSTITUTIONAL COMPLIANCE & SELECTIVE AUDITABILITY CIRCUITS
+  // ============================================================================
+
+  public registerComplianceAttestation(
+    fundId: string,
+    kycProviderId: string
+  ): { status: 'registered' | 'rejected'; reason?: string } {
+    const riskScore = this.witnesses.getComplianceRiskScore ? this.witnesses.getComplianceRiskScore() : 5;
+    if (riskScore > 15) {
+      return { status: 'rejected', reason: 'compliance risk score exceeds institutional threshold' };
+    }
+    const kycTier = this.witnesses.getKycTier ? this.witnesses.getKycTier() : 2;
+    if (kycTier < 1) {
+      return { status: 'rejected', reason: 'invalid KYC / AML qualification tier' };
+    }
+
+    const complianceHash = `0xcompliance_${kycProviderId}_risk${riskScore}_tier${kycTier}`;
+    this.complianceAttestationRegistry.set(fundId, complianceHash);
+    return { status: 'registered' };
+  }
+
+  public delegateAuditorAccess(
+    delegationId: string,
+    fundId: string,
+    auditorPubKey: string,
+    currentTime: bigint
+  ): { status: 'delegated' | 'rejected'; reason?: string } {
+    if (!this.complianceAttestationRegistry.has(fundId)) {
+      return { status: 'rejected', reason: 'fund not registered in compliance registry' };
+    }
+    const expiry = this.witnesses.getAuditorExpiry ? this.witnesses.getAuditorExpiry() : currentTime + 86400n * 90n;
+    if (expiry <= currentTime) {
+      return { status: 'rejected', reason: 'delegation expiration timestamp must be in future' };
+    }
+    const scopeBitmask = this.witnesses.getAuditorScopeBitmask ? this.witnesses.getAuditorScopeBitmask() : 0x03;
+    if (scopeBitmask <= 0) {
+      return { status: 'rejected', reason: 'at least one audit scope permission must be granted' };
+    }
+
+    this.auditorAccessRegistry.set(delegationId, {
+      auditorPubKey,
+      scopeBitmask,
+      expiry,
+      active: true,
+    });
+    this.auditorDelegationCount++;
+    return { status: 'delegated' };
+  }
+
+  public revokeAuditorAccess(delegationId: string): { status: 'revoked' | 'rejected'; reason?: string } {
+    const record = this.auditorAccessRegistry.get(delegationId);
+    if (!record) {
+      return { status: 'rejected', reason: 'delegation not found' };
+    }
+    record.active = false;
+    this.auditorAccessRegistry.set(delegationId, record);
+    return { status: 'revoked' };
+  }
+
+  public verifyProofOfSolvency(
+    fundId: string,
+    minSolvencyBps: bigint
+  ): { status: 'verified' | 'rejected'; reason?: string } {
+    if (!this.complianceAttestationRegistry.has(fundId)) {
+      return { status: 'rejected', reason: 'fund not registered in compliance registry' };
+    }
+    const solvencyRatio = this.witnesses.getSolvencyRatioBps ? this.witnesses.getSolvencyRatioBps() : 14850n;
+    if (solvencyRatio < minSolvencyBps) {
+      return { status: 'rejected', reason: 'fund fails zero-knowledge solvency ratio requirement' };
+    }
+    return { status: 'verified' };
   }
 }

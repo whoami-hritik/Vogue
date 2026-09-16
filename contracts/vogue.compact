@@ -34,6 +34,9 @@ export ledger darkIntentCount: Counter;
 export ledger alphaStrategyRegistry: Map<Bytes<32>, Bytes<32>>;   // strategyId -> profile commitment hash
 export ledger alphaSubscriptionStatus: Map<Bytes<32>, Uint<8>>;   // subscriptionId -> 1=active, 2=cancelled
 export ledger alphaStrategyCount: Counter;
+export ledger complianceAttestationRegistry: Map<Bytes<32>, Bytes<32>>; // fundId -> compliance proof commitment hash
+export ledger auditorAccessRegistry: Map<Bytes<32>, Bytes<32>>;         // delegationId -> delegation commitment hash
+export ledger auditorDelegationCount: Counter;
 
 // ---------- PRIVATE WITNESSES ----------
 witness getMaxPositionPct(): Uint<8>;
@@ -56,6 +59,11 @@ witness getAlphaFeeBps(): Uint<16>;
 witness getAlphaMinStakeUsd(): Uint<64>;
 witness getAlphaProfitUsd(): Uint<64>;
 witness getAlphaHighWaterMarkUsd(): Uint<64>;
+witness getComplianceRiskScore(): Uint<16>;
+witness getKycTier(): Uint<8>;
+witness getAuditorScopeBitmask(): Uint<8>;
+witness getAuditorExpiry(): Uint<64>;
+witness getSolvencyRatioBps(): Uint<64>;
 
 // ---------- CIRCUITS ----------
 
@@ -192,6 +200,61 @@ export circuit settlePerformanceFee(strategyId: Bytes<32>, subscriptionId: Bytes
   assert(profitUsd > (0 as Uint<64>), "zero profit cannot be fee-settled");
   assert(profitUsd > currentHwm, "profit does not breach High-Water Mark threshold");
   assert(getAlphaFeeBps() <= (5000 as Uint<16>), "invalid fee percentage");
+}
+
+// ============================================================================
+// INSTITUTIONAL COMPLIANCE & SELECTIVE AUDITABILITY CIRCUITS
+// ============================================================================
+
+// Register institutional compliance attestation (ZK-AML / Sanctions Non-Inclusion)
+export circuit registerComplianceAttestation(fundId: Bytes<32>, kycProviderId: Bytes<32>): [] {
+  assert(getComplianceRiskScore() <= (15 as Uint<16>), "compliance risk score exceeds institutional threshold");
+  assert(getKycTier() >= (1 as Uint<8>), "invalid KYC / AML qualification tier");
+
+  const complianceHash = disclose(
+    persistentHash<Vector<3, Bytes<32>>>([
+      kycProviderId,
+      getComplianceRiskScore() as Field as Bytes<32>,
+      getKycTier() as Field as Bytes<32>
+    ])
+  );
+  complianceAttestationRegistry.insert(disclose(fundId), complianceHash);
+}
+
+// Delegate scoped, time-locked viewing key to accredited auditor on Midnight
+export circuit delegateAuditorAccess(delegationId: Bytes<32>, fundId: Bytes<32>, auditorPubKey: Bytes<32>, currentTime: Uint<64>): [] {
+  assert(complianceAttestationRegistry.member(disclose(fundId)), "fund not registered in compliance registry");
+  assert(getAuditorExpiry() > currentTime, "delegation expiration timestamp must be in future");
+  assert(getAuditorScopeBitmask() > (0 as Uint<8>), "at least one audit scope permission must be granted");
+
+  const delegationHash = disclose(
+    persistentHash<Vector<4, Bytes<32>>>([
+      auditorPubKey,
+      getAuditorScopeBitmask() as Field as Bytes<32>,
+      getAuditorExpiry() as Field as Bytes<32>,
+      1 as Field as Bytes<32> // Status: 1 = ACTIVE
+    ])
+  );
+  auditorAccessRegistry.insert(disclose(delegationId), delegationHash);
+  auditorDelegationCount.increment(1);
+}
+
+// Revoke an auditor's viewing access immediately on-chain
+export circuit revokeAuditorAccess(delegationId: Bytes<32>): [] {
+  assert(auditorAccessRegistry.member(disclose(delegationId)), "delegation not found");
+  const revokedHash = disclose(
+    persistentHash<Vector<2, Bytes<32>>>([
+      delegationId,
+      2 as Field as Bytes<32> // Status: 2 = REVOKED
+    ])
+  );
+  auditorAccessRegistry.insert(disclose(delegationId), revokedHash);
+}
+
+// Prove vault solvency in Zero-Knowledge without disclosing absolute balance numbers
+export circuit verifyProofOfSolvency(fundId: Bytes<32>, minSolvencyBps: Uint<64>): [] {
+  assert(complianceAttestationRegistry.member(disclose(fundId)), "fund not registered in compliance registry");
+  assert(getSolvencyRatioBps() >= minSolvencyBps, "fund fails zero-knowledge solvency ratio requirement");
 }
 
 
