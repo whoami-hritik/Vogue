@@ -11,6 +11,7 @@ import { MarketChart } from './components/MarketChart';
 import { OverviewStrategies } from './components/OverviewStrategies';
 import { DarkIntentMonitor } from './components/DarkIntentMonitor';
 import { AlphaMarketplace } from './components/AlphaMarketplace';
+import { InstitutionalCompliance } from './components/InstitutionalCompliance';
 import { formatISTDate, formatISTTime } from './utils/time';
 import { useMidnight } from './hooks/useMidnight';
 import { PreprodCounter } from './components/PreprodCounter';
@@ -307,6 +308,17 @@ export function App() {
         {/* 2.5 ALPHA MARKETPLACE (PROOF OF ALPHA & BLIND COPY-TRADING) */}
         {activeTab === 'alpha-marketplace' && (
           <AlphaMarketplace
+            walletConnected={walletConnected}
+            walletAddress={walletAddress}
+            vaultBalance={vaultBalance}
+            onConnectWallet={() => setIsModalOpen(true)}
+            onNavigateTab={setActiveTab}
+          />
+        )}
+
+        {/* 2.75 INSTITUTIONAL COMPLIANCE & SELECTIVE AUDITABILITY */}
+        {activeTab === 'institutional-compliance' && (
+          <InstitutionalCompliance
             walletConnected={walletConnected}
             walletAddress={walletAddress}
             vaultBalance={vaultBalance}
