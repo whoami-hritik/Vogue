@@ -24,45 +24,46 @@ export interface MidnightApiTransaction {
 // ─── 1AM & Midnight Explorer URL Builders ───────────────────────────────────
 
 /**
- * 1AM / Midnight Explorer Transaction URL
- * Format: https://explorer.1am.xyz/tx/fbd5fb67f0681bdcc6dc0e4621aaa01db1f49f4b7c23de18919c9fc6cf5eb90a?network=preview
+ * Official Midnight Explorer Transaction URL
+ * Format: https://preprod.midnightexplorer.com/transactions/0x27ffe1...
  */
 export function getMidnightExplorerTxUrl(txHash: string, network: string = 'preview'): string {
-  const cleanHash = txHash ? txHash.replace(/^0x/, '') : '';
-  const net = network === 'preprod' ? 'preprod' : 'preview';
-  return cleanHash
-    ? `https://explorer.1am.xyz/tx/${cleanHash}?network=${net}`
-    : `https://explorer.1am.xyz?network=${net}`;
+  const hash = txHash ? (txHash.startsWith('0x') ? txHash : `0x${txHash}`) : '';
+  const domain = network === 'preprod' ? 'preprod.midnightexplorer.com' : 'preview.midnightexplorer.com';
+  return hash
+    ? `https://${domain}/transactions/${hash}`
+    : `https://${domain}`;
 }
 
 /**
- * 1AM / Midnight Explorer Contract / Commitment URL
+ * Official Midnight Explorer Contract / Commitment URL
+ * Format: https://preprod.midnightexplorer.com/contracts/0x2428cd...
  */
 export function getMidnightExplorerContractUrl(hashOrAddr: string, network: string = 'preview'): string {
-  const cleanAddr = hashOrAddr ? hashOrAddr.replace(/^0x/, '') : '';
-  const net = network === 'preprod' ? 'preprod' : 'preview';
-  return cleanAddr
-    ? `https://explorer.1am.xyz/contract/${cleanAddr}?network=${net}`
-    : `https://explorer.1am.xyz?network=${net}`;
+  const addr = hashOrAddr ? (hashOrAddr.startsWith('0x') ? hashOrAddr : `0x${hashOrAddr}`) : '';
+  const domain = network === 'preprod' ? 'preprod.midnightexplorer.com' : 'preview.midnightexplorer.com';
+  return addr
+    ? `https://${domain}/contracts/${addr}`
+    : `https://${domain}`;
 }
 
 /**
- * 1AM / Midnight Explorer Block URL
+ * Official Midnight Explorer Block URL
  */
 export function getMidnightExplorerBlockUrl(blockHeight: number, network: string = 'preview'): string {
-  const net = network === 'preprod' ? 'preprod' : 'preview';
-  return `https://explorer.1am.xyz/block/${blockHeight}?network=${net}`;
+  const domain = network === 'preprod' ? 'preprod.midnightexplorer.com' : 'preview.midnightexplorer.com';
+  return `https://${domain}/blocks/${blockHeight}`;
 }
 
 /**
- * 1AM / Midnight Explorer Address URL
+ * Official Midnight Explorer Address URL
  */
 export function getMidnightExplorerAddressUrl(address: string, network: string = 'preview'): string {
-  const cleanAddr = address ? address.replace(/^0x/, '') : '';
-  const net = network === 'preprod' ? 'preprod' : 'preview';
-  return cleanAddr
-    ? `https://explorer.1am.xyz/address/${cleanAddr}?network=${net}`
-    : `https://explorer.1am.xyz?network=${net}`;
+  const addr = address ? (address.startsWith('0x') ? address : `0x${address}`) : '';
+  const domain = network === 'preprod' ? 'preprod.midnightexplorer.com' : 'preview.midnightexplorer.com';
+  return addr
+    ? `https://${domain}/accounts/${addr}`
+    : `https://${domain}`;
 }
 
 // Aliases for backwards compatibility

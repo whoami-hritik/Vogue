@@ -12,8 +12,8 @@ This directory contains versioned deployment records for Vogue's Compact ZK circ
 | Field | Value |
 |:------|:------|
 | **Deployer Wallet** | `@vogue_night` — [x.com/vogue_night](https://x.com/vogue_night) |
-| **Preprod Deployment TX** | [`0x27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645`](https://explorer.1am.xyz/tx/27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645?network=preprod) |
-| **Preprod Contract Address** | [`0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524`](https://explorer.1am.xyz/contract/2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524?network=preprod) |
+| **Preprod Deployment TX** | [`0x27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645`](https://preprod.midnightexplorer.com/transactions/0x27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645) |
+| **Preprod Contract Address** | [`0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524`](https://preprod.midnightexplorer.com/contracts/0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524) |
 
 | **Block** | `2098826` |
 | **Deployed At** | `2026-08-14T11:03:00Z` |

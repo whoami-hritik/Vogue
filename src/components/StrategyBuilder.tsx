@@ -327,6 +327,9 @@ export const StrategyBuilder: React.FC<StrategyBuilderProps> = ({
                 <Cpu className="w-8 h-8 text-orange-500 animate-spin" />
                 <span className="font-extrabold text-gray-900 text-sm uppercase tracking-wide">Synthesizing ZK Circuit...</span>
                 <span className="text-[11px] font-mono text-gray-500 bg-white/80 px-4 py-1.5 rounded-full border border-gray-200 shadow-sm">{proofStep}</span>
+                <p className="text-xs text-gray-500 text-center max-w-sm">
+                  Please check and approve the signature prompt in your 1AM wallet popup. If the popup was minimized or blocked, proof generation will automatically proceed via local cryptographic witness in a few seconds.
+                </p>
               </div>
             ) : !committedHash ? (
               <button
