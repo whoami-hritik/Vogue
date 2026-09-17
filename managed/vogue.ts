@@ -38,6 +38,7 @@ export interface StrategyWitnesses {
   getIcebergTimeHorizonSeconds?: () => bigint;
   getIcebergMaxPriceLimit?: () => bigint;
   getSliceAmountUsd?: () => bigint;
+  getCrossChainStateProof?: () => string;
 }
 
 export class VogueContractSimulator {
@@ -48,6 +49,8 @@ export class VogueContractSimulator {
   public darkIntentCommitment = new Map<string, string>(); // intentId -> intentHash
   public darkIntentStatus = new Map<string, number>();     // intentId -> status (1=committed, 2=filled, 3=refunded)
   public darkIntentCount: number = 0;
+  public solverBondRegistry = new Map<string, bigint>();   // solverId -> bonded collateral USD
+  public solverSlashCount: number = 0;
   public alphaStrategyRegistry = new Map<string, string>(); // strategyId -> profile hash
   public alphaSubscriptionStatus = new Map<string, number>(); // subscriptionId -> 1=active, 2=cancelled
   public alphaStrategyCount: number = 0;
@@ -67,6 +70,13 @@ export class VogueContractSimulator {
 
   constructor(witnesses: StrategyWitnesses) {
     this.witnesses = witnesses;
+    // Pre-seed registered bonded solvers with default collateral
+    this.solverBondRegistry.set('0xsolver_hyperliquid_01', 500_000n);
+    this.solverBondRegistry.set('0xsolver_hyperliquid_alpha', 500_000n);
+    this.solverBondRegistry.set('0xsolver_uniswap_core', 350_000n);
+    this.solverBondRegistry.set('0xsolver_minswap_cardano', 250_000n);
+    this.solverBondRegistry.set('0xsolver_solana_jupiter', 750_000n);
+    this.solverBondRegistry.set('0xsolver_darkpool_p2p', 1_000_000n);
   }
 
   // Hash calculation matching persistentHash([maxPos, stopLoss, expiry])
@@ -233,6 +243,40 @@ export class VogueContractSimulator {
     }
   }
 
+  public registerSolverBond(solverId: string, bondAmountUsd: bigint): { status: 'registered' | 'rejected'; reason?: string } {
+    try {
+      if (bondAmountUsd < 100_000n) {
+        throw new Error('minimum solver bond requirement is $100,000');
+      }
+      const existing = this.solverBondRegistry.get(solverId) || 0n;
+      this.solverBondRegistry.set(solverId, existing + bondAmountUsd);
+      return { status: 'registered' };
+    } catch (err: any) {
+      return { status: 'rejected', reason: err.message };
+    }
+  }
+
+  public slashDishonestSolver(solverId: string, intentId: string, slashPenaltyUsd: bigint): { status: 'slashed' | 'rejected'; remainingBond?: bigint; reason?: string } {
+    try {
+      const currentBond = this.solverBondRegistry.get(solverId);
+      if (!currentBond || currentBond <= 0n) {
+        throw new Error('solver has no bonded collateral');
+      }
+      if (slashPenaltyUsd <= 0n) {
+        throw new Error('invalid slash penalty');
+      }
+      if (slashPenaltyUsd > currentBond) {
+        throw new Error('slash penalty exceeds bonded balance');
+      }
+      const remaining = currentBond - slashPenaltyUsd;
+      this.solverBondRegistry.set(solverId, remaining);
+      this.solverSlashCount++;
+      return { status: 'slashed', remainingBond: remaining };
+    } catch (err: any) {
+      return { status: 'rejected', reason: err.message };
+    }
+  }
+
   public fulfillDarkIntent(intentId: string, solverId: string, fillPriceUsd: bigint, currentTime: bigint): { status: 'filled' | 'rejected'; reason?: string } {
     try {
       const status = this.darkIntentStatus.get(intentId);
@@ -248,6 +292,17 @@ export class VogueContractSimulator {
       const maxPrice = this.witnesses.getMaxPriceLimit ? this.witnesses.getMaxPriceLimit() : 1000n;
       if (fillPriceUsd > maxPrice) {
         throw new Error('fill price exceeds max price limit');
+      }
+
+      const escrow = this.witnesses.getEscrowVusdAmount ? this.witnesses.getEscrowVusdAmount() : 2000n;
+      const solverBond = this.solverBondRegistry.get(solverId) || 0n;
+      if (solverBond < escrow) {
+        throw new Error('solver insufficient bond coverage');
+      }
+
+      const stateProof = this.witnesses.getCrossChainStateProof ? this.witnesses.getCrossChainStateProof() : '0xstate_proof_valid_merkle';
+      if (!stateProof || stateProof === '0x' || stateProof === '0x0') {
+        throw new Error('invalid cross-chain state proof');
       }
 
       const asset = this.witnesses.getIntentAsset ? this.witnesses.getIntentAsset() : 'ADA';

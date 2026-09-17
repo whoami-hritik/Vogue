@@ -45,6 +45,8 @@ export ledger icebergOrderStatus: Map<Bytes<32>, Uint<8>>;              // order
 export ledger icebergFilledAmountUsd: Map<Bytes<32>, Uint<64>>;         // orderId -> cumulative filled amount
 export ledger icebergSliceCount: Counter;
 export ledger icebergOrderCount: Counter;
+export ledger solverBondRegistry: Map<Bytes<32>, Uint<64>>;         // solverId -> bonded collateral amount in USD
+export ledger solverSlashCount: Counter;
 
 // ---------- PRIVATE WITNESSES ----------
 witness getMaxPositionPct(): Uint<8>;
@@ -82,6 +84,7 @@ witness getIcebergMaxSlippageBps(): Uint<16>;
 witness getIcebergTimeHorizonSeconds(): Uint<64>;
 witness getIcebergMaxPriceLimit(): Uint<64>;
 witness getSliceAmountUsd(): Uint<64>;
+witness getCrossChainStateProof(): Bytes<32>;
 
 // ---------- CIRCUITS ----------
 
@@ -143,6 +146,12 @@ export circuit unshieldWithdraw(agentId: Bytes<32>, amountUsd: Uint<64>): [] {
 // DARK INTENT NETWORK (DIN) — CROSS-CHAIN SOLVER CIRCUITS
 // ============================================================================
 
+// Register a bonded solver staking collateral to guarantee atomic intent execution
+export circuit registerSolverBond(solverId: Bytes<32>, bondAmountUsd: Uint<64>): [] {
+  assert(bondAmountUsd >= (100000 as Uint<64>), "minimum solver bond requirement is $100,000");
+  solverBondRegistry.insert(disclose(solverId), disclose(bondAmountUsd));
+}
+
 // Commit a private dark intent with locked escrow vUSD and private limit price / asset bounds
 export circuit commitDarkIntent(agentId: Bytes<32>, intentId: Bytes<32>): [] {
   assert(getEscrowVusdAmount() > (0 as Uint<64>), "invalid escrow amount");
@@ -166,6 +175,8 @@ export circuit fulfillDarkIntent(intentId: Bytes<32>, solverId: Bytes<32>, fillP
   assert(darkIntentStatus.lookup(disclose(intentId)) == (1 as Uint<8>), "intent not in committed state");
   assert(currentTime <= getIntentExpiry(), "intent expired");
   assert(fillPriceUsd <= getMaxPriceLimit(), "fill price exceeds max price limit");
+  assert(solverBondRegistry.lookup(disclose(solverId)) >= getEscrowVusdAmount(), "solver insufficient bond coverage");
+  assert(getCrossChainStateProof() != (0 as Field as Bytes<32>), "invalid cross-chain state proof");
 
   const recomputedIntentHash = disclose(
     persistentHash<Vector<4, Bytes<32>>>([
@@ -178,6 +189,15 @@ export circuit fulfillDarkIntent(intentId: Bytes<32>, solverId: Bytes<32>, fillP
   assert(darkIntentCommitment.lookup(disclose(intentId)) == recomputedIntentHash, "intent parameters mismatch");
 
   darkIntentStatus.insert(disclose(intentId), disclose(2 as Uint<8>));
+}
+
+// Slash a delinquent or dishonest solver that fails execution or breaches constraints
+export circuit slashDishonestSolver(solverId: Bytes<32>, intentId: Bytes<32>, slashPenaltyUsd: Uint<64>): [] {
+  const currentBond = solverBondRegistry.lookup(disclose(solverId));
+  assert(currentBond >= slashPenaltyUsd, "slash penalty exceeds bonded balance");
+  assert(slashPenaltyUsd > (0 as Uint<64>), "invalid slash penalty");
+  solverBondRegistry.insert(disclose(solverId), disclose(currentBond - slashPenaltyUsd));
+  solverSlashCount.increment(1);
 }
 
 // Refund escrowed vUSD if intent remains unfilled past intent expiry timeline

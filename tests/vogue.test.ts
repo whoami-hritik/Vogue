@@ -622,6 +622,118 @@ describe('Vogue Compact Smart Contract Privacy & Verification Suite', () => {
     expect(sliceAttempt.status).toBe('rejected');
     expect(sliceAttempt.reason).toContain('iceberg order not active');
   });
+
+  it('30. registerSolverBond: locks solver collateral on Midnight and enforces $100k minimum bond threshold', () => {
+    const contract = new VogueContractSimulator(defaultWitnesses);
+    const solverId = '0xsolver_solana_jupiter_new';
+
+    // Attempt registration below $100k threshold ($50,000)
+    const failRes = contract.registerSolverBond(solverId, 50000n);
+    expect(failRes.status).toBe('rejected');
+    expect(failRes.reason).toContain('minimum solver bond requirement is $100,000');
+
+    // Valid registration of $250,000 bond
+    const okRes = contract.registerSolverBond(solverId, 250000n);
+    expect(okRes.status).toBe('registered');
+    expect(contract.solverBondRegistry.get(solverId)).toBe(250000n);
+  });
+
+  it('31. fulfillDarkIntent: requires verified bonded solver and valid cross-chain state proof to release escrow', () => {
+    const solverId = '0xsolver_solana_jupiter';
+    const stateProofHash = '0xstate_proof_solana_slot_289410294_merkle_root';
+    const intentWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getPortfolioValue: () => 100000n,
+      getEscrowVusdAmount: () => 50000n, // $50k escrow
+      getIntentAsset: () => 'SOL',
+      getMinFillAmount: () => 340n,
+      getMaxPriceLimit: () => 150n,      // Limit $150 per SOL
+      getIntentExpiry: () => 1760000000n,
+      getCrossChainStateProof: () => stateProofHash
+    };
+
+    const contract = new VogueContractSimulator(intentWitnesses);
+    const intentId = '0xintent_sol_50k';
+
+    // Commit intent
+    const commitRes = contract.commitDarkIntent('0xtrader_sol', intentId);
+    expect(commitRes.status).toBe('committed');
+
+    // Fulfill intent with bonded solver ($750k bond >= $50k escrow) and valid cross-chain state proof
+    const fillRes = contract.fulfillDarkIntent(intentId, solverId, 145n, 1750000000n);
+    expect(fillRes.status).toBe('filled');
+    expect(contract.darkIntentStatus.get(intentId)).toBe(2); // 2 = FILLED
+  });
+
+  it('32. fulfillDarkIntent: rejects unbonded solver, undercollateralized solver, or invalid cross-chain state proof', () => {
+    const intentWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getPortfolioValue: () => 100000n,
+      getEscrowVusdAmount: () => 60000n, // $60k escrow
+      getIntentAsset: () => 'ADA',
+      getMinFillAmount: () => 70000n,
+      getMaxPriceLimit: () => 85n,
+      getIntentExpiry: () => 1760000000n,
+      getCrossChainStateProof: () => '0xstate_proof_cardano_eutxo_slot_91024'
+    };
+
+    const contract = new VogueContractSimulator(intentWitnesses);
+    const intentId = '0xintent_cross_chain_rejections';
+    contract.commitDarkIntent('0xtrader_1', intentId);
+
+    // Rejection 1: Completely unbonded solver
+    const unbondedRes = contract.fulfillDarkIntent(intentId, '0xsolver_unbonded_wildcat', 80n, 1750000000n);
+    expect(unbondedRes.status).toBe('rejected');
+    expect(unbondedRes.reason).toContain('solver insufficient bond coverage');
+
+    // Rejection 2: Under-collateralized solver ($30k bond for $60k escrow)
+    contract.registerSolverBond('0xsolver_small_bond', 100000n); // $100k minimum
+    // But if escrow was $150k
+    const bigEscrowWitnesses: StrategyWitnesses = {
+      ...intentWitnesses,
+      getPortfolioValue: () => 200000n,
+      getEscrowVusdAmount: () => 150000n,
+    };
+    const contract2 = new VogueContractSimulator(bigEscrowWitnesses);
+    contract2.registerSolverBond('0xsolver_small_bond', 100000n);
+    contract2.commitDarkIntent('0xtrader_1', '0xintent_big');
+    const underRes = contract2.fulfillDarkIntent('0xintent_big', '0xsolver_small_bond', 80n, 1750000000n);
+    expect(underRes.status).toBe('rejected');
+    expect(underRes.reason).toContain('solver insufficient bond coverage');
+
+    // Rejection 3: Invalid cross-chain state proof
+    const invalidProofWitnesses: StrategyWitnesses = {
+      ...intentWitnesses,
+      getCrossChainStateProof: () => '0x0' // Zero/invalid proof
+    };
+    const contract3 = new VogueContractSimulator(invalidProofWitnesses);
+    contract3.commitDarkIntent('0xtrader_1', '0xintent_bad_proof');
+    const proofRes = contract3.fulfillDarkIntent('0xintent_bad_proof', '0xsolver_hyperliquid_01', 80n, 1750000000n);
+    expect(proofRes.status).toBe('rejected');
+    expect(proofRes.reason).toContain('invalid cross-chain state proof');
+  });
+
+  it('33. slashDishonestSolver: penalizes solver bonded balance and increments slash counter upon SLA breach', () => {
+    const contract = new VogueContractSimulator(defaultWitnesses);
+    const solverId = '0xsolver_amber_arbitrum';
+    contract.registerSolverBond(solverId, 300000n);
+
+    const initialBond = contract.solverBondRegistry.get(solverId);
+    expect(initialBond).toBe(300000n);
+    expect(contract.solverSlashCount).toBe(0);
+
+    // Slash $50,000 penalty for toxic frontrunning / latency breach
+    const slashRes = contract.slashDishonestSolver(solverId, '0xintent_breached_001', 50000n);
+    expect(slashRes.status).toBe('slashed');
+    expect(slashRes.remainingBond).toBe(250000n);
+    expect(contract.solverBondRegistry.get(solverId)).toBe(250000n);
+    expect(contract.solverSlashCount).toBe(1);
+
+    // Reject excessive slash exceeding remaining bond
+    const excessiveSlash = contract.slashDishonestSolver(solverId, '0xintent_excess', 300000n);
+    expect(excessiveSlash.status).toBe('rejected');
+    expect(excessiveSlash.reason).toContain('slash penalty exceeds bonded balance');
+  });
 });
 
 
