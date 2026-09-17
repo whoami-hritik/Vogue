@@ -16,26 +16,26 @@
   [![Live on Vercel](https://img.shields.io/badge/Live%20Demo-vogue--amber.vercel.app-black?logo=vercel)](https://vogue-amber.vercel.app/)
   [![Status](https://img.shields.io/badge/Status-Live-success)](https://vogue-amber.vercel.app/)
   
-  ### 🚀 [**Live Application → vogue-amber.vercel.app**](https://vogue-amber.vercel.app/) | 📄 [Level 4–6 Product Proposal](./PROPOSAL.md)
+  ### [**Live Application → vogue-amber.vercel.app**](https://vogue-amber.vercel.app/) | [Level 4–6 Product Proposal](./PROPOSAL.md)
 </div>
 
 ---
 
-## 📜 Deployed Smart Contract Addresses
+## Deployed Smart Contract Addresses
 
 | Network | Version | Contract Address | Explorer Link | Status |
 |---------|---------|------------------|---------------|--------|
-| Midnight Preprod Testnet | v1.2.0 | `0x2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524` | [View on 1AM Preprod Explorer ?](https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod) | ?? ACTIVE PREPROD MVP |
-| Midnight Preview Testnet | v1.2.0 | `0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30` | [View on 1AM Preview Explorer ?](https://explorer.1am.xyz/contract/33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30?network=preview) | ?? ACTIVE PREVIEW MVP |
-| Historical Deployment | v1.0.0 | `0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3` | [View on 1AM Explorer ?](https://explorer.1am.xyz/contract/62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3?network=preview) | ?? Historical (V1) |
+| Midnight Preprod Testnet | v1.2.0 | `0x2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524` | [View on 1AM Preprod Explorer](https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod) | ACTIVE PREPROD MVP |
+| Midnight Preview Testnet | v1.2.0 | `0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30` | [View on 1AM Preview Explorer](https://explorer.1am.xyz/contract/33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30?network=preview) | ACTIVE PREVIEW MVP |
+| Historical Deployment | v1.0.0 | `0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3` | [View on 1AM Explorer](https://explorer.1am.xyz/contract/62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3?network=preview) | Historical (V1) |
 
 ---
 
-## 🚀 What's New in Vogue: Institutional Protocol Innovations
+## What's New in Vogue: Institutional Protocol Innovations
 
 Vogue has expanded into a full-scale institutional execution network on Midnight, delivering five breakthrough modules that solve cross-chain liquidity, front-running, regulatory compliance, and quant alpha monetization with zero-knowledge cryptographic guarantees:
 
-### 1. 🌐 ZK-Dark Intent Solver Network (DIN) & Cross-Chain Liquidity
+### 1. ZK-Dark Intent Solver Network (DIN) & Cross-Chain Liquidity
 * **The Core Innovation:** Bridges Midnight's privacy guarantees to deep external liquidity venues on **Cardano (Minswap eUTxO)**, **Solana (Jupiter / Raydium CLMM via Jito)**, **Ethereum (Uniswap v3 EVM)**, and **Hyperliquid (Prime CLOB)**.
 * **How It Works via Midnight:**
   - The trader formulates a private trade intent (e.g., *"Swap 50,000 vUSD for ADA at limit price $0.82"* or *"100,000 vUSD for SOL at $145.00"*). The intent parameters and capital allocation are locked into Midnight inside `commitDarkIntent`.
@@ -45,7 +45,7 @@ Vogue has expanded into a full-scale institutional execution network on Midnight
   - **Bonding & Slashing:** Solvers register capital collateral in `solverBondRegistry` (minimum $100k bond) and face immediate slashing (`slashDishonestSolver`) upon default or constraint breach.
 * **Impact:** Permanently neutralizes the "Island Liquidity" bottleneck. External observers observe only standard settlements, while the trader's total portfolio size, stop-loss trigger, and trading strategy remain 100% private.
 
-### 2. ⏳ ZK-Iceberg & Temporal Shuffling (Anti-MEV TWAP Relayer)
+### 2. ZK-Iceberg & Temporal Shuffling (Anti-MEV TWAP Relayer)
 * **The Core Innovation:** Breaks multi-million dollar institutional allocations into randomized, unlinkable on-chain micro-slices across non-linear time horizons (up to 48 hours).
 * **How It Works via Midnight:**
   - Rather than executing predictable, periodic transactions (e.g., every 15 minutes, which toxic MEV sandwich bots exploit), Midnight zero-knowledge proofs authorize randomized micro-transactions via `authorizeIcebergSliceExecution`.
@@ -53,7 +53,7 @@ Vogue has expanded into a full-scale institutional execution network on Midnight
   - To on-chain forensics and blockchain explorers, each micro-fill appears as an independent, unrelated zero-knowledge state transition originating from disjoint temporal slots.
 * **Impact:** Neutralizes toxic sandwich bots, latency arbitrageurs, and statistical copy-traders that drain institutional order flow on public chains.
 
-### 3. 🛡️ Institutional Compliance & Verifiable Selective Auditability
+### 3. Institutional Compliance & Verifiable Selective Auditability
 * **The Core Innovation:** Solves the institutional "Compliance Catch-22" for regulated hedge funds, family offices, and enterprise treasuries.
 * **How It Works via Midnight:**
   - **ZK-AML & Sanctions Attestation (`registerComplianceAttestation`):** Proves clean origin of funds and absence from OFAC/sanctions lists via zero-knowledge proofs without exposing complete counterparty histories.
@@ -62,7 +62,7 @@ Vogue has expanded into a full-scale institutional execution network on Midnight
   - **On-Chain Revocation (`revokeAuditorAccess`):** Immediately revokes auditor credentials upon audit completion.
 * **Impact:** Enables multi-billion dollar regulated funds to trade on privacy rails while maintaining full compliance with SEC, CFTC, FinCEN, FATF, and MiCA auditing mandates.
 
-### 4. 🏆 Proof of Alpha (PoA) & Blind Copy-Trading Marketplace
+### 4. Proof of Alpha (PoA) & Blind Copy-Trading Marketplace
 * **The Core Innovation:** Quant strategy developers cryptographically prove their historical risk-adjusted track records (Sharpe ratio, max drawdown, win rate) without publishing strategy code or trade logic.
 * **How It Works via Midnight:**
   - The quant commits audited trade logs into `issueProofOfAlphaCertificate`, generating a verifiable Zero-Knowledge Performance Certificate.
@@ -70,7 +70,7 @@ Vogue has expanded into a full-scale institutional execution network on Midnight
   - **High-Water Mark (HWM) Performance Fee Settlement (`settleAlphaPerformanceFee`):** Performance fees are calculated on net new profit and locked against on-chain HWM records, ensuring developers are rewarded strictly for verified alpha.
 * **Impact:** Democratizes institutional-grade quant strategies while offering total IP protection to quantitative researchers.
 
-### 5. ⚡ Confidential AI Strategy Runtime & Proportional Mirroring
+### 5. Confidential AI Strategy Runtime & Proportional Mirroring
 * **The Core Innovation:** Secure enclaves execute proprietary algorithmic strategies and emit confidential on-chain signals (`emitConfidentialSignal`).
 * **How It Works via Midnight:**
   - Strategy signals are cryptographically verified and broadcasted without revealing underlying indicators or weights.
@@ -79,15 +79,15 @@ Vogue has expanded into a full-scale institutional execution network on Midnight
 
 ---
 
-## 💡 Initial Product Idea & Vision
+## Initial Product Idea & Vision
 
 **Vogue** is a decentralized, privacy-first AI-orchestrated trading protocol built natively on the **Midnight Privacy Blockchain**. It allows traders to synthesize market parameters using Gemini 2.5 Flash, verify risk using EZKL machine learning models, and execute trades with absolute confidentiality. By leveraging client-side Zero-Knowledge (ZK) proofs, Vogue mathematically proves that algorithmic trading constraints and risk limits are strictly enforced, while keeping trading strategies, capital balances, and trade execution history completely shielded from public ledger surveillance.
 
-> 📄 **Official Submission Document:** For the complete Level 4–6 architecture, dual-state data model, and Mainnet feasibility roadmap, please review [PROPOSAL.md](./PROPOSAL.md).
+> **Official Submission Document:** For the complete Level 4–6 architecture, dual-state data model, and Mainnet feasibility roadmap, please review [PROPOSAL.md](./PROPOSAL.md).
 
 ---
 
-## 🚨 The Real-World Problem
+## The Real-World Problem
 
 As institutional and retail trading transitions to decentralized rails, traders face an insurmountable barrier: **Public blockchains expose confidential trading strategies to the entire world.**
 
@@ -98,7 +98,7 @@ When a trader executes algorithmic or AI-driven trades on traditional public blo
 
 ---
 
-## 🛡️ Privacy Model: Public Ledger State vs. Private Witness
+## Privacy Model: Public Ledger State vs. Private Witness
 
 Midnight's dual-state architecture divides computation into **Public Ledger State** (verified by network consensus) and **Private Witness State** (computed locally on the user's device inside Zero-Knowledge circuits).
 
@@ -122,7 +122,7 @@ Midnight's dual-state architecture divides computation into **Public Ledger Stat
 
 ---
 
-## 📸 Comprehensive Platform Gallery & Screenshots
+## Platform Gallery & Screenshots
 
 Here is the complete showcase of all components of the Vogue platform, from UI dashboard and real-time market insights to zero-knowledge contract verification and strategy building.
 
@@ -159,14 +159,14 @@ Here is the complete showcase of all components of the Vogue platform, from UI d
 <img src="./screenshots/CI%20CD.png" alt="CI CD Pipeline" width="100%" />
 
 ### 9. Vitest Contract & Risk Model Suite
-*All cryptographic circuit tests and EZKL zero-knowledge risk model assertions pass � ensuring every privacy constraint is mathematically verified before deployment.*
+*All cryptographic circuit tests and EZKL zero-knowledge risk model assertions pass, ensuring every privacy constraint is mathematically verified before deployment.*
 <img src="./screenshots/vite-test.png" alt="Vitest Test Suite" width="100%" />
 
 
 
 ---
 
-## 🔗 Verified On-Chain Transactions & Contracts
+## Verified On-Chain Transactions & Contracts
 
 Vogue is fully integrated with the Midnight Network. It generates real zero-knowledge proofs and settles them on-chain.
 
@@ -174,9 +174,9 @@ Vogue is fully integrated with the Midnight Network. It generates real zero-know
 
 | Network | Version | Contract Address | Explorer Link | Status |
 |---------|---------|------------------|---------------|--------|
-| Midnight Preprod Testnet | v1.2.0 | `0x2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524` | [View on 1AM Preprod Explorer ?](https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod) | ?? ACTIVE PREPROD MVP |
-| Midnight Preview Testnet | v1.2.0 | `0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30` | [View on 1AM Preview Explorer ?](https://explorer.1am.xyz/contract/33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30?network=preview) | ?? ACTIVE PREVIEW MVP |
-| Historical Deployment | v1.0.0 | `0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3` | [View on 1AM Explorer ?](https://explorer.1am.xyz/contract/62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3?network=preview) | ?? Historical (V1) |
+| Midnight Preprod Testnet | v1.2.0 | `0x2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524` | [View on 1AM Preprod Explorer](https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod) | ACTIVE PREPROD MVP |
+| Midnight Preview Testnet | v1.2.0 | `0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30` | [View on 1AM Preview Explorer](https://explorer.1am.xyz/contract/33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30?network=preview) | ACTIVE PREVIEW MVP |
+| Historical Deployment | v1.0.0 | `0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3` | [View on 1AM Explorer](https://explorer.1am.xyz/contract/62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3?network=preview) | Historical (V1) |
 
 > [!NOTE]
 > **Wallet Integration:** Seamless connection via **1AM Wallet** and **Midnight Lace** supporting dynamic network auto-detection (Preprod & Preview).
@@ -189,7 +189,7 @@ Vogue is fully integrated with the Midnight Network. It generates real zero-know
 
 ---
 
-## 🏛️ Enterprise ZK Product Modules & Applications
+## Enterprise ZK Product Modules & Applications
 
 Vogue is architected to solve three high-impact, real-world algorithmic trading problems using Midnight's core ZK primitives:
 
@@ -212,7 +212,7 @@ Vogue is architected to solve three high-impact, real-world algorithmic trading 
 
 ---
 
-## 🏗️ Detailed Project Architecture & Directory Structure
+## Detailed Project Architecture & Directory Structure
 
 ```text
 Vogue/
@@ -287,7 +287,7 @@ Vogue/
 
 ---
 
-## 💻 Run Locally
+## Run Locally
 
 ### Prerequisites
 1. **1AM Wallet or Midnight Lace:** Installed in your browser and switched to the Midnight Preprod network.
