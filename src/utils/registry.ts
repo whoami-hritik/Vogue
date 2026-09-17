@@ -13,7 +13,7 @@ export interface DeploymentEntry {
   circuits: string[];
 }
 
-export function getActiveContractAddress(network: 'preview' | 'preprod' | string = 'preview'): string {
+export function getActiveContractAddress(network: 'preview' | 'preprod' | string = 'preprod'): string {
   const netKey = network === 'preprod' ? 'preprod' : 'preview';
   const entries: DeploymentEntry[] = (registryData.vogue as Record<string, DeploymentEntry[]>)[netKey] || [];
   if (entries.length > 0) {
@@ -29,7 +29,7 @@ export function getActiveContractAddress(network: 'preview' | 'preprod' | string
   }
   return (
     (typeof import.meta !== 'undefined' && (import.meta.env?.['VITE_PREVIEW_CONTRACT_ADDRESS'] as string)) ||
-    '0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3'
+    '0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524'
   );
 }
 

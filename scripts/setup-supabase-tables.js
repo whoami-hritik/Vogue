@@ -12,7 +12,7 @@ async function setupSampleData() {
     agent_id: '0xagent_1am_demo',
     commitment_hash: '0x811c9dc5811c9dc5811c9dc5811c9dc5',
     wallet_address: 'mn_shield-cpk_preview1xypgstqfj73qanw5d0jqcy93yd2fhp2kc8nudzd64pqgm7qznxqpya16k',
-    tx_hash: '0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3',
+    tx_hash: '0x27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645',
     status: 'active'
   };
 

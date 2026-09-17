@@ -42,7 +42,7 @@ declare global {
 export type MidnightNetwork = "preview" | "preprod" | "mainnet" | "undeployed";
 
 const DEFAULT_NETWORK: MidnightNetwork =
-  ((typeof import.meta !== "undefined" && import.meta.env?.["VITE_MIDNIGHT_NETWORK"]) as MidnightNetwork) ?? "preview";
+  ((typeof import.meta !== "undefined" && import.meta.env?.["VITE_MIDNIGHT_NETWORK"]) as MidnightNetwork) ?? "preprod";
 
 export interface OneAMServiceConfig {
   networkId: string;

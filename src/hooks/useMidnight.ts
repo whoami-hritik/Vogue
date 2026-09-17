@@ -96,7 +96,7 @@ export function useMidnight() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [networkId, setNetworkId] = useState<MidnightNetwork>('preview');
+  const [networkId, setNetworkId] = useState<MidnightNetwork>('preprod');
 
   // ─── Shielded Vault state (0 by default for new wallets) ─────────────
   const [vaultBalance, setVaultBalance] = useState<number>(0);
@@ -298,6 +298,9 @@ export function useMidnight() {
 
       setSession(live);
       setLiveSession(live);
+      if (live.network) {
+        setNetworkId(live.network as MidnightNetwork);
+      }
       setWalletConnected(true);
       setDustReady(isDustReady());
 

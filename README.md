@@ -26,8 +26,8 @@
 | Network | Version | Contract Address | Explorer Link | Status |
 |---------|---------|------------------|---------------|--------|
 | Midnight Preprod Testnet | v1.2.0 | `0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524` | [View on Midnight Preprod Explorer](https://preprod.midnightexplorer.com/contracts/0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524) \| [Deployment TX (Block 2,098,826)](https://preprod.midnightexplorer.com/transactions/0x27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645) | ACTIVE PREPROD MVP (Verified) |
-| Midnight Preview Testnet | v1.2.0 | `0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30` | [View on Midnight Preview Explorer](https://preview.midnightexplorer.com/contracts/0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30) | PREVIEW TESTNET (Ephemeral) |
-| Historical Deployment | v1.0.0 | `0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3` | [View on Midnight Explorer](https://preview.midnightexplorer.com/contracts/0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3) | Historical (V1) |
+
+> **Network Note:** Vogue is actively deployed, indexed, and verifiable on the **Midnight Preprod Testnet**. Midnight's earlier Preview testnet was an ephemeral sandbox network that has undergone network state resets (earlier preview contracts are no longer visible on the explorer). All live transactions, zero-knowledge proofs, and 1AM wallet connections run natively on **Midnight Preprod**.
 
 ---
 
@@ -175,11 +175,10 @@ Vogue is fully integrated with the Midnight Network. It generates real zero-know
 | Network | Version | Contract Address | Explorer Link | Status |
 |---------|---------|------------------|---------------|--------|
 | Midnight Preprod Testnet | v1.2.0 | `0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524` | [View on Midnight Preprod Explorer](https://preprod.midnightexplorer.com/contracts/0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524) \| [Deployment TX (Block 2,098,826)](https://preprod.midnightexplorer.com/transactions/0x27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645) | ACTIVE PREPROD MVP (Verified) |
-| Midnight Preview Testnet | v1.2.0 | `0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30` | [View on Midnight Preview Explorer](https://preview.midnightexplorer.com/contracts/0x33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30) | PREVIEW TESTNET (Ephemeral) |
-| Historical Deployment | v1.0.0 | `0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3` | [View on Midnight Explorer](https://preview.midnightexplorer.com/contracts/0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3) | Historical (V1) |
 
 > [!NOTE]
-> **Wallet Integration:** Seamless connection via **1AM Wallet** and **Midnight Lace** supporting dynamic network auto-detection (Preprod & Preview).
+> **Active Network:** Vogue is deployed and verified on **Midnight Preprod Testnet**. Preview testnet contracts are no longer indexed due to upstream Midnight testnet state resets.
+> **Wallet Integration:** Seamless connection via **1AM Wallet** and **Midnight Lace** configured to Midnight Preprod.
 > **Local Proving Engine:** Client-side proof generation via the local Midnight Proof Server (`http://127.0.0.1:6300`) or 1AM Proofstation.
 
 ### Real Transaction Hash
