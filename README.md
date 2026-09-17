@@ -15,8 +15,10 @@
   [![Vogue CI/CD Pipeline](https://github.com/whoami-hritik/Vogue/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/whoami-hritik/Vogue/actions/workflows/ci.yml)
   [![Live on Vercel](https://img.shields.io/badge/Live%20Demo-vogue--amber.vercel.app-black?logo=vercel)](https://vogue-amber.vercel.app/)
   [![Status](https://img.shields.io/badge/Status-Live-success)](https://vogue-amber.vercel.app/)
+  [![X Profile](https://img.shields.io/badge/X%20(Twitter)-@Voguentwrk-black?logo=x)](https://x.com/Voguentwrk)
+  [![X Announcement](https://img.shields.io/badge/Announcement-Post%20on%20X-1DA1F2?logo=x)](https://x.com/i/status/2100487430482923779)
   
-  ### [**Live Application → vogue-amber.vercel.app**](https://vogue-amber.vercel.app/) | [Level 4–6 Product Proposal](./PROPOSAL.md)
+  ### [**Live Application → vogue-amber.vercel.app**](https://vogue-amber.vercel.app/) | [**Announcement on X**](https://x.com/i/status/2100487430482923779) | [**Follow @Voguentwrk**](https://x.com/Voguentwrk) | [Level 4–6 Product Proposal](./PROPOSAL.md)
 </div>
 
 ---
@@ -45,6 +47,8 @@ Vogue has expanded into a full-scale institutional execution network on Midnight
   - **Bonding & Slashing:** Solvers register capital collateral in `solverBondRegistry` (minimum $100k bond) and face immediate slashing (`slashDishonestSolver`) upon default or constraint breach.
 * **Impact:** Permanently neutralizes the "Island Liquidity" bottleneck. External observers observe only standard settlements, while the trader's total portfolio size, stop-loss trigger, and trading strategy remain 100% private.
 
+<img src="./screenshots/Dark%20Intent.png" alt="ZK-Dark Intent Solver Network (DIN)" width="100%" />
+
 ### 2. ZK-Iceberg & Temporal Shuffling (Anti-MEV TWAP Relayer)
 * **The Core Innovation:** Breaks multi-million dollar institutional allocations into randomized, unlinkable on-chain micro-slices across non-linear time horizons (up to 48 hours).
 * **How It Works via Midnight:**
@@ -52,6 +56,8 @@ Vogue has expanded into a full-scale institutional execution network on Midnight
   - Non-linear time distribution and stochastic jitter prevent algorithmic timing heuristics and statistical pattern recognition.
   - To on-chain forensics and blockchain explorers, each micro-fill appears as an independent, unrelated zero-knowledge state transition originating from disjoint temporal slots.
 * **Impact:** Neutralizes toxic sandwich bots, latency arbitrageurs, and statistical copy-traders that drain institutional order flow on public chains.
+
+<img src="./screenshots/ZK%20Iceberg.png" alt="ZK-Iceberg & Temporal Shuffling Relayer" width="100%" />
 
 ### 3. Institutional Compliance & Verifiable Selective Auditability
 * **The Core Innovation:** Solves the institutional "Compliance Catch-22" for regulated hedge funds, family offices, and enterprise treasuries.
@@ -69,6 +75,8 @@ Vogue has expanded into a full-scale institutional execution network on Midnight
   - Followers can subscribe to the strategy in a **blind copy-trading** model where trade execution is mirrored proportionally into their shielded vaults without exposing the creator's secret parameters.
   - **High-Water Mark (HWM) Performance Fee Settlement (`settleAlphaPerformanceFee`):** Performance fees are calculated on net new profit and locked against on-chain HWM records, ensuring developers are rewarded strictly for verified alpha.
 * **Impact:** Democratizes institutional-grade quant strategies while offering total IP protection to quantitative researchers.
+
+<img src="./screenshots/Alpha%20Market.png" alt="Proof of Alpha (PoA) & Blind Copy-Trading Marketplace" width="100%" />
 
 ### 5. Confidential AI Strategy Runtime & Proportional Mirroring
 * **The Core Innovation:** Secure enclaves execute proprietary algorithmic strategies and emit confidential on-chain signals (`emitConfidentialSignal`).
@@ -138,27 +146,39 @@ Here is the complete showcase of all components of the Vogue platform, from UI d
 *Synthesize high-frequency trading parameters from natural language prompts using Gemini 2.5 Flash. Strategy hashes are committed to Midnight's ledger.*
 <img src="./screenshots/strategy.png" alt="Strategy Builder" width="100%" />
 
-### 4. Trade Execution Engine
+### 4. ZK-Dark Intent Solver Network (DIN)
+*Institutional Liquidity without Leaking Intent. Formulate zero-knowledge trade intents on Midnight and settle against deep order books on Cardano, Ethereum, Hyperliquid, and Solana via bonded competitive solvers.*
+<img src="./screenshots/Dark%20Intent.png" alt="ZK-Dark Intent Solver Network" width="100%" />
+
+### 5. ZK-Iceberg & Temporal Shuffling Relayer (Anti-MEV TWAP)
+*Execute large capital orders without front-running decay. Midnight zero-knowledge proofs authorize randomized, un-linkable on-chain micro-slices across time, neutralizing toxic MEV sandwich bots.*
+<img src="./screenshots/ZK%20Iceberg.png" alt="ZK-Iceberg & Temporal Shuffling Relayer" width="100%" />
+
+### 6. Proof of Alpha (PoA) & Blind Copy-Trading Marketplace
+*Follow mathematical trading track records proven by Midnight consensus circuits with zero prompt disclosure, non-custodial execution, and High-Water Mark performance fees.*
+<img src="./screenshots/Alpha%20Market.png" alt="Proof of Alpha Marketplace" width="100%" />
+
+### 7. Trade Execution Engine
 *Execute zero-knowledge trades directly on-chain. Cryptographic commitments ensure your market moves stay fully shielded.*
 <img src="./screenshots/market_execute_trade.png" alt="Trade Execution" width="100%" />
 
-### 5. Private Trade History
+### 8. Private Trade History
 *Review your complete trading history with cryptographic proof verifications and EZKL risk attestations.*
 <img src="./screenshots/trade_history.png" alt="Trade History" width="100%" />
 
-### 6. Zero-Knowledge Architecture
+### 9. Zero-Knowledge Architecture
 *Real-time visibility into the Vogue dual-state model combining client-side LLMs, EZKL model inference, and Midnight ZK proofs.*
 <img src="./screenshots/architecture.png" alt="Architecture" width="100%" />
 
-### 7. Private Portfolio & Position Management
+### 10. Private Portfolio & Position Management
 *Track all active shielded positions, performance metrics, and overall yield distribution across ZK-verified strategies in real-time.*
 <img src="./screenshots/Portfolio.png" alt="Private Portfolio" width="100%" />
 
-### 8. Continuous Integration & Verification Pipeline
+### 11. Continuous Integration & Verification Pipeline
 *Automated GitHub Actions CI/CD pipeline ensuring cryptographic circuits compile cleanly and ZK risk constraints are mathematically validated on every commit.*
 <img src="./screenshots/CI%20CD.png" alt="CI CD Pipeline" width="100%" />
 
-### 9. Vitest Contract & Risk Model Suite
+### 12. Vitest Contract & Risk Model Suite
 *All cryptographic circuit tests and EZKL zero-knowledge risk model assertions pass, ensuring every privacy constraint is mathematically verified before deployment.*
 <img src="./screenshots/vite-test.png" alt="Vitest Test Suite" width="100%" />
 
