@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LayoutDashboard,
   LineChart,
@@ -12,11 +12,13 @@ import {
   Award,
   ShieldCheck,
   Shuffle,
-  Layers
+  Layers,
+  Server
 } from 'lucide-react';
 import { WalletConnect } from './WalletConnect';
 import type { DetectedWallet } from '../lib/lace-wallet';
 import { GradientBackground } from './ui/pipo';
+import { ContractDeployerModal } from './ContractDeployerModal';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -71,6 +73,8 @@ export const Layout: React.FC<LayoutProps> = ({
   onConnect,
   onDisconnect
 }) => {
+  const [deployerModalOpen, setDeployerModalOpen] = useState(false);
+
   const navItems = [
     { id: 'landing', label: 'Studio Home', icon: Sparkles },
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -129,8 +133,18 @@ export const Layout: React.FC<LayoutProps> = ({
             </span>
           </div>
 
-          {/* Header Right: Wallet Connect */}
-          <div className="flex items-center gap-3">
+          {/* Header Right: Contract Status + Wallet Connect */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={() => setDeployerModalOpen(true)}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/70 hover:bg-white border border-gray-200/90 text-gray-800 text-xs font-bold transition-all shadow-sm cursor-pointer"
+              title="Midnight Contract Deployment & Status"
+            >
+              <Server className="w-3.5 h-3.5 text-orange-500" />
+              <span className="capitalize">{networkId} Contract</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            </button>
+
             <WalletConnect
               connected={walletConnected}
               address={walletAddress}
@@ -268,12 +282,22 @@ export const Layout: React.FC<LayoutProps> = ({
             <span>tNIGHT: <span className="text-gray-900 font-bold">$1.00</span></span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span className="text-gray-700 font-medium">Midnight {networkId === 'preprod' ? 'Preprod' : 'Preview'} Explorer API Active</span>
-          </div>
+          <button
+            onClick={() => setDeployerModalOpen(true)}
+            className="flex items-center gap-2 hover:text-orange-600 transition-colors cursor-pointer text-left"
+            title="Open Midnight Contract Deployment & Status"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-gray-700 font-medium">Midnight {networkId === 'preprod' ? 'Preprod' : 'Preview'} Contract Active</span>
+          </button>
         </div>
       </footer>
+
+      <ContractDeployerModal
+        isOpen={deployerModalOpen}
+        onClose={() => setDeployerModalOpen(false)}
+        networkId={networkId}
+      />
     </div>
   );
 };

@@ -23,6 +23,7 @@ import {
   type MidnightApiTransaction
 } from '../utils/midnightApi';
 import { formatISTDateTime } from '../utils/time';
+import { getActiveContractAddress } from '../utils/registry';
 
 interface TradeHistoryProps {
   trades: TradeRecord[];
@@ -125,7 +126,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = ({
           </div>
 
           <a
-            href={networkId === 'preprod' ? 'https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod' : 'https://explorer.1am.xyz/contract/33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30?network=preview'}
+            href={getMidnightExplorerContractUrl(getActiveContractAddress(networkId), networkId)}
             target="_blank"
             rel="noreferrer"
             className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/60 hover:bg-white border border-white/80 text-gray-800 text-xs font-extrabold tracking-widest uppercase transition-all shadow-sm cursor-pointer"

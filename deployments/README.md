@@ -13,7 +13,7 @@ This directory contains versioned deployment records for Vogue's Compact ZK circ
 |:------|:------|
 | **Deployer Wallet** | `@vogue_night` — [x.com/vogue_night](https://x.com/vogue_night) |
 | **Preprod Deployment TX** | [`0x27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645`](https://explorer.1am.xyz/tx/27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645?network=preprod) |
-| **Preprod Contract Address** | [`0x2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524`](https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod) |
+| **Preprod Contract Address** | [`0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524`](https://explorer.1am.xyz/contract/2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524?network=preprod) |
 
 | **Block** | `2098826` |
 | **Deployed At** | `2026-08-14T11:03:00Z` |
@@ -42,7 +42,7 @@ All subsequent user interactions (strategy commits, vault mints, trade execution
 
 | Version | Contract Address | Deployment TX | Block | Deployed At | Circuits | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `1.2.0` | `0x2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524` | `0x27ffe1f7...cd28645` | `2098826` | 2026-08-14 | `commitStrategy`, `executeTrade`, `mintVaultBalance`, `burnVaultBalance`, `unshieldWithdraw` | **Active (Verified)** |
+| `1.2.0` | `0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524` | `0x27ffe1f7...cd28645` | `2098826` | 2026-08-14 | `commitStrategy`, `executeTrade`, `mintVaultBalance`, `burnVaultBalance`, `unshieldWithdraw` | **Active (Verified)** |
 | `1.0.0` | `0x62a27ceda5eb600263e208768d5d285c659d47f2cd6b14a20c62b160f4da46f3` | — | — | 2026-08-12 | `commitStrategy`, `executeTrade`, `unshieldWithdraw` | Historical |
 
 ---

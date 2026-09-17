@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import type { ActiveStrategy } from '../hooks/useMidnight';
 import { formatISTDateTime } from '../utils/time';
+import { getMidnightExplorerContractUrl } from '../utils/midnightApi';
+import { getActiveContractAddress } from '../utils/registry';
 
 interface OverviewStrategiesProps {
   activeStrategies: ActiveStrategy[];
@@ -139,7 +141,7 @@ export const OverviewStrategies: React.FC<OverviewStrategiesProps> = ({
                     <span className="font-bold text-gray-700 shrink-0">ZK Hash:</span>
                     <span className="truncate">{strat.commitmentHash}</span>
                     <a
-                      href={networkId === 'preprod' ? 'https://explorer.1am.xyz/contract/2428cd4ae7c2cd0bb501e1e9162de3003b103c1063c220e0d5cfc3f0b438e524?network=preprod' : 'https://explorer.1am.xyz/contract/33eb41d22028264e9e8bbe7f95b3089cece6e3c2a53008535e72a9f3350d3e30?network=preview'}
+                      href={getMidnightExplorerContractUrl(getActiveContractAddress(networkId), networkId)}
                       target="_blank"
                       rel="noreferrer"
                       className="text-orange-600 hover:text-orange-700 hover:underline inline-flex items-center gap-0.5 font-bold shrink-0 ml-1"
