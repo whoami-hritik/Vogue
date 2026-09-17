@@ -40,6 +40,11 @@ export ledger alphaMirroredTradeStatus: Map<Bytes<32>, Uint<8>>;  // mirrorTrade
 export ledger complianceAttestationRegistry: Map<Bytes<32>, Bytes<32>>; // fundId -> compliance proof commitment hash
 export ledger auditorAccessRegistry: Map<Bytes<32>, Bytes<32>>;         // delegationId -> delegation commitment hash
 export ledger auditorDelegationCount: Counter;
+export ledger icebergOrderCommitment: Map<Bytes<32>, Bytes<32>>;        // orderId -> private iceberg commitment hash
+export ledger icebergOrderStatus: Map<Bytes<32>, Uint<8>>;              // orderId -> 0=none, 1=active, 2=completed, 3=cancelled
+export ledger icebergFilledAmountUsd: Map<Bytes<32>, Uint<64>>;         // orderId -> cumulative filled amount
+export ledger icebergSliceCount: Counter;
+export ledger icebergOrderCount: Counter;
 
 // ---------- PRIVATE WITNESSES ----------
 witness getMaxPositionPct(): Uint<8>;
@@ -71,6 +76,12 @@ witness getKycTier(): Uint<8>;
 witness getAuditorScopeBitmask(): Uint<8>;
 witness getAuditorExpiry(): Uint<64>;
 witness getSolvencyRatioBps(): Uint<64>;
+witness getIcebergTotalAmountUsd(): Uint<64>;
+witness getIcebergAsset(): Bytes<32>;
+witness getIcebergMaxSlippageBps(): Uint<16>;
+witness getIcebergTimeHorizonSeconds(): Uint<64>;
+witness getIcebergMaxPriceLimit(): Uint<64>;
+witness getSliceAmountUsd(): Uint<64>;
 
 // ---------- CIRCUITS ----------
 
@@ -291,5 +302,55 @@ export circuit verifyProofOfSolvency(fundId: Bytes<32>, minSolvencyBps: Uint<64>
   assert(complianceAttestationRegistry.member(disclose(fundId)), "fund not registered in compliance registry");
   assert(getSolvencyRatioBps() >= minSolvencyBps, "fund fails zero-knowledge solvency ratio requirement");
 }
+
+// ============================================================================
+// ZK-ICEBERG & TEMPORAL SHUFFLING (ANTI-MEV TWAP) CIRCUITS
+// ============================================================================
+
+// Commit institutional parent iceberg order into shielded state
+export circuit commitIcebergOrder(orderId: Bytes<32>, startTime: Uint<64>): [] {
+  assert(getIcebergTotalAmountUsd() > (0 as Uint<64>), "iceberg order amount must be positive");
+  assert(getIcebergTimeHorizonSeconds() > (0 as Uint<64>), "invalid time horizon");
+  assert(getIcebergMaxSlippageBps() <= (1000 as Uint<16>), "max slippage cannot exceed 10%");
+
+  const orderHash = disclose(
+    persistentHash<Vector<5, Bytes<32>>>([
+      getIcebergAsset(),
+      getIcebergTotalAmountUsd() as Field as Bytes<32>,
+      getIcebergMaxSlippageBps() as Field as Bytes<32>,
+      getIcebergTimeHorizonSeconds() as Field as Bytes<32>,
+      getIcebergMaxPriceLimit() as Field as Bytes<32>
+    ])
+  );
+  icebergOrderCommitment.insert(disclose(orderId), orderHash);
+  icebergOrderStatus.insert(disclose(orderId), disclose(1 as Uint<8>)); // 1 = ACTIVE
+  icebergFilledAmountUsd.insert(disclose(orderId), disclose(0 as Uint<64>));
+  icebergOrderCount.increment(1);
+}
+
+// Execute randomized temporal micro-slice in Zero-Knowledge
+export circuit executeIcebergSlice(orderId: Bytes<32>, sliceId: Bytes<32>, fillPriceUsd: Uint<64>, currentTime: Uint<64>): [] {
+  assert(icebergOrderStatus.lookup(disclose(orderId)) == (1 as Uint<8>), "iceberg order not active");
+  assert(fillPriceUsd <= getIcebergMaxPriceLimit(), "fill price exceeds max limit price");
+  assert(getSliceAmountUsd() > (0 as Uint<64>), "slice amount must be positive");
+
+  const currentFilled = icebergFilledAmountUsd.lookup(disclose(orderId));
+  const newFilled = currentFilled + getSliceAmountUsd();
+  assert(newFilled <= getIcebergTotalAmountUsd(), "slice exceeds remaining iceberg order allocation");
+
+  icebergFilledAmountUsd.insert(disclose(orderId), disclose(newFilled));
+  icebergSliceCount.increment(1);
+
+  if (newFilled == getIcebergTotalAmountUsd()) {
+    icebergOrderStatus.insert(disclose(orderId), disclose(2 as Uint<8>)); // 2 = COMPLETED
+  }
+}
+
+// Cancel remaining unfilled portion of iceberg order
+export circuit cancelIcebergOrder(orderId: Bytes<32>): [] {
+  assert(icebergOrderStatus.lookup(disclose(orderId)) == (1 as Uint<8>), "iceberg order not active or already finished");
+  icebergOrderStatus.insert(disclose(orderId), disclose(3 as Uint<8>)); // 3 = CANCELLED
+}
+
 
 

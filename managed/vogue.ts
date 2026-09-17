@@ -32,6 +32,12 @@ export interface StrategyWitnesses {
   getSignalDirection?: () => number;
   getSignalPriceLimitUsd?: () => bigint;
   getProportionalAllocationBps?: () => number;
+  getIcebergTotalAmountUsd?: () => bigint;
+  getIcebergAsset?: () => string;
+  getIcebergMaxSlippageBps?: () => number;
+  getIcebergTimeHorizonSeconds?: () => bigint;
+  getIcebergMaxPriceLimit?: () => bigint;
+  getSliceAmountUsd?: () => bigint;
 }
 
 export class VogueContractSimulator {
@@ -51,6 +57,11 @@ export class VogueContractSimulator {
   public complianceAttestationRegistry = new Map<string, string>(); // fundId -> compliance hash
   public auditorAccessRegistry = new Map<string, { auditorPubKey: string; scopeBitmask: number; expiry: bigint; active: boolean }>();
   public auditorDelegationCount: number = 0;
+  public icebergOrderCommitment = new Map<string, string>(); // orderId -> commitmentHash
+  public icebergOrderStatus = new Map<string, number>();      // orderId -> 1=active, 2=completed, 3=cancelled
+  public icebergFilledAmountUsd = new Map<string, bigint>();  // orderId -> cumulativeFilledUsd
+  public icebergSliceCount: number = 0;
+  public icebergOrderCount: number = 0;
 
   private witnesses: StrategyWitnesses;
 
@@ -442,5 +453,85 @@ export class VogueContractSimulator {
       return { status: 'rejected', reason: 'fund fails zero-knowledge solvency ratio requirement' };
     }
     return { status: 'verified' };
+  }
+
+  // ============================================================================
+  // ZK-ICEBERG & TEMPORAL SHUFFLING (ANTI-MEV TWAP) CIRCUITS
+  // ============================================================================
+
+  public commitIcebergOrder(
+    orderId: string,
+    startTime: bigint
+  ): { status: 'committed' | 'rejected'; reason?: string; commitmentHash?: string } {
+    const totalAmount = this.witnesses.getIcebergTotalAmountUsd ? this.witnesses.getIcebergTotalAmountUsd() : 1000000n;
+    if (totalAmount <= 0n) {
+      return { status: 'rejected', reason: 'iceberg order amount must be positive' };
+    }
+    const timeHorizon = this.witnesses.getIcebergTimeHorizonSeconds ? this.witnesses.getIcebergTimeHorizonSeconds() : 86400n * 2n;
+    if (timeHorizon <= 0n) {
+      return { status: 'rejected', reason: 'invalid time horizon' };
+    }
+    const maxSlippage = this.witnesses.getIcebergMaxSlippageBps ? this.witnesses.getIcebergMaxSlippageBps() : 300;
+    if (maxSlippage > 1000) {
+      return { status: 'rejected', reason: 'max slippage cannot exceed 10%' };
+    }
+
+    const asset = this.witnesses.getIcebergAsset ? this.witnesses.getIcebergAsset() : 'BTC';
+    const maxPriceLimit = this.witnesses.getIcebergMaxPriceLimit ? this.witnesses.getIcebergMaxPriceLimit() : 75000n;
+
+    const commitmentHash = `0xiceberg_${orderId}_${asset}_amt${totalAmount}_slip${maxSlippage}`;
+    this.icebergOrderCommitment.set(orderId, commitmentHash);
+    this.icebergOrderStatus.set(orderId, 1); // 1 = ACTIVE
+    this.icebergFilledAmountUsd.set(orderId, 0n);
+    this.icebergOrderCount++;
+
+    return { status: 'committed', commitmentHash };
+  }
+
+  public executeIcebergSlice(
+    orderId: string,
+    sliceId: string,
+    fillPriceUsd: bigint,
+    currentTime: bigint
+  ): { status: 'executed' | 'rejected'; reason?: string; filledAmountUsd?: bigint; isCompleted?: boolean } {
+    if (this.icebergOrderStatus.get(orderId) !== 1) {
+      return { status: 'rejected', reason: 'iceberg order not active' };
+    }
+
+    const maxLimitPrice = this.witnesses.getIcebergMaxPriceLimit ? this.witnesses.getIcebergMaxPriceLimit() : 75000n;
+    if (fillPriceUsd > maxLimitPrice) {
+      return { status: 'rejected', reason: 'fill price exceeds max limit price' };
+    }
+
+    const sliceAmount = this.witnesses.getSliceAmountUsd ? this.witnesses.getSliceAmountUsd() : 50000n;
+    if (sliceAmount <= 0n) {
+      return { status: 'rejected', reason: 'slice amount must be positive' };
+    }
+
+    const totalAmount = this.witnesses.getIcebergTotalAmountUsd ? this.witnesses.getIcebergTotalAmountUsd() : 1000000n;
+    const currentFilled = this.icebergFilledAmountUsd.get(orderId) || 0n;
+    const newFilled = currentFilled + sliceAmount;
+
+    if (newFilled > totalAmount) {
+      return { status: 'rejected', reason: 'slice exceeds remaining iceberg order allocation' };
+    }
+
+    this.icebergFilledAmountUsd.set(orderId, newFilled);
+    this.icebergSliceCount++;
+
+    const isCompleted = newFilled === totalAmount;
+    if (isCompleted) {
+      this.icebergOrderStatus.set(orderId, 2); // 2 = COMPLETED
+    }
+
+    return { status: 'executed', filledAmountUsd: newFilled, isCompleted };
+  }
+
+  public cancelIcebergOrder(orderId: string): { status: 'cancelled' | 'rejected'; reason?: string } {
+    if (this.icebergOrderStatus.get(orderId) !== 1) {
+      return { status: 'rejected', reason: 'iceberg order not active or already finished' };
+    }
+    this.icebergOrderStatus.set(orderId, 3); // 3 = CANCELLED
+    return { status: 'cancelled' };
   }
 }

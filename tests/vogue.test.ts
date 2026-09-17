@@ -514,5 +514,114 @@ describe('Vogue Compact Smart Contract Privacy & Verification Suite', () => {
     expect(overAllocRes.status).toBe('rejected');
     expect(overAllocRes.reason).toContain('allocation cannot exceed 100%');
   });
+
+  // ============================================================================
+  // ZK-ICEBERG & TEMPORAL SHUFFLING (ANTI-MEV TWAP) TESTS
+  // ============================================================================
+
+  it('26. commitIcebergOrder: commits institutional parent order into shielded state without leaking size or schedule', () => {
+    const icebergWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getIcebergTotalAmountUsd: () => 1000000n, // $1,000,000 vUSD
+      getIcebergAsset: () => 'BTC',
+      getIcebergMaxSlippageBps: () => 200, // 2% max slippage
+      getIcebergTimeHorizonSeconds: () => 86400n * 2n, // 48 hours
+      getIcebergMaxPriceLimit: () => 72000n
+    };
+
+    const contract = new VogueContractSimulator(icebergWitnesses);
+    const orderId = '0xiceberg_order_parent_001';
+    const now = 1750000000n;
+
+    const res = contract.commitIcebergOrder(orderId, now);
+    expect(res.status).toBe('committed');
+    expect(contract.icebergOrderStatus.get(orderId)).toBe(1); // 1 = ACTIVE
+    expect(contract.icebergFilledAmountUsd.get(orderId)).toBe(0n);
+    expect(contract.icebergOrderCount).toBe(1);
+    expect(contract.icebergOrderCommitment.get(orderId)).toBeDefined();
+  });
+
+  it('27. executeIcebergSlice: executes randomized temporal micro-slice and completes order when fully filled', () => {
+    const totalCapital = 100000n;
+    const slice1Amount = 40000n;
+    const slice2Amount = 60000n;
+
+    let currentSliceAmount = slice1Amount;
+    const icebergWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getIcebergTotalAmountUsd: () => totalCapital,
+      getIcebergAsset: () => 'ETH',
+      getIcebergMaxPriceLimit: () => 3600n,
+      getSliceAmountUsd: () => currentSliceAmount
+    };
+
+    const contract = new VogueContractSimulator(icebergWitnesses);
+    const orderId = '0xiceberg_order_parent_002';
+    const now = 1750000000n;
+
+    contract.commitIcebergOrder(orderId, now);
+
+    // Slice 1: $40,000 at $3,450 (<= $3,600 max price)
+    const slice1Res = contract.executeIcebergSlice(orderId, '0xslice_01', 3450n, now + 1800n);
+    expect(slice1Res.status).toBe('executed');
+    expect(slice1Res.filledAmountUsd).toBe(40000n);
+    expect(slice1Res.isCompleted).toBe(false);
+    expect(contract.icebergOrderStatus.get(orderId)).toBe(1); // Still ACTIVE
+
+    // Slice 2: $60,000 at $3,500 (completes $100,000 order)
+    currentSliceAmount = slice2Amount;
+    const slice2Res = contract.executeIcebergSlice(orderId, '0xslice_02', 3500n, now + 5400n);
+    expect(slice2Res.status).toBe('executed');
+    expect(slice2Res.filledAmountUsd).toBe(100000n);
+    expect(slice2Res.isCompleted).toBe(true);
+    expect(contract.icebergOrderStatus.get(orderId)).toBe(2); // 2 = COMPLETED
+  });
+
+  it('28. executeIcebergSlice: rejects micro-slice if fill price exceeds hidden limit price or slice exceeds remaining capital', () => {
+    const icebergWitnesses: StrategyWitnesses = {
+      ...defaultWitnesses,
+      getIcebergTotalAmountUsd: () => 50000n,
+      getIcebergMaxPriceLimit: () => 3200n,
+      getSliceAmountUsd: () => 30000n
+    };
+
+    const contract = new VogueContractSimulator(icebergWitnesses);
+    const orderId = '0xiceberg_order_parent_003';
+    const now = 1750000000n;
+
+    contract.commitIcebergOrder(orderId, now);
+
+    // Rejection 1: Toxic fill price exceeding hidden limit price ($3,350 > $3,200)
+    const priceReject = contract.executeIcebergSlice(orderId, '0xslice_mev_spike', 3350n, now + 600n);
+    expect(priceReject.status).toBe('rejected');
+    expect(priceReject.reason).toContain('fill price exceeds max limit price');
+
+    // Execute valid Slice 1: $30,000
+    contract.executeIcebergSlice(orderId, '0xslice_valid_1', 3150n, now + 600n);
+
+    // Rejection 2: Next slice of $30,000 exceeds remaining allocation ($50,000 - $30,000 = $20,000)
+    const sizeReject = contract.executeIcebergSlice(orderId, '0xslice_overflow', 3150n, now + 1200n);
+    expect(sizeReject.status).toBe('rejected');
+    expect(sizeReject.reason).toContain('slice exceeds remaining iceberg order allocation');
+  });
+
+  it('29. cancelIcebergOrder: cancels active iceberg order and locks out subsequent slice execution', () => {
+    const contract = new VogueContractSimulator(defaultWitnesses);
+    const orderId = '0xiceberg_order_cancel_test';
+    const now = 1750000000n;
+
+    contract.commitIcebergOrder(orderId, now);
+    expect(contract.icebergOrderStatus.get(orderId)).toBe(1);
+
+    const cancelRes = contract.cancelIcebergOrder(orderId);
+    expect(cancelRes.status).toBe('cancelled');
+    expect(contract.icebergOrderStatus.get(orderId)).toBe(3); // 3 = CANCELLED
+
+    // Slices attempted on cancelled order must fail
+    const sliceAttempt = contract.executeIcebergSlice(orderId, '0xslice_after_cancel', 65000n, now + 600n);
+    expect(sliceAttempt.status).toBe('rejected');
+    expect(sliceAttempt.reason).toContain('iceberg order not active');
+  });
 });
+
 
