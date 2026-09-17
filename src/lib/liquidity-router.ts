@@ -6,7 +6,7 @@
  * with zero-knowledge anonymity guarantees.
  */
 
-export type LiquidityVenueId = 'hyperliquid' | 'uniswap_v3' | 'minswap' | 'midnight_darkpool';
+export type LiquidityVenueId = 'hyperliquid' | 'uniswap_v3' | 'minswap' | 'midnight_darkpool' | 'jupiter_solana';
 
 export interface LiquidityVenue {
   id: LiquidityVenueId;
@@ -97,6 +97,20 @@ export const LIQUIDITY_VENUES: Record<LiquidityVenueId, LiquidityVenue> = {
     supportedAssets: ['ADA', 'tNIGHT', 'WMT', 'AGIX'],
     description: 'Native Cardano liquidity routing directly through deterministic eUTxO batches.',
   },
+  jupiter_solana: {
+    id: 'jupiter_solana',
+    name: 'Jupiter / Raydium CLMM (Solana)',
+    shortLabel: 'Solana (Jupiter)',
+    chain: 'Solana',
+    executionType: 'CONCENTRATED_AMM',
+    baseFeeBps: 1, // 0.01%
+    availableLiquidityUsd: 110_000_000,
+    avgLatencyMs: 120, // Sub-second Solana speed
+    anonymityScore: 99.7,
+    status: 'OPTIMAL',
+    supportedAssets: ['SOL', 'JUP', 'USDC', 'BONK', 'ETH', 'BTC'],
+    description: 'Ultra-fast Solana liquidity aggregation via Jupiter and Raydium concentrated liquidity market maker.',
+  },
   midnight_darkpool: {
     id: 'midnight_darkpool',
     name: 'Midnight P2P Dark Intent Pool',
@@ -162,6 +176,12 @@ export function calculateVenueSlippage(
       return Number(Math.min(2.8, base + depthFactor * 0.25).toFixed(4));
     }
 
+    case 'jupiter_solana': {
+      // Solana deep CLMM liquidity
+      const depthFactor = amountUsd / 1_500_000;
+      return Number(Math.min(0.9, 0.022 + depthFactor * 0.07).toFixed(4));
+    }
+
     default:
       return 0.1;
   }
@@ -216,6 +236,8 @@ export function compareExecutionRoutes(
       routingReason = 'Zero-fee internal P2P intent match with 100% cryptographic shielding';
     } else if (venue.id === 'minswap') {
       routingReason = 'Native Cardano eUTxO direct batch settlement';
+    } else if (venue.id === 'jupiter_solana') {
+      routingReason = 'Sub-second Solana settlement with deep Jupiter CLMM routing';
     } else {
       routingReason = 'Multi-chain concentrated liquidity across EVM pairs';
     }
