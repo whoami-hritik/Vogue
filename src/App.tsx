@@ -13,6 +13,7 @@ import { DarkIntentMonitor } from './components/DarkIntentMonitor';
 import { AlphaMarketplace } from './components/AlphaMarketplace';
 import { InstitutionalCompliance } from './components/InstitutionalCompliance';
 import { IcebergMonitor } from './components/IcebergMonitor';
+import { DarkIntentPortal } from './components/DarkIntentPortal';
 import { formatISTDate, formatISTTime } from './utils/time';
 import { useMidnight } from './hooks/useMidnight';
 import { PreprodCounter } from './components/PreprodCounter';
@@ -335,6 +336,17 @@ export function App() {
             walletAddress={walletAddress}
             vaultBalance={vaultBalance}
             onConnectWallet={() => setIsModalOpen(true)}
+          />
+        )}
+
+        {/* 2.95 ZK-DARK INTENT SOLVER NETWORK (DIN) */}
+        {activeTab === 'dark-intent' && (
+          <DarkIntentPortal
+            walletConnected={walletConnected}
+            walletAddress={walletAddress}
+            vaultBalance={vaultBalance}
+            onConnectWallet={() => setIsModalOpen(true)}
+            networkId={networkId}
           />
         )}
 

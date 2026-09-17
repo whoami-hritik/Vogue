@@ -293,3 +293,23 @@ export function compareExecutionRoutes(
     totalSlippageSavedUsd: optimalRoute.slippageSavedUsd,
   };
 }
+
+export function findBestLiquidityRoute(
+  asset: string,
+  amountUsd: number,
+  marketPriceUsd?: number
+): RouteQuote {
+  const price = marketPriceUsd || (asset === 'SOL' ? 145 : asset === 'ETH' ? 2750 : asset === 'BTC' ? 64000 : 0.82);
+  const comp = compareExecutionRoutes(asset, amountUsd, price);
+  return comp.optimalRoute;
+}
+
+export function compareLiquidityRoutes(
+  asset: string,
+  amountUsd: number,
+  marketPriceUsd?: number
+): RouteComparisonResult {
+  const price = marketPriceUsd || (asset === 'SOL' ? 145 : asset === 'ETH' ? 2750 : asset === 'BTC' ? 64000 : 0.82);
+  return compareExecutionRoutes(asset, amountUsd, price);
+}
+

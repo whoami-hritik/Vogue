@@ -11,7 +11,8 @@ import {
   Clock,
   Award,
   ShieldCheck,
-  Shuffle
+  Shuffle,
+  Layers
 } from 'lucide-react';
 import { WalletConnect } from './WalletConnect';
 import type { DetectedWallet } from '../lib/lace-wallet';
@@ -77,6 +78,7 @@ export const Layout: React.FC<LayoutProps> = ({
     { id: 'alpha-marketplace', label: 'Alpha Market', icon: Award, highlight: true },
     { id: 'institutional-compliance', label: 'Compliance & Audit', icon: ShieldCheck, highlight: true },
     { id: 'zk-iceberg', label: 'ZK-Iceberg TWAP', icon: Shuffle, highlight: true },
+    { id: 'dark-intent', label: 'Dark Intent (DIN)', icon: Layers, highlight: true },
     { id: 'market-insights', label: 'Market Insights', icon: LineChart },
     { id: 'portfolio', label: 'Portfolio', icon: PieChart },
     { id: 'trade-history', label: 'Trade History', icon: History },
