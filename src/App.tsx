@@ -12,6 +12,7 @@ import { OverviewStrategies } from './components/OverviewStrategies';
 import { DarkIntentMonitor } from './components/DarkIntentMonitor';
 import { AlphaMarketplace } from './components/AlphaMarketplace';
 import { InstitutionalCompliance } from './components/InstitutionalCompliance';
+import { IcebergMonitor } from './components/IcebergMonitor';
 import { formatISTDate, formatISTTime } from './utils/time';
 import { useMidnight } from './hooks/useMidnight';
 import { PreprodCounter } from './components/PreprodCounter';
@@ -324,6 +325,16 @@ export function App() {
             vaultBalance={vaultBalance}
             onConnectWallet={() => setIsModalOpen(true)}
             onNavigateTab={setActiveTab}
+          />
+        )}
+
+        {/* 2.85 ZK-ICEBERG & TEMPORAL SHUFFLING ANTI-MEV TWAP */}
+        {activeTab === 'zk-iceberg' && (
+          <IcebergMonitor
+            walletConnected={walletConnected}
+            walletAddress={walletAddress}
+            vaultBalance={vaultBalance}
+            onConnectWallet={() => setIsModalOpen(true)}
           />
         )}
 
