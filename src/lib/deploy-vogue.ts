@@ -31,6 +31,12 @@ import type { MidnightProvider } from "@midnight-ntwrk/midnight-js-types";
 import type { BrowserSession } from "./midnight-browser";
 import { setCustomContractAddress } from "../utils/registry";
 
+// Static import of the compactc-generated contract class.
+// Vite bundles this at build time — DO NOT use @vite-ignore dynamic import,
+// that bypasses Vite's module graph and the file never reaches the browser.
+// Path is relative to this file (src/lib/) → ../../contracts/managed/vogue/contract/index.js
+import { Contract as VogueContract } from "../../contracts/managed/vogue/contract/index.js";
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const CONTRACT_NAME = "vogue";
@@ -166,31 +172,13 @@ function createWitnesses() {
  * Until then, the function throws with a helpful message.
  */
 async function makeCompiledContract() {
-  let Contract: unknown;
-  try {
-    // Dynamic import so the app doesn't crash if the file doesn't exist yet
-    const mod = await import(
-      /* @vite-ignore */
-      "../../contracts/managed/vogue/contract/index.js"
-    );
-    Contract = mod.Contract;
-  } catch {
-    throw new Error(
-      "[Vogue Deploy] Compiled contract bindings not found.\n" +
-        "Run: compact compile \"+0.31.1\" contracts/vogue.compact contracts/managed/vogue\n" +
-        "Then sync ZK assets: cp -R contracts/managed/vogue/keys public/zk/vogue/keys\n" +
-        "                     cp -R contracts/managed/vogue/zkir public/zk/vogue/zkir"
-    );
-  }
-
+  // Use the statically-imported Contract class (Vite bundles this at build time)
   return (CompiledContract as unknown as {
     make: (name: string, contract: unknown) => {
-      pipe: (
-        ...fns: unknown[]
-      ) => unknown;
+      pipe: (...fns: unknown[]) => unknown;
     };
   })
-    .make(CONTRACT_NAME, Contract)
+    .make(CONTRACT_NAME, VogueContract)
     .pipe(
       (CompiledContract as unknown as {
         withWitnesses: (w: unknown) => unknown;
