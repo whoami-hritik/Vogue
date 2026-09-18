@@ -355,13 +355,15 @@ export circuit executeIcebergSlice(orderId: Bytes<32>, sliceId: Bytes<32>, fillP
   assert(getSliceAmountUsd() > (0 as Uint<64>), "slice amount must be positive");
 
   const currentFilled = icebergFilledAmountUsd.lookup(disclose(orderId));
-  const newFilled = currentFilled + getSliceAmountUsd();
-  assert(newFilled <= getIcebergTotalAmountUsd(), "slice exceeds remaining iceberg order allocation");
+  const sliceAmt = disclose(getSliceAmountUsd());
+  const totalAmt = disclose(getIcebergTotalAmountUsd());
+  const newFilled = (currentFilled + sliceAmt) as Uint<64>;
+  assert(newFilled <= totalAmt, "slice exceeds remaining iceberg order allocation");
 
   icebergFilledAmountUsd.insert(disclose(orderId), disclose(newFilled));
   icebergSliceCount.increment(1);
 
-  if (newFilled == getIcebergTotalAmountUsd()) {
+  if (newFilled == totalAmt) {
     icebergOrderStatus.insert(disclose(orderId), disclose(2 as Uint<8>)); // 2 = COMPLETED
   }
 }

@@ -22,15 +22,9 @@ import {
   resetCustomContractAddress,
   getCustomContractAddress
 } from '../utils/registry';
-import {
-  getMidnightExplorerContractUrl,
-  getMidnightExplorerTxUrl
-} from '../utils/midnightApi';
-import {
-  checkProofServerHealth,
-  deployContractVia1AM,
-  type DeployedContractResult
-} from '../lib/midnight-api';
+import { checkProofServerHealth } from '../lib/midnight-api';
+import { connectOneAm } from '../lib/midnight-browser';
+import { deployVogueContract, type DeployResult } from '../lib/deploy-vogue';
 
 interface ContractDeployerModalProps {
   isOpen: boolean;
@@ -65,7 +59,7 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployStep, setDeployStep] = useState<string>('');
   const [deployError, setDeployError] = useState<string | null>(null);
-  const [deployedResult, setDeployedResult] = useState<DeployedContractResult | null>(null);
+  const [deployedResult, setDeployedResult] = useState<DeployResult | null>(null);
   const [currentContract, setCurrentContract] = useState<string>(() =>
     getActiveContractAddress(selectedNetwork)
   );
@@ -109,24 +103,29 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
     setIsDeploying(true);
     setDeployError(null);
     setDeployedResult(null);
-    setDeployStep('1. Initializing Compact bytecode and constructor parameters...');
+    setDeployStep('1. Connecting to 1AM wallet provider stack...');
 
     try {
-      const result = await deployContractVia1AM(selectedNetwork, (step) => {
+      // Step 1: Build the real Midnight provider stack via 1AM wallet
+      setDeployStep('1. Connecting to 1AM wallet and building Midnight provider stack...');
+      const session = await connectOneAm(selectedNetwork, '/zk/vogue/');
+
+      // Steps 2-4 driven by deployVogueContract's onStep callback
+      const result = await deployVogueContract(session, undefined, (step) => {
         setDeployStep(step);
       });
 
       setDeployedResult(result);
-      setCustomContractAddress(selectedNetwork, result.contractAddress);
+      // setCustomContractAddress is already called inside deployVogueContract
       setCurrentContract(result.contractAddress);
       if (onContractAddressChange) {
         onContractAddressChange(result.contractAddress);
       }
-      setDeploySuccess(`Contract successfully deployed to Midnight ${selectedNetwork}!`);
-      setTimeout(() => setDeploySuccess(null), 5000);
+      setDeploySuccess(`Contract deployed on Midnight ${selectedNetwork}! Address: ${result.contractAddress.substring(0, 16)}...`);
+      setTimeout(() => setDeploySuccess(null), 8000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error('[Vogue] In-app deployment error:', err);
+      console.error('[Vogue] Real deployment error:', err);
       setDeployError(msg);
     } finally {
       setIsDeploying(false);
@@ -280,7 +279,7 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
                   </div>
                   <div>
                     <span className="text-[10px] text-gray-400 font-bold uppercase block">Circuit Count</span>
-                    <span className="font-bold text-gray-800">11 ZK Circuits</span>
+                    <span className="font-bold text-gray-800">22 ZK Circuits</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-gray-400 font-bold uppercase block">Est. Fee</span>
@@ -327,13 +326,13 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                       <span className="font-bold text-emerald-900 text-xs uppercase tracking-wide">
-                        Contract Deployed & Bound to DApp
+                        ✅ Real Contract Deployed &amp; Live on Midnight
                       </span>
                     </div>
 
                     <div className="space-y-2 text-xs">
                       <div>
-                        <span className="text-gray-500 font-medium block text-[11px] mb-1">New Contract Address:</span>
+                        <span className="text-gray-500 font-medium block text-[11px] mb-1">On-Chain Contract Address:</span>
                         <div className="flex items-center justify-between gap-2 p-2 bg-white rounded-xl border border-emerald-200 font-mono text-[11px]">
                           <span className="truncate text-gray-900 font-bold">{deployedResult.contractAddress}</span>
                           <button
@@ -347,11 +346,11 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
                       </div>
 
                       <div>
-                        <span className="text-gray-500 font-medium block text-[11px] mb-1">Deployment Transaction:</span>
+                        <span className="text-gray-500 font-medium block text-[11px] mb-1">Deployment Transaction Hash:</span>
                         <div className="flex items-center justify-between gap-2 p-2 bg-white rounded-xl border border-emerald-200 font-mono text-[11px]">
-                          <span className="truncate text-gray-700">{deployedResult.txHash}</span>
+                          <span className="truncate text-gray-700">{deployedResult.transactionId}</span>
                           <button
-                            onClick={() => copyToClipboard(deployedResult.txHash, 'res-tx')}
+                            onClick={() => copyToClipboard(deployedResult.transactionId, 'res-tx')}
                             className="p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-lg shrink-0"
                             title="Copy Tx Hash"
                           >
@@ -363,18 +362,27 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
 
                     <div className="pt-1 flex flex-wrap gap-2">
                       <a
-                        href={getMidnightExplorerContractUrl(deployedResult.contractAddress, selectedNetwork)}
+                        href={deployedResult.explorerContractUrl}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm"
                       >
                         <Globe className="w-3.5 h-3.5" />
-                        <span>View on Midnight Explorer</span>
+                        <span>Verify on Midnight Explorer</span>
                         <ExternalLink className="w-3 h-3" />
+                      </a>
+                      <a
+                        href={deployedResult.explorerTxUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-gray-50 border border-emerald-300 text-emerald-800 text-xs font-bold transition-all shadow-sm"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>View Deploy Tx</span>
                       </a>
                       <button
                         onClick={() => setActiveTab('status')}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-gray-50 border border-emerald-300 text-emerald-800 text-xs font-bold transition-all shadow-sm cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold transition-all shadow-sm cursor-pointer"
                       >
                         <Activity className="w-3.5 h-3.5" />
                         <span>Inspect in Status Tab</span>
@@ -501,7 +509,7 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
                 {/* Explorer Links */}
                 <div className="pt-2 flex flex-wrap gap-2">
                   <a
-                    href={getMidnightExplorerContractUrl(currentContract, selectedNetwork)}
+                    href={`https://${selectedNetwork}.midnightexplorer.com/contracts/${currentContract.replace(/^0x/i, '0x')}`}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-all shadow-sm"
@@ -513,7 +521,7 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
 
                   {selectedNetwork === 'preprod' && !isCustomActive && (
                     <a
-                      href={getMidnightExplorerTxUrl(preprodTx, 'preprod')}
+                      href={`https://preprod.midnightexplorer.com/tx/${preprodTx}`}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 text-xs font-bold transition-all shadow-sm"
