@@ -49,12 +49,12 @@ export function getActiveContractAddress(network: 'preview' | 'preprod' | string
   if (netKey === 'preprod') {
     return (
       (typeof import.meta !== 'undefined' && (import.meta.env?.['VITE_PREPROD_CONTRACT_ADDRESS'] as string)) ||
-      '0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43'
+      '0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7'
     );
   }
   return (
     (typeof import.meta !== 'undefined' && (import.meta.env?.['VITE_PREVIEW_CONTRACT_ADDRESS'] as string)) ||
-    '0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43'
+    '0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7'
   );
 }
 

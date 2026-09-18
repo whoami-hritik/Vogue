@@ -81,11 +81,11 @@
       },
       {
         "version": "2.0.0",
-        "contractAddress": "0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43",
+        "contractAddress": "0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7",
         "deploymentTx": "0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43",
         "deployedAt": "2026-09-18T15:12:00.000Z",
         "deployedVia": "1AM Wallet in-app deployer",
-        "explorerContract": "https://preprod.midnightexplorer.com/contracts/0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43",
+        "explorerContract": "https://preprod.midnightexplorer.com/contracts/0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7",
         "explorerTx": "https://preprod.midnightexplorer.com/transactions/0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43",
         "compactVersion": "0.5.2",
         "commitHash": "9c7d7a8",
