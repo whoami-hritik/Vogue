@@ -236,47 +236,50 @@ export async function deployVogueContract(
 
   onStep?.("3. Requesting 1AM wallet authorization — approve the popup...");
 
-  // ─── Early-resolve pattern (from Aquas) ──────────────────────────────────────
+  // ─── Early-resolve / reject pattern (from Aquas, fixed to propagate errors) ──
   // submitTxAsync blocks on indexer polling AFTER 1AM has already confirmed.
-  // We intercept midnightProvider.submitTx to resolve immediately on 1AM confirmation.
+  // We intercept midnightProvider.submitTx to resolve immediately on 1AM
+  // confirmation — OR reject immediately if 1AM returns an error.
   let earlyResolveTxId!: (txId: string) => void;
-  const earlyTxIdPromise = new Promise<string>((resolve) => {
+  let earlyRejectTxId!: (err: unknown) => void;
+  const earlyTxIdPromise = new Promise<string>((resolve, reject) => {
     earlyResolveTxId = resolve;
+    earlyRejectTxId = reject;
   });
 
   const interceptedMidnightProvider: MidnightProvider = {
     submitTx: async (transaction) => {
-      let txId = "";
+      // Call the real 1AM submitTransaction. If it throws (e.g. "block limits
+      // exhausted", "user rejected", "invalid transaction"), propagate the
+      // error immediately — DO NOT swallow it with console.warn.
+      let txId: string;
       try {
         const raw = await session.providers.midnightProvider.submitTx(transaction);
         txId = String(raw || "").trim().replace(/^0x/i, "");
       } catch (err) {
-        console.warn(
-          "[Vogue Deploy] submitTx notice (tx may already be in mempool):",
-          err
-        );
+        // Re-throw so submitTxAsync bubbles it to backgroundDeploy.catch,
+        // which then calls earlyRejectTxId so the UI sees the real error.
+        earlyRejectTxId(err);
+        throw err;
       }
 
+      // Try to extract a better txId from the transaction object if 1AM
+      // returned an empty string
       if (!txId) {
         try {
           if (typeof (transaction as { transactionHash?: () => unknown }).transactionHash === "function") {
             const h = (transaction as { transactionHash: () => unknown }).transactionHash();
             txId = String(h || "").trim().replace(/^0x/i, "");
           }
-        } catch {
-          // ignore
-        }
+        } catch { /* ignore */ }
       }
-
       if (!txId) {
         try {
           const ids = (transaction as { identifiers?: () => string[] }).identifiers?.();
           if (ids && ids.length > 0 && ids[0]) {
             txId = String(ids[0]).trim().replace(/^0x/i, "");
           }
-        } catch {
-          // ignore
-        }
+        } catch { /* ignore */ }
       }
 
       const finalTxId = txId || contractAddress;
@@ -295,8 +298,8 @@ export async function deployVogueContract(
     options: { unprovenTx: unknown }
   ) => Promise<unknown>;
 
-  // Fire submitTxAsync in the background (proves + balances + submits + polls indexer).
-  // We do NOT await it. We only care about the moment 1AM confirms.
+  // Fire submitTxAsync in the background (proves + balances + submits).
+  // We do NOT await it — we race on earlyTxIdPromise instead.
   const backgroundDeploy = submitFn(interceptedProviders, {
     unprovenTx: deployTxData.private.unprovenTx,
   })
@@ -306,16 +309,21 @@ export async function deployVogueContract(
       }
     })
     .catch((err: unknown) => {
-      console.warn("[Vogue Deploy] Background indexer sync warning (non-fatal):", err);
-      earlyResolveTxId(contractAddress);
+      // Propagate the real error (e.g. "block limits", "user rejected")
+      earlyRejectTxId(err);
     });
 
-  // 120s absolute timeout fallback
-  const timeoutFallback = new Promise<string>((resolve) =>
-    setTimeout(() => resolve(contractAddress), 120_000)
+  // 120s absolute timeout — if 1AM hasn't responded, fail loudly
+  const timeoutFallback = new Promise<string>((_, reject) =>
+    setTimeout(
+      () => reject(new Error("Deployment timed out after 120s — 1AM wallet did not confirm. Check your wallet and try again.")),
+      120_000
+    )
   );
 
-  // Race: earlyTxIdPromise fires as soon as 1AM wallet confirms
+  // Race: earlyTxIdPromise resolves on success OR rejects on 1AM error
+  // If earlyRejectTxId was called (by the interceptor or backgroundDeploy.catch),
+  // this will throw and the modal's catch block shows the real error.
   const transactionId = await Promise.race([earlyTxIdPromise, timeoutFallback]);
 
   onStep?.("4. Transaction confirmed by 1AM wallet! Saving state...");
