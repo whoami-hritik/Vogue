@@ -27,9 +27,9 @@
 
 | Network | Version | Contract Address | Explorer Link | Status |
 |---------|---------|------------------|---------------|--------|
-| Midnight Preprod Testnet | v1.2.0 | `0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524` | [View on Midnight Preprod Explorer](https://preprod.midnightexplorer.com/contracts/0x2428cd4ae7c2cd8bb581e1e9182de3003b103c1083c228e0d5cfc3f0b438e524) \| [Deployment TX (Block 2,098,826)](https://preprod.midnightexplorer.com/transactions/0x27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645) | ACTIVE PREPROD MVP (Verified) |
+| Midnight Preprod Testnet | v1.0.0 | `0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43` | [View Contract](https://preprod.midnightexplorer.com/contracts/0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43) \| [Deployment TX](https://preprod.midnightexplorer.com/transactions/0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43) | ✅ LIVE — Deployed via 1AM Wallet |
 
-> **Network Note:** Vogue is actively deployed, indexed, and verifiable on the **Midnight Preprod Testnet**. Midnight's earlier Preview testnet was an ephemeral sandbox network that has undergone network state resets (earlier preview contracts are no longer visible on the explorer). All live transactions, zero-knowledge proofs, and 1AM wallet connections run natively on **Midnight Preprod**.
+> **Deployed live on Midnight Preprod Testnet** via the in-app 1AM wallet deployer. This is a **real on-chain contract** — the transaction and contract address are verifiable on the [Midnight Explorer](https://preprod.midnightexplorer.com/transactions/0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43). The contract runs 8 core ZK circuits compiled with `compact 0.5.2` — including `commitStrategy`, `executeTrade`, the full shielded vault (`mintVaultBalance`, `burnVaultBalance`, `unshieldWithdraw`), and the Dark Intent Network (`commitDarkIntent`, `fulfillDarkIntent`, `refundDarkIntent`).
 
 ---
 

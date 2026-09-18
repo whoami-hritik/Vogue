@@ -78,6 +78,27 @@
           "burnVaultBalance",
           "unshieldWithdraw"
         ]
+      },
+      {
+        "version": "2.0.0",
+        "contractAddress": "0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43",
+        "deploymentTx": "0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43",
+        "deployedAt": "2026-09-18T15:12:00.000Z",
+        "deployedVia": "1AM Wallet in-app deployer",
+        "explorerContract": "https://preprod.midnightexplorer.com/contracts/0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43",
+        "explorerTx": "https://preprod.midnightexplorer.com/transactions/0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43",
+        "compactVersion": "0.5.2",
+        "commitHash": "9c7d7a8",
+        "circuits": [
+          "commitStrategy",
+          "executeTrade",
+          "mintVaultBalance",
+          "burnVaultBalance",
+          "unshieldWithdraw",
+          "commitDarkIntent",
+          "fulfillDarkIntent",
+          "refundDarkIntent"
+        ]
       }
     ]
   }
