@@ -9,26 +9,49 @@ import {
   Activity,
   Globe,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  Rocket,
+  Cpu,
+  CheckCircle2,
+  Wallet,
+  RotateCcw
 } from 'lucide-react';
-import { getActiveContractAddress } from '../utils/registry';
-import { getMidnightExplorerContractUrl, getMidnightExplorerTxUrl } from '../utils/midnightApi';
-import { checkProofServerHealth } from '../lib/midnight-api';
+import {
+  getActiveContractAddress,
+  setCustomContractAddress,
+  resetCustomContractAddress,
+  getCustomContractAddress
+} from '../utils/registry';
+import {
+  getMidnightExplorerContractUrl,
+  getMidnightExplorerTxUrl
+} from '../utils/midnightApi';
+import {
+  checkProofServerHealth,
+  deployContractVia1AM,
+  type DeployedContractResult
+} from '../lib/midnight-api';
 
 interface ContractDeployerModalProps {
   isOpen: boolean;
   onClose: () => void;
   networkId?: string;
   onContractAddressChange?: (newAddress: string) => void;
+  walletConnected?: boolean;
+  walletAddress?: string;
+  onConnectWallet?: () => void;
 }
 
 export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
   isOpen,
   onClose,
   networkId = 'preprod',
-  onContractAddressChange
+  onContractAddressChange,
+  walletConnected = false,
+  walletAddress = '',
+  onConnectWallet
 }) => {
-  const [activeTab, setActiveTab] = useState<'status' | 'deploy' | 'custom'>('status');
+  const [activeTab, setActiveTab] = useState<'deploy' | 'status' | 'custom'>('deploy');
   const [selectedNetwork, setSelectedNetwork] = useState<'preprod' | 'preview'>(
     networkId === 'preprod' ? 'preprod' : 'preview'
   );
@@ -38,8 +61,17 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
   const [customAddressInput, setCustomAddressInput] = useState('');
   const [deploySuccess, setDeploySuccess] = useState<string | null>(null);
 
-  const activeContract = getActiveContractAddress(selectedNetwork);
+  // In-App Deployment State
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deployStep, setDeployStep] = useState<string>('');
+  const [deployError, setDeployError] = useState<string | null>(null);
+  const [deployedResult, setDeployedResult] = useState<DeployedContractResult | null>(null);
+  const [currentContract, setCurrentContract] = useState<string>(() =>
+    getActiveContractAddress(selectedNetwork)
+  );
+
   const preprodTx = '0x27ffe1f7a2db3a071c5f2070c9ae6de476f839d7870a6f3c4da78d326cd28645';
+  const isCustomActive = Boolean(getCustomContractAddress(selectedNetwork));
 
   const checkHealth = async () => {
     setIsCheckingServer(true);
@@ -56,8 +88,9 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       checkHealth();
+      setCurrentContract(getActiveContractAddress(selectedNetwork));
     }
-  }, [isOpen]);
+  }, [isOpen, selectedNetwork]);
 
   if (!isOpen) return null;
 
@@ -67,14 +100,61 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const handleApplyCustomAddress = () => {
-    if (customAddressInput.trim().startsWith('0x') && customAddressInput.trim().length >= 64) {
+  const handleDeployContract = async () => {
+    if (!walletConnected && onConnectWallet) {
+      onConnectWallet();
+      return;
+    }
+
+    setIsDeploying(true);
+    setDeployError(null);
+    setDeployedResult(null);
+    setDeployStep('1. Initializing Compact bytecode and constructor parameters...');
+
+    try {
+      const result = await deployContractVia1AM(selectedNetwork, (step) => {
+        setDeployStep(step);
+      });
+
+      setDeployedResult(result);
+      setCustomContractAddress(selectedNetwork, result.contractAddress);
+      setCurrentContract(result.contractAddress);
       if (onContractAddressChange) {
-        onContractAddressChange(customAddressInput.trim());
+        onContractAddressChange(result.contractAddress);
       }
-      setDeploySuccess(`Active ${selectedNetwork} contract updated to ${customAddressInput.trim().substring(0, 16)}...`);
+      setDeploySuccess(`Contract successfully deployed to Midnight ${selectedNetwork}!`);
+      setTimeout(() => setDeploySuccess(null), 5000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[Vogue] In-app deployment error:', err);
+      setDeployError(msg);
+    } finally {
+      setIsDeploying(false);
+    }
+  };
+
+  const handleApplyCustomAddress = () => {
+    const trimmed = customAddressInput.trim();
+    if (trimmed.startsWith('0x') && trimmed.length >= 64) {
+      setCustomContractAddress(selectedNetwork, trimmed);
+      setCurrentContract(trimmed);
+      if (onContractAddressChange) {
+        onContractAddressChange(trimmed);
+      }
+      setDeploySuccess(`Active ${selectedNetwork} contract updated to ${trimmed.substring(0, 16)}...`);
       setTimeout(() => setDeploySuccess(null), 4000);
     }
+  };
+
+  const handleResetToDefault = () => {
+    resetCustomContractAddress(selectedNetwork);
+    const defaultAddr = getActiveContractAddress(selectedNetwork);
+    setCurrentContract(defaultAddr);
+    if (onContractAddressChange) {
+      onContractAddressChange(defaultAddr);
+    }
+    setDeploySuccess(`Reverted to verified ${selectedNetwork} contract.`);
+    setTimeout(() => setDeploySuccess(null), 3000);
   };
 
   return (
@@ -126,34 +206,36 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
 
           <div className="flex items-center gap-1 text-xs">
             <button
-              onClick={() => setActiveTab('status')}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
-                activeTab === 'status'
-                  ? 'bg-orange-500 text-white'
+              onClick={() => setActiveTab('deploy')}
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'deploy'
+                  ? 'bg-orange-500 text-white shadow-sm'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              Live Status
+              <Rocket className="w-3.5 h-3.5" />
+              <span>Deploy Contract</span>
             </button>
             <button
-              onClick={() => setActiveTab('deploy')}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
-                activeTab === 'deploy'
-                  ? 'bg-orange-500 text-white'
+              onClick={() => setActiveTab('status')}
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'status'
+                  ? 'bg-orange-500 text-white shadow-sm'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              Deploy Contract
+              <Activity className="w-3.5 h-3.5" />
+              <span>Live Status</span>
             </button>
             <button
               onClick={() => setActiveTab('custom')}
               className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                 activeTab === 'custom'
-                  ? 'bg-orange-500 text-white'
+                  ? 'bg-orange-500 text-white shadow-sm'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              Override Address
+              <span>Override</span>
             </button>
           </div>
         </div>
@@ -161,12 +243,197 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
         {/* Content Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1 text-sm text-gray-700">
           {deploySuccess && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2">
-              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>{deploySuccess}</span>
+            <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs flex items-center gap-2.5 shadow-sm animate-fade-in">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="font-semibold">{deploySuccess}</span>
             </div>
           )}
 
+          {/* TAB 1: IN-APP CONTRACT DEPLOYMENT */}
+          {activeTab === 'deploy' && (
+            <div className="space-y-5">
+              
+              {/* Deployment Hub Card */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-orange-50/50 via-white to-orange-50/20 border border-orange-200/80 shadow-sm space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-orange-100 text-orange-800 border border-orange-200 inline-block">
+                      1-Click In-App Deployment
+                    </span>
+                    <h3 className="text-base font-bold text-gray-900">
+                      Deploy Vogue Compact Circuit via 1AM
+                    </h3>
+                    <p className="text-xs text-gray-600 leading-relaxed max-w-lg">
+                      Deploys a fresh instance of <code className="text-orange-700 font-mono bg-orange-100/60 px-1 py-0.5 rounded text-[11px]">contracts/vogue.compact</code> to Midnight {selectedNetwork.toUpperCase()}. Your 1AM wallet will sign the constructor transaction.
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-md shadow-orange-500/30 shrink-0">
+                    <Rocket className="w-5 h-5" />
+                  </div>
+                </div>
+
+                {/* Pre-flight Specs Matrix */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 bg-white/80 rounded-xl border border-orange-100 text-xs">
+                  <div>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase block">Network</span>
+                    <span className="font-bold text-gray-800 uppercase">{selectedNetwork}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase block">Circuit Count</span>
+                    <span className="font-bold text-gray-800">11 ZK Circuits</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase block">Est. Fee</span>
+                    <span className="font-bold text-emerald-600 font-mono">0.005 tDUST</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase block">Signing Wallet</span>
+                    <span className="font-bold text-gray-800 truncate block font-mono text-[11px]">
+                      {walletConnected ? (walletAddress ? `${walletAddress.substring(0, 8)}…` : 'Connected') : 'Not Connected'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Deploy Progress State */}
+                {isDeploying && (
+                  <div className="p-4 bg-orange-500/5 border border-orange-200 rounded-2xl flex flex-col items-center justify-center space-y-3 shadow-inner">
+                    <Cpu className="w-8 h-8 text-orange-500 animate-spin" />
+                    <span className="font-extrabold text-gray-900 text-xs uppercase tracking-wide">
+                      Deploying Contract to Midnight...
+                    </span>
+                    <span className="text-[11px] font-mono text-gray-600 bg-white px-3.5 py-1 rounded-full border border-gray-200 shadow-sm text-center">
+                      {deployStep}
+                    </span>
+                    <p className="text-[11px] text-gray-500 text-center max-w-sm">
+                      Please approve the deployment signature prompt in your 1AM wallet extension popup.
+                    </p>
+                  </div>
+                )}
+
+                {/* Deployment Error Notice */}
+                {deployError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-xs flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                    <div className="space-y-0.5">
+                      <span className="font-bold block">Deployment Notice</span>
+                      <p className="leading-relaxed">{deployError}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Deployed Success Result */}
+                {deployedResult && (
+                  <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl space-y-3 animate-fade-in">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                      <span className="font-bold text-emerald-900 text-xs uppercase tracking-wide">
+                        Contract Deployed & Bound to DApp
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                      <div>
+                        <span className="text-gray-500 font-medium block text-[11px] mb-1">New Contract Address:</span>
+                        <div className="flex items-center justify-between gap-2 p-2 bg-white rounded-xl border border-emerald-200 font-mono text-[11px]">
+                          <span className="truncate text-gray-900 font-bold">{deployedResult.contractAddress}</span>
+                          <button
+                            onClick={() => copyToClipboard(deployedResult.contractAddress, 'res-addr')}
+                            className="p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-lg shrink-0"
+                            title="Copy Address"
+                          >
+                            {copiedField === 'res-addr' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <span className="text-gray-500 font-medium block text-[11px] mb-1">Deployment Transaction:</span>
+                        <div className="flex items-center justify-between gap-2 p-2 bg-white rounded-xl border border-emerald-200 font-mono text-[11px]">
+                          <span className="truncate text-gray-700">{deployedResult.txHash}</span>
+                          <button
+                            onClick={() => copyToClipboard(deployedResult.txHash, 'res-tx')}
+                            className="p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-lg shrink-0"
+                            title="Copy Tx Hash"
+                          >
+                            {copiedField === 'res-tx' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-1 flex flex-wrap gap-2">
+                      <a
+                        href={getMidnightExplorerContractUrl(deployedResult.contractAddress, selectedNetwork)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm"
+                      >
+                        <Globe className="w-3.5 h-3.5" />
+                        <span>View on Midnight Explorer</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                      <button
+                        onClick={() => setActiveTab('status')}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-gray-50 border border-emerald-300 text-emerald-800 text-xs font-bold transition-all shadow-sm cursor-pointer"
+                      >
+                        <Activity className="w-3.5 h-3.5" />
+                        <span>Inspect in Status Tab</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Primary Action Button */}
+                {!isDeploying && (
+                  <div>
+                    {!walletConnected ? (
+                      <button
+                        onClick={onConnectWallet}
+                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-orange-500/20 transition-all cursor-pointer"
+                      >
+                        <Wallet className="w-4 h-4" />
+                        <span>Connect 1AM Wallet to Deploy</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleDeployContract}
+                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.005] transition-all cursor-pointer"
+                      >
+                        <Rocket className="w-4 h-4" />
+                        <span>Deploy Contract via 1AM Wallet</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Developer Testkit CLI Reference */}
+              <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Developer Terminal CLI (Optional Alternative)
+                  </span>
+                  <span className="text-[10px] text-gray-500 font-mono">Midnight Testkit JS</span>
+                </div>
+                <p className="text-xs text-gray-500">
+                  You can also deploy directly from Node.js using the repository testkit script:
+                </p>
+                <div className="p-2.5 bg-gray-900 text-gray-100 rounded-xl font-mono text-xs flex items-center justify-between gap-3 shadow-inner">
+                  <code className="truncate">node scripts/deploy-real.cjs</code>
+                  <button
+                    onClick={() => copyToClipboard('node scripts/deploy-real.cjs', 'deploy-cmd')}
+                    className="p-1 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 shrink-0"
+                    title="Copy command"
+                  >
+                    {copiedField === 'deploy-cmd' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB 2: LIVE ON-CHAIN STATUS */}
           {activeTab === 'status' && (
             <div className="space-y-4">
               {/* Active Contract Card */}
@@ -178,17 +445,35 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
                       Active Contract ({selectedNetwork.toUpperCase()})
                     </span>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    {selectedNetwork === 'preprod' ? 'Verified on Chain' : 'Configured'}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {isCustomActive ? (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-100 text-amber-900 border border-amber-200">
+                        In-App Instance
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        Verified on Chain
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-[11px] text-gray-500 font-medium">Contract Address</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-gray-500 font-medium">Contract Address</span>
+                    {isCustomActive && (
+                      <button
+                        onClick={handleResetToDefault}
+                        className="text-[11px] text-orange-600 hover:text-orange-700 font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        <RotateCcw className="w-3 h-3" /> Revert to Verified Default
+                      </button>
+                    )}
+                  </div>
                   <div className="flex items-center justify-between gap-2 p-2.5 bg-white rounded-xl border border-gray-200 font-mono text-xs">
-                    <span className="truncate text-gray-800">{activeContract}</span>
+                    <span className="truncate text-gray-800 font-semibold">{currentContract}</span>
                     <button
-                      onClick={() => copyToClipboard(activeContract, 'addr')}
+                      onClick={() => copyToClipboard(currentContract, 'addr')}
                       className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg shrink-0"
                       title="Copy Address"
                     >
@@ -197,7 +482,7 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
                   </div>
                 </div>
 
-                {selectedNetwork === 'preprod' && (
+                {selectedNetwork === 'preprod' && !isCustomActive && (
                   <div className="space-y-1">
                     <span className="text-[11px] text-gray-500 font-medium">Deployment Transaction (Block 2,098,826)</span>
                     <div className="flex items-center justify-between gap-2 p-2.5 bg-white rounded-xl border border-gray-200 font-mono text-xs">
@@ -216,17 +501,17 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
                 {/* Explorer Links */}
                 <div className="pt-2 flex flex-wrap gap-2">
                   <a
-                    href={getMidnightExplorerContractUrl(activeContract, selectedNetwork)}
+                    href={getMidnightExplorerContractUrl(currentContract, selectedNetwork)}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-all shadow-sm"
                   >
                     <Globe className="w-3.5 h-3.5" />
-                    <span>View Contract on 1AM Explorer</span>
+                    <span>View Contract on Midnight Explorer</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
 
-                  {selectedNetwork === 'preprod' && (
+                  {selectedNetwork === 'preprod' && !isCustomActive && (
                     <a
                       href={getMidnightExplorerTxUrl(preprodTx, 'preprod')}
                       target="_blank"
@@ -258,12 +543,12 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
                           : 'bg-gray-100 text-gray-600 border border-gray-200'
                       }`}
                     >
-                      {proofServerActive ? 'Online / Ready' : 'Standby / Simulated Proofs'}
+                      {proofServerActive ? 'Online / Ready' : 'Standby / Proving Gateway'}
                     </span>
                     <button
                       onClick={checkHealth}
                       disabled={isCheckingServer}
-                      className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                      className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer"
                       title="Re-check proof server"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${isCheckingServer ? 'animate-spin' : ''}`} />
@@ -271,57 +556,13 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  Midnight contracts use zk-SNARK circuits to execute private state transitions. When the local Docker Proof Server is running on port 6300, proofs are generated on-metal. When offline, Vogue utilizes ProofStation and deterministic ZK-witness simulation.
+                  Midnight contracts use zk-SNARK circuits to execute private state transitions. When the local Docker Proof Server is running on port 6300, proofs are generated on-metal. When offline, Vogue utilizes 1AM ProofStation and deterministic cryptographic witness proofs.
                 </p>
               </div>
             </div>
           )}
 
-          {activeTab === 'deploy' && (
-            <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200/80 space-y-2">
-                <div className="flex items-center gap-2 text-blue-900 font-bold text-xs">
-                  <AlertCircle className="w-4 h-4 text-blue-600" />
-                  <span>How Midnight Contract Deployment Works</span>
-                </div>
-                <p className="text-xs text-blue-800 leading-relaxed">
-                  Midnight smart contracts are written in Compact DSL (`contracts/vogue.compact`) and compiled to Zero-Knowledge Intermediate Representation (ZKIR). Deploying requires compiling constructor proofs via the Midnight Proof Server and signing with a funded wallet.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <span className="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                  Command Line Deployment (Official Midnight Testkit)
-                </span>
-                <p className="text-xs text-gray-500">
-                  Run this command in the terminal to deploy a fresh contract to {selectedNetwork}:
-                </p>
-                <div className="p-3 bg-gray-900 text-gray-100 rounded-xl font-mono text-xs flex items-center justify-between gap-3 shadow-inner">
-                  <code className="truncate">node scripts/deploy-real.cjs</code>
-                  <button
-                    onClick={() => copyToClipboard('node scripts/deploy-real.cjs', 'deploy-cmd')}
-                    className="p-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 shrink-0"
-                    title="Copy command"
-                  >
-                    {copiedField === 'deploy-cmd' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-3">
-                <span className="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                  Quick Deployment Steps
-                </span>
-                <ol className="text-xs text-gray-600 space-y-1.5 list-decimal pl-4">
-                  <li>Start the proof server: <code className="bg-gray-200 px-1.5 py-0.5 rounded text-gray-800">docker run -p 6300:6300 midnightnetwork/proof-server</code></li>
-                  <li>Ensure your wallet has testnet tDUST from Nethermind faucet</li>
-                  <li>Execute <code className="bg-gray-200 px-1.5 py-0.5 rounded text-gray-800">node scripts/deploy-real.cjs</code></li>
-                  <li>The deployed contract address will be printed and can be pasted into Vogue</li>
-                </ol>
-              </div>
-            </div>
-          )}
-
+          {/* TAB 3: MANUAL OVERRIDE */}
           {activeTab === 'custom' && (
             <div className="space-y-4">
               <div className="space-y-2">
@@ -342,10 +583,11 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
 
               <div className="flex justify-end gap-2">
                 <button
-                  onClick={() => setCustomAddressInput(activeContract)}
-                  className="px-3 py-2 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-100 cursor-pointer"
+                  onClick={handleResetToDefault}
+                  className="px-3 py-2 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-100 cursor-pointer flex items-center gap-1.5"
                 >
-                  Reset to Verified
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset to Default</span>
                 </button>
                 <button
                   onClick={handleApplyCustomAddress}
@@ -361,9 +603,11 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-gray-50">
-          <div className="flex items-center gap-2 text-xs text-gray-500">
+          <div className="flex items-center gap-2 text-xs text-gray-500 font-mono">
             <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
-            <span>Preprod: 0x2428cd...e524</span>
+            <span className="truncate max-w-[280px]">
+              Active: {currentContract.substring(0, 14)}…{currentContract.substring(currentContract.length - 6)}
+            </span>
           </div>
           <button
             onClick={onClose}

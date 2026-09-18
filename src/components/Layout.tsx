@@ -13,7 +13,8 @@ import {
   ShieldCheck,
   Shuffle,
   Layers,
-  Server
+  Server,
+  Rocket
 } from 'lucide-react';
 import { WalletConnect } from './WalletConnect';
 import type { DetectedWallet } from '../lib/lace-wallet';
@@ -140,8 +141,8 @@ export const Layout: React.FC<LayoutProps> = ({
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/70 hover:bg-white border border-gray-200/90 text-gray-800 text-xs font-bold transition-all shadow-sm cursor-pointer"
               title="Midnight Contract Deployment & Status"
             >
-              <Server className="w-3.5 h-3.5 text-orange-500" />
-              <span className="capitalize">{networkId} Contract</span>
+              <Rocket className="w-3.5 h-3.5 text-orange-500" />
+              <span className="capitalize">Deploy / {networkId} Contract</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             </button>
 
@@ -250,6 +251,13 @@ export const Layout: React.FC<LayoutProps> = ({
                   <span>#{latestBlockHeight.toLocaleString()}</span>
                 </div>
               )}
+              <button
+                onClick={() => setDeployerModalOpen(true)}
+                className="w-full mt-2.5 py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold flex items-center justify-center gap-2 transition-all shadow-sm shadow-orange-500/20 cursor-pointer"
+              >
+                <Rocket className="w-3.5 h-3.5" />
+                <span>Deploy Contract via 1AM</span>
+              </button>
             </div>
           </div>
         </aside>
@@ -288,7 +296,7 @@ export const Layout: React.FC<LayoutProps> = ({
             title="Open Midnight Contract Deployment & Status"
           >
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-gray-700 font-medium">Midnight {networkId === 'preprod' ? 'Preprod' : 'Preview'} Contract Active</span>
+            <span className="text-gray-700 font-medium">Deploy / Switch Midnight {networkId === 'preprod' ? 'Preprod' : 'Preview'} Contract</span>
           </button>
         </div>
       </footer>
@@ -297,6 +305,9 @@ export const Layout: React.FC<LayoutProps> = ({
         isOpen={deployerModalOpen}
         onClose={() => setDeployerModalOpen(false)}
         networkId={networkId}
+        walletConnected={walletConnected}
+        walletAddress={walletAddress || undefined}
+        onConnectWallet={onOpenModal}
       />
     </div>
   );

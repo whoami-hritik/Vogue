@@ -13,8 +13,33 @@ export interface DeploymentEntry {
   circuits: string[];
 }
 
+const LOCAL_STORAGE_KEY_PREFIX = 'vogue_active_contract_';
+
+export function setCustomContractAddress(network: string, address: string): void {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    window.localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}${network}`, address);
+  }
+}
+
+export function getCustomContractAddress(network: string): string | null {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    return window.localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}${network}`);
+  }
+  return null;
+}
+
+export function resetCustomContractAddress(network: string): void {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    window.localStorage.removeItem(`${LOCAL_STORAGE_KEY_PREFIX}${network}`);
+  }
+}
+
 export function getActiveContractAddress(network: 'preview' | 'preprod' | string = 'preprod'): string {
   const netKey = network === 'preprod' ? 'preprod' : 'preview';
+  const custom = getCustomContractAddress(netKey);
+  if (custom && custom.startsWith('0x') && custom.length >= 64) {
+    return custom;
+  }
   const entries: DeploymentEntry[] = (registryData.vogue as Record<string, DeploymentEntry[]>)[netKey] || [];
   if (entries.length > 0) {
     return entries[entries.length - 1].contractAddress;

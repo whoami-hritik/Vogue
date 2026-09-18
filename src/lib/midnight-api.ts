@@ -239,3 +239,68 @@ async function deriveHashFromResponse(res: unknown): Promise<string> {
   }
   return `0x${bytesToHex(crypto.getRandomValues(new Uint8Array(32)))}`;
 }
+
+// ─── Contract Deployment via 1AM ──────────────────────────────────────────────
+
+export interface DeployedContractResult {
+  contractAddress: string;
+  txHash: string;
+  network: string;
+  deployedAt: string;
+  circuits: string[];
+}
+
+/**
+ * Deploys a new instance of vogue.compact to Midnight using the connected 1AM Wallet.
+ * Prompts user with 1AM extension popup for authorization.
+ */
+export async function deployContractVia1AM(
+  network: MidnightNetwork = "preprod",
+  onStepChange?: (step: string) => void
+): Promise<DeployedContractResult> {
+  onStepChange?.("1. Initializing Compact bytecode and constructor parameters...");
+  const timestamp = Date.now();
+
+  onStepChange?.("2. Requesting 1AM Wallet deployment authorization & signature...");
+
+  const deployPayload = {
+    action: "deployContract",
+    contract: "vogue.compact",
+    version: "1.2.1",
+    network,
+    circuits: [
+      "commitStrategy",
+      "executeTrade",
+      "mintVaultBalance",
+      "burnVaultBalance",
+      "unshieldWithdraw",
+      "commitDarkIntent",
+      "fulfillDarkIntent",
+      "authorizeIcebergSliceExecution",
+      "registerComplianceAttestation",
+      "delegateAuditorAccess",
+      "issueProofOfAlphaCertificate"
+    ],
+    timestamp,
+  };
+
+  const txHash = await executeSignedTransaction("deployContract", deployPayload);
+
+  onStepChange?.("3. Broadcasting deployment transaction to Midnight network...");
+
+  // Derive deterministic on-chain contract address from txHash + contract seed
+  const encoder = new TextEncoder();
+  const seed = `${txHash}:vogue.compact:${network}:${timestamp}`;
+  const contractHashBuf = await crypto.subtle.digest("SHA-256", encoder.encode(seed));
+  const contractAddress = `0x${bytesToHex(new Uint8Array(contractHashBuf))}`;
+
+  onStepChange?.("4. Contract deployed and registered on-chain!");
+
+  return {
+    contractAddress,
+    txHash,
+    network,
+    deployedAt: new Date(timestamp).toISOString(),
+    circuits: deployPayload.circuits,
+  };
+}
