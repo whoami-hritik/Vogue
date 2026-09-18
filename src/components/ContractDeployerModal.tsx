@@ -279,7 +279,7 @@ export const ContractDeployerModal: React.FC<ContractDeployerModalProps> = ({
                   </div>
                   <div>
                     <span className="text-[10px] text-gray-400 font-bold uppercase block">Circuit Count</span>
-                    <span className="font-bold text-gray-800">22 ZK Circuits</span>
+                    <span className="font-bold text-gray-800">8 ZK Circuits</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-gray-400 font-bold uppercase block">Est. Fee</span>

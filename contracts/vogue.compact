@@ -1,24 +1,40 @@
 // ============================================================================
-// Vogue — Privacy-First Natural-Language Trading Agent Contract
+// Vogue — Privacy-First Natural-Language Trading Agent Contract (Core v1)
 // ============================================================================
 // PRIVACY MODEL:
 // 1. PUBLIC LEDGER STATE (ON-CHAIN):
 //    - agentCommitment: Maps agentId (Bytes<32>) -> strategy commitment hash (Bytes<32>).
 //    - tradeStatus: Maps tradeId (Bytes<32>) -> Uint<8> status (0=pending, 1=executed, 2=rejected, 3=withdrawn).
 //    - tradeCount: Counter tracking total proven trades executed by the agent.
+//    - darkIntentCommitment: Maps intentId -> private intent hash.
+//    - darkIntentStatus: Maps intentId -> status.
+//    - darkIntentCount: Counter for dark pool intents.
 //
 // 2. PRIVATE WITNESSES (SHIELDED, CLIENT-SIDE ONLY):
-//    - Strategy parameters: asset, maxPositionPct, stopLossPct, expiry.
+//    - Strategy parameters: maxPositionPct, stopLossPct, expiry.
 //    - Portfolio state: total portfolio value USD, private key.
-//    - Trade details: trade target asset, trade size USD.
+//    - Trade details: asset, size USD.
+//    - Dark pool: intent asset, fill bounds, price limits, escrow.
 //    - Never broadcast or stored on ledger.
 //
 // 3. ZERO-KNOWLEDGE PROOF GUARANTEES:
-//    - Proves that a trade adheres to the SAME strategy committed in agentCommitment.
+//    - Proves trade adheres to the SAME strategy committed in agentCommitment.
 //    - Proves trade size <= maxPositionPct of current portfolio value.
-//    - Proves trade asset matches strategy target asset.
-//    - Proves trade timestamp is within strategy expiry bounds.
-//    - Discloses ONLY trade execution status (1 or 2). Zero strategy parameters exposed.
+//    - Proves dark intent filled within committed price/asset bounds.
+//    - Discloses ONLY trade execution status. Zero strategy parameters exposed.
+//
+// v1 CIRCUITS (8 total — fits Midnight preprod block limit):
+//   Core Trading:   commitStrategy, executeTrade
+//   Vault:          mintVaultBalance, burnVaultBalance, unshieldWithdraw
+//   Dark Pool:      commitDarkIntent, fulfillDarkIntent, refundDarkIntent
+//
+// v2 CIRCUITS (to be added after initial deployment):
+//   PoA Copy-Trading: registerAlphaStrategy, subscribeAlphaStrategy,
+//                     settlePerformanceFee, emitAlphaSignal, mirrorAlphaTrade
+//   Compliance:       registerComplianceAttestation, delegateAuditorAccess,
+//                     revokeAuditorAccess, verifyProofOfSolvency
+//   Solver/Iceberg:   registerSolverBond, slashDishonestSolver,
+//                     commitIcebergOrder, executeIcebergSlice, cancelIcebergOrder
 // ============================================================================
 
 pragma language_version >= 0.16 && <= 0.25;
@@ -31,22 +47,6 @@ export ledger tradeCount: Counter;
 export ledger darkIntentCommitment: Map<Bytes<32>, Bytes<32>>;   // intentId -> private intent hash
 export ledger darkIntentStatus: Map<Bytes<32>, Uint<8>>;         // intentId -> 0=none, 1=committed, 2=filled, 3=refunded
 export ledger darkIntentCount: Counter;
-export ledger alphaStrategyRegistry: Map<Bytes<32>, Bytes<32>>;   // strategyId -> profile commitment hash
-export ledger alphaSubscriptionStatus: Map<Bytes<32>, Uint<8>>;   // subscriptionId -> 1=active, 2=cancelled
-export ledger alphaStrategyCount: Counter;
-export ledger alphaSignalCommitment: Map<Bytes<32>, Bytes<32>>;   // signalId -> private signal commitment hash
-export ledger alphaSignalCount: Counter;
-export ledger alphaMirroredTradeStatus: Map<Bytes<32>, Uint<8>>;  // mirrorTradeId -> 1=executed, 2=rejected
-export ledger complianceAttestationRegistry: Map<Bytes<32>, Bytes<32>>; // fundId -> compliance proof commitment hash
-export ledger auditorAccessRegistry: Map<Bytes<32>, Bytes<32>>;         // delegationId -> delegation commitment hash
-export ledger auditorDelegationCount: Counter;
-export ledger icebergOrderCommitment: Map<Bytes<32>, Bytes<32>>;        // orderId -> private iceberg commitment hash
-export ledger icebergOrderStatus: Map<Bytes<32>, Uint<8>>;              // orderId -> 0=none, 1=active, 2=completed, 3=cancelled
-export ledger icebergFilledAmountUsd: Map<Bytes<32>, Uint<64>>;         // orderId -> cumulative filled amount
-export ledger icebergSliceCount: Counter;
-export ledger icebergOrderCount: Counter;
-export ledger solverBondRegistry: Map<Bytes<32>, Uint<64>>;         // solverId -> bonded collateral amount in USD
-export ledger solverSlashCount: Counter;
 
 // ---------- PRIVATE WITNESSES ----------
 witness getMaxPositionPct(): Uint<8>;
@@ -65,26 +65,6 @@ witness getMinFillAmount(): Uint<64>;
 witness getMaxPriceLimit(): Uint<64>;
 witness getIntentExpiry(): Uint<64>;
 witness getEscrowVusdAmount(): Uint<64>;
-witness getAlphaFeeBps(): Uint<16>;
-witness getAlphaMinStakeUsd(): Uint<64>;
-witness getAlphaProfitUsd(): Uint<64>;
-witness getAlphaHighWaterMarkUsd(): Uint<64>;
-witness getSignalAsset(): Bytes<32>;
-witness getSignalDirection(): Uint<8>;
-witness getSignalPriceLimitUsd(): Uint<64>;
-witness getProportionalAllocationBps(): Uint<16>;
-witness getComplianceRiskScore(): Uint<16>;
-witness getKycTier(): Uint<8>;
-witness getAuditorScopeBitmask(): Uint<8>;
-witness getAuditorExpiry(): Uint<64>;
-witness getSolvencyRatioBps(): Uint<64>;
-witness getIcebergTotalAmountUsd(): Uint<64>;
-witness getIcebergAsset(): Bytes<32>;
-witness getIcebergMaxSlippageBps(): Uint<16>;
-witness getIcebergTimeHorizonSeconds(): Uint<64>;
-witness getIcebergMaxPriceLimit(): Uint<64>;
-witness getSliceAmountUsd(): Uint<64>;
-witness getCrossChainStateProof(): Bytes<32>;
 
 // ---------- CIRCUITS ----------
 
@@ -146,12 +126,6 @@ export circuit unshieldWithdraw(agentId: Bytes<32>, amountUsd: Uint<64>): [] {
 // DARK INTENT NETWORK (DIN) — CROSS-CHAIN SOLVER CIRCUITS
 // ============================================================================
 
-// Register a bonded solver staking collateral to guarantee atomic intent execution
-export circuit registerSolverBond(solverId: Bytes<32>, bondAmountUsd: Uint<64>): [] {
-  assert(bondAmountUsd >= (100000 as Uint<64>), "minimum solver bond requirement is $100,000");
-  solverBondRegistry.insert(disclose(solverId), disclose(bondAmountUsd));
-}
-
 // Commit a private dark intent with locked escrow vUSD and private limit price / asset bounds
 export circuit commitDarkIntent(agentId: Bytes<32>, intentId: Bytes<32>): [] {
   assert(getEscrowVusdAmount() > (0 as Uint<64>), "invalid escrow amount");
@@ -171,12 +145,10 @@ export circuit commitDarkIntent(agentId: Bytes<32>, intentId: Bytes<32>): [] {
 }
 
 // Atomically fulfill dark intent when external solver provides verified fill within price bounds
-export circuit fulfillDarkIntent(intentId: Bytes<32>, solverId: Bytes<32>, fillPriceUsd: Uint<64>, currentTime: Uint<64>): [] {
+export circuit fulfillDarkIntent(intentId: Bytes<32>, fillPriceUsd: Uint<64>, currentTime: Uint<64>): [] {
   assert(darkIntentStatus.lookup(disclose(intentId)) == (1 as Uint<8>), "intent not in committed state");
   assert(currentTime <= getIntentExpiry(), "intent expired");
   assert(fillPriceUsd <= getMaxPriceLimit(), "fill price exceeds max price limit");
-  assert(solverBondRegistry.lookup(disclose(solverId)) >= getEscrowVusdAmount(), "solver insufficient bond coverage");
-  assert(getCrossChainStateProof() != (0 as Field as Bytes<32>), "invalid cross-chain state proof");
 
   const recomputedIntentHash = disclose(
     persistentHash<Vector<4, Bytes<32>>>([
@@ -191,188 +163,9 @@ export circuit fulfillDarkIntent(intentId: Bytes<32>, solverId: Bytes<32>, fillP
   darkIntentStatus.insert(disclose(intentId), disclose(2 as Uint<8>));
 }
 
-// Slash a delinquent or dishonest solver that fails execution or breaches constraints
-export circuit slashDishonestSolver(solverId: Bytes<32>, intentId: Bytes<32>, slashPenaltyUsd: Uint<64>): [] {
-  const currentBond = solverBondRegistry.lookup(disclose(solverId));
-  assert(currentBond >= slashPenaltyUsd, "slash penalty exceeds bonded balance");
-  assert(slashPenaltyUsd > (0 as Uint<64>), "invalid slash penalty");
-  solverBondRegistry.insert(disclose(solverId), disclose(currentBond - slashPenaltyUsd));
-  solverSlashCount.increment(1);
-}
-
 // Refund escrowed vUSD if intent remains unfilled past intent expiry timeline
 export circuit refundDarkIntent(intentId: Bytes<32>, currentTime: Uint<64>): [] {
   assert(darkIntentStatus.lookup(disclose(intentId)) == (1 as Uint<8>), "intent not eligible for refund");
   assert(currentTime > getIntentExpiry(), "intent not yet expired");
   darkIntentStatus.insert(disclose(intentId), disclose(3 as Uint<8>));
 }
-
-// ============================================================================
-// PROOF OF ALPHA (POA) — BLIND COPY-TRADING & PERFORMANCE CIRCUITS
-// ============================================================================
-
-// Register strategy for public blind marketplace discovery with performance fee bounds
-export circuit registerAlphaStrategy(strategyId: Bytes<32>, feeBps: Uint<16>): [] {
-  assert(feeBps <= (5000 as Uint<16>), "performance fee cannot exceed 50%");
-  assert(getAlphaMinStakeUsd() >= (0 as Uint<64>), "invalid min stake");
-
-  const profileHash = disclose(
-    persistentHash<Vector<2, Bytes<32>>>([
-      feeBps as Field as Bytes<32>,
-      getAlphaMinStakeUsd() as Field as Bytes<32>
-    ])
-  );
-  alphaStrategyRegistry.insert(disclose(strategyId), profileHash);
-  alphaStrategyCount.increment(1);
-}
-
-// Subscribe to a verified Alpha strategy with shielded follower collateral
-export circuit subscribeAlphaStrategy(subscriptionId: Bytes<32>, strategyId: Bytes<32>): [] {
-  assert(alphaStrategyRegistry.member(disclose(strategyId)), "strategy not registered in alpha registry");
-  alphaSubscriptionStatus.insert(disclose(subscriptionId), disclose(1 as Uint<8>));
-}
-
-// Settle performance fee on net new profits above High-Water Mark in Zero-Knowledge
-export circuit settlePerformanceFee(strategyId: Bytes<32>, subscriptionId: Bytes<32>, profitUsd: Uint<64>, currentHwm: Uint<64>): [] {
-  assert(alphaSubscriptionStatus.lookup(disclose(subscriptionId)) == (1 as Uint<8>), "subscription not active");
-  assert(profitUsd > (0 as Uint<64>), "zero profit cannot be fee-settled");
-  assert(profitUsd > currentHwm, "profit does not breach High-Water Mark threshold");
-  assert(getAlphaFeeBps() <= (5000 as Uint<16>), "invalid fee percentage");
-}
-
-// Emit confidential trade signal commitment from strategy enclave to Midnight
-export circuit emitAlphaSignal(strategyId: Bytes<32>, signalId: Bytes<32>): [] {
-  assert(alphaStrategyRegistry.member(disclose(strategyId)), "strategy not registered");
-  assert(getSignalPriceLimitUsd() > (0 as Uint<64>), "invalid signal limit price");
-  assert(getSignalDirection() == (1 as Uint<8>) || getSignalDirection() == (2 as Uint<8>), "invalid direction");
-
-  const signalHash = disclose(
-    persistentHash<Vector<4, Bytes<32>>>([
-      strategyId,
-      getSignalAsset(),
-      getSignalDirection() as Field as Bytes<32>,
-      getSignalPriceLimitUsd() as Field as Bytes<32>
-    ])
-  );
-  alphaSignalCommitment.insert(disclose(signalId), signalHash);
-  alphaSignalCount.increment(1);
-}
-
-// Mirror trade proportionally into follower's private vault in Zero-Knowledge
-export circuit mirrorAlphaTrade(subscriptionId: Bytes<32>, signalId: Bytes<32>, mirrorTradeId: Bytes<32>): [] {
-  assert(alphaSubscriptionStatus.lookup(disclose(subscriptionId)) == (1 as Uint<8>), "subscription not active");
-  assert(alphaSignalCommitment.member(disclose(signalId)), "trade signal not registered on-chain");
-  assert(getProportionalAllocationBps() > (0 as Uint<16>), "allocation must be positive");
-  assert(getProportionalAllocationBps() <= (10000 as Uint<16>), "allocation cannot exceed 100%");
-
-  alphaMirroredTradeStatus.insert(disclose(mirrorTradeId), disclose(1 as Uint<8>));
-}
-
-// ============================================================================
-// INSTITUTIONAL COMPLIANCE & SELECTIVE AUDITABILITY CIRCUITS
-// ============================================================================
-
-// Register institutional compliance attestation (ZK-AML / Sanctions Non-Inclusion)
-export circuit registerComplianceAttestation(fundId: Bytes<32>, kycProviderId: Bytes<32>): [] {
-  assert(getComplianceRiskScore() <= (15 as Uint<16>), "compliance risk score exceeds institutional threshold");
-  assert(getKycTier() >= (1 as Uint<8>), "invalid KYC / AML qualification tier");
-
-  const complianceHash = disclose(
-    persistentHash<Vector<3, Bytes<32>>>([
-      kycProviderId,
-      getComplianceRiskScore() as Field as Bytes<32>,
-      getKycTier() as Field as Bytes<32>
-    ])
-  );
-  complianceAttestationRegistry.insert(disclose(fundId), complianceHash);
-}
-
-// Delegate scoped, time-locked viewing key to accredited auditor on Midnight
-export circuit delegateAuditorAccess(delegationId: Bytes<32>, fundId: Bytes<32>, auditorPubKey: Bytes<32>, currentTime: Uint<64>): [] {
-  assert(complianceAttestationRegistry.member(disclose(fundId)), "fund not registered in compliance registry");
-  assert(getAuditorExpiry() > currentTime, "delegation expiration timestamp must be in future");
-  assert(getAuditorScopeBitmask() > (0 as Uint<8>), "at least one audit scope permission must be granted");
-
-  const delegationHash = disclose(
-    persistentHash<Vector<4, Bytes<32>>>([
-      auditorPubKey,
-      getAuditorScopeBitmask() as Field as Bytes<32>,
-      getAuditorExpiry() as Field as Bytes<32>,
-      1 as Field as Bytes<32> // Status: 1 = ACTIVE
-    ])
-  );
-  auditorAccessRegistry.insert(disclose(delegationId), delegationHash);
-  auditorDelegationCount.increment(1);
-}
-
-// Revoke an auditor's viewing access immediately on-chain
-export circuit revokeAuditorAccess(delegationId: Bytes<32>): [] {
-  assert(auditorAccessRegistry.member(disclose(delegationId)), "delegation not found");
-  const revokedHash = disclose(
-    persistentHash<Vector<2, Bytes<32>>>([
-      delegationId,
-      2 as Field as Bytes<32> // Status: 2 = REVOKED
-    ])
-  );
-  auditorAccessRegistry.insert(disclose(delegationId), revokedHash);
-}
-
-// Prove vault solvency in Zero-Knowledge without disclosing absolute balance numbers
-export circuit verifyProofOfSolvency(fundId: Bytes<32>, minSolvencyBps: Uint<64>): [] {
-  assert(complianceAttestationRegistry.member(disclose(fundId)), "fund not registered in compliance registry");
-  assert(getSolvencyRatioBps() >= minSolvencyBps, "fund fails zero-knowledge solvency ratio requirement");
-}
-
-// ============================================================================
-// ZK-ICEBERG & TEMPORAL SHUFFLING (ANTI-MEV TWAP) CIRCUITS
-// ============================================================================
-
-// Commit institutional parent iceberg order into shielded state
-export circuit commitIcebergOrder(orderId: Bytes<32>, startTime: Uint<64>): [] {
-  assert(getIcebergTotalAmountUsd() > (0 as Uint<64>), "iceberg order amount must be positive");
-  assert(getIcebergTimeHorizonSeconds() > (0 as Uint<64>), "invalid time horizon");
-  assert(getIcebergMaxSlippageBps() <= (1000 as Uint<16>), "max slippage cannot exceed 10%");
-
-  const orderHash = disclose(
-    persistentHash<Vector<5, Bytes<32>>>([
-      getIcebergAsset(),
-      getIcebergTotalAmountUsd() as Field as Bytes<32>,
-      getIcebergMaxSlippageBps() as Field as Bytes<32>,
-      getIcebergTimeHorizonSeconds() as Field as Bytes<32>,
-      getIcebergMaxPriceLimit() as Field as Bytes<32>
-    ])
-  );
-  icebergOrderCommitment.insert(disclose(orderId), orderHash);
-  icebergOrderStatus.insert(disclose(orderId), disclose(1 as Uint<8>)); // 1 = ACTIVE
-  icebergFilledAmountUsd.insert(disclose(orderId), disclose(0 as Uint<64>));
-  icebergOrderCount.increment(1);
-}
-
-// Execute randomized temporal micro-slice in Zero-Knowledge
-export circuit executeIcebergSlice(orderId: Bytes<32>, sliceId: Bytes<32>, fillPriceUsd: Uint<64>, currentTime: Uint<64>): [] {
-  assert(icebergOrderStatus.lookup(disclose(orderId)) == (1 as Uint<8>), "iceberg order not active");
-  assert(fillPriceUsd <= getIcebergMaxPriceLimit(), "fill price exceeds max limit price");
-  assert(getSliceAmountUsd() > (0 as Uint<64>), "slice amount must be positive");
-
-  const currentFilled = icebergFilledAmountUsd.lookup(disclose(orderId));
-  const sliceAmt = disclose(getSliceAmountUsd());
-  const totalAmt = disclose(getIcebergTotalAmountUsd());
-  const newFilled = (currentFilled + sliceAmt) as Uint<64>;
-  assert(newFilled <= totalAmt, "slice exceeds remaining iceberg order allocation");
-
-  icebergFilledAmountUsd.insert(disclose(orderId), disclose(newFilled));
-  icebergSliceCount.increment(1);
-
-  if (newFilled == totalAmt) {
-    icebergOrderStatus.insert(disclose(orderId), disclose(2 as Uint<8>)); // 2 = COMPLETED
-  }
-}
-
-// Cancel remaining unfilled portion of iceberg order
-export circuit cancelIcebergOrder(orderId: Bytes<32>): [] {
-  assert(icebergOrderStatus.lookup(disclose(orderId)) == (1 as Uint<8>), "iceberg order not active or already finished");
-  icebergOrderStatus.insert(disclose(orderId), disclose(3 as Uint<8>)); // 3 = CANCELLED
-}
-
-
-
