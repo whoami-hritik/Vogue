@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  frontend-build:
-    name: Build Frontend
+  test-and-verify:
+    name: Contract & Privacy Test Suite
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -23,28 +23,31 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Production Frontend Build
-        run: npm run build
+      - name: Validate TypeScript Integrity
+        run: npx tsc --noEmit
 
-  contract-build:
-    name: Build & Verify Compact Contract
-    needs: frontend-build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js v22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Compile Compact Smart Contract
+      - name: Verify Compact v1.0 Smart Contract & ZK Artifacts
         run: npm run compile
 
-      - name: Run Vitest Contract Privacy Suite
+      - name: Run Vitest Privacy & Enclave Suite
         run: npm test
+
+  frontend-build:
+    name: Production Frontend Build
+    needs: test-and-verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js v22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Production Frontend Assets
+        run: npm run build
