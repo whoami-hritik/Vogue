@@ -111,158 +111,139 @@ export default function ShaderShowcase({
       </div>
 
       <header className="relative z-50 pt-4 px-4 sm:px-6 max-w-[1440px] mx-auto w-full">
-        <div className="light-glass rounded-full px-2 py-2 flex items-center justify-between shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)] border border-white/60 backdrop-blur-xl bg-white/70">
+        <div className="rounded-xl px-4 py-3 flex items-center justify-between bg-[#0D111A]/90 border border-white/[0.08] backdrop-blur-xl shadow-xl">
           
-          <div className="flex items-center gap-6 pl-2">
+          <div className="flex items-center gap-6">
             {/* Logo */}
             <motion.div
               className="flex items-center gap-3 group cursor-pointer"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
             >
-              <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200 shadow-sm bg-[#0a0a0b] flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-lg overflow-hidden border border-white/10 bg-[#111622] flex items-center justify-center shrink-0 shadow-xs">
                 <img
                   src="/vogue-logo.svg"
                   alt="Vogue Trade"
-                  className="w-7 h-7 object-contain group-hover:scale-105 transition-transform"
+                  className="w-6 h-6 object-contain group-hover:scale-105 transition-transform"
                 />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-extrabold text-gray-900 tracking-tight leading-none drop-shadow-sm">VOGUE</span>
-                <span className="text-[10px] text-gray-500 font-semibold tracking-wider uppercase mt-0.5">TRADE</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-extrabold text-white tracking-tight leading-none font-mono">VOGUE</span>
+                  <span className="text-[10px] text-cyan-400 font-mono tracking-wider font-semibold uppercase">PROTOCOL</span>
+                </div>
+                <span className="text-[10px] text-zinc-500 font-mono mt-0.5">Private moves. Public proof.</span>
               </div>
             </motion.div>
 
             {/* Nav Links */}
-            <nav className="hidden md:flex items-center space-x-1 border-l border-gray-300/50 pl-6 ml-2">
-              <a href="#architecture" className="text-gray-700 hover:text-black text-[13px] font-semibold px-3 py-2 rounded-full hover:bg-black/5 transition-all duration-200">
-                Architecture
+            <nav className="hidden md:flex items-center space-x-1 border-l border-white/[0.08] pl-6 ml-2 text-xs font-medium">
+              <a href="#pipeline" className="text-zinc-400 hover:text-white px-3 py-1.5 rounded-md hover:bg-white/[0.04] transition-colors">
+                ZK Pipeline
               </a>
-              <a href="#modules" className="text-gray-700 hover:text-black text-[13px] font-semibold px-3 py-2 rounded-full hover:bg-black/5 transition-all duration-200">
-                Modules
+              <a href="#modules" className="text-zinc-400 hover:text-white px-3 py-1.5 rounded-md hover:bg-white/[0.04] transition-colors">
+                Institutional Modules
               </a>
-              <a href="#circuits" className="text-gray-700 hover:text-black text-[13px] font-semibold px-3 py-2 rounded-full hover:bg-black/5 transition-all duration-200">
-                ZK Circuits
+              <a href="#circuits" className="text-zinc-400 hover:text-white px-3 py-1.5 rounded-md hover:bg-white/[0.04] transition-colors">
+                Verified Circuits
               </a>
-              <a href="https://explorer.1am.xyz?network=preprod" target="_blank" rel="noreferrer" className="text-gray-700 hover:text-black text-[13px] font-semibold px-3 py-2 rounded-full hover:bg-black/5 transition-all duration-200 flex items-center gap-1.5">
-                1AM Explorer <ArrowRight className="w-3 h-3 -rotate-45 opacity-60" />
+              <a
+                href="https://preprod.midnightexplorer.com/contracts/0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7"
+                target="_blank"
+                rel="noreferrer"
+                className="text-cyan-400 hover:text-cyan-300 px-3 py-1.5 rounded-md hover:bg-cyan-500/10 transition-colors flex items-center gap-1 font-mono text-[11px]"
+              >
+                Contract Explorer <ArrowRight className="w-3 h-3 -rotate-45 opacity-70" />
               </a>
             </nav>
           </div>
 
-          <div className="flex items-center gap-3 pr-1">
-            {/* Status Pills */}
+          <div className="flex items-center gap-3">
+            {/* Status Pill */}
             <div className="hidden lg:flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-100 text-emerald-700 text-xs font-semibold backdrop-blur-md">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Midnight Preprod & Preview Live
-              </div>
-              
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200/60 text-gray-600 text-xs font-medium backdrop-blur-md">
-                <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date())} in London
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Preprod Verified</span>
               </div>
             </div>
 
             {/* Launch Button */}
             <button 
               onClick={walletConnected ? onEnterDashboard : onConnectWallet}
-              className="group relative flex items-center gap-3 bg-[#0f1117] hover:bg-[#1a1d27] text-white px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs sm:text-sm transition-all duration-300 shadow-md overflow-hidden"
+              className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs transition-all shadow-sm shadow-cyan-500/20 cursor-pointer"
             >
-              <span className="relative z-10">{walletConnected ? 'Dashboard' : 'Launch Vogue Trade'}</span>
-              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white flex items-center justify-center shrink-0 relative z-10">
-                <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-black group-hover:translate-x-0.5 transition-transform" />
-              </div>
+              <span>{walletConnected ? 'Open Trading Terminal' : 'Launch Vogue Terminal'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
         </div>
       </header>
 
-      <main className="absolute bottom-8 left-8 md:bottom-16 md:left-16 lg:left-24 z-20 max-w-3xl pr-8">
+      <main className="absolute bottom-10 left-6 sm:left-12 md:left-16 lg:left-20 z-20 max-w-3xl pr-6">
         <div className="text-left">
+          {/* Institutional Badge */}
           <motion.div
-            className="inline-flex items-center px-4 py-2 rounded-full light-glass/5 backdrop-blur-sm mb-6 relative border border-white/10"
-            style={{
-              filter: "url(#glass-effect)",
-            }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#111622]/90 border border-white/[0.08] mb-6 shadow-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <div className="absolute top-0 left-1 right-1 h-px bg-gradient-to-r from-transparent via-orange-400/50 to-transparent rounded-full" />
-            <span className="text-white/90 text-sm font-medium relative z-10 tracking-wide">
-              ✨ Private moves. Public proof.
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span className="text-zinc-300 text-xs font-mono tracking-wider uppercase">
+              Midnight Preprod • 8 ZK-SNARK Circuits Live
             </span>
           </motion.div>
 
+          {/* Heading */}
           <motion.h1
-            className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-none tracking-tight"
+            className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 leading-[1.08] tracking-tight"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
           >
-            <span className="block font-black text-white drop-shadow-2xl mb-2">Autonomous</span>
-            <motion.span
-              className="block font-light text-white/90 text-4xl md:text-5xl lg:text-6xl tracking-wider pb-1"
-              style={{
-                background: "linear-gradient(135deg, #ffffff 0%, #f26522 30%, #f97316 70%, #ffffff 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                filter: "url(#text-glow)",
-              }}
-              animate={{
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "linear",
-              }}
-            >
-              zero-knowledge trading
-            </motion.span>
-            <span className="block font-light text-white/80 italic text-3xl md:text-4xl lg:text-5xl mt-2">on Midnight Network.</span>
+            <span>The Zero-Knowledge</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-200 to-indigo-300 font-extrabold">
+              Algorithmic Execution Layer
+            </span>
+            <span className="block text-zinc-400 text-3xl sm:text-4xl font-normal mt-1">
+              on Midnight Network.
+            </span>
           </motion.h1>
 
+          {/* Subtitle */}
           <motion.p
-            className="text-lg md:text-xl font-light text-white/70 mb-8 leading-relaxed max-w-2xl"
+            className="text-base sm:text-lg text-zinc-400 mb-8 leading-relaxed max-w-2xl font-normal"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
           >
-            Vogue combines client-side Gemini AI strategy synthesis, Compact smart contracts, and EZKL risk verification. Your trade secrets stay private — execution is proven on-chain.
+            Execute algorithmic strategies, cross-chain dark pool intents, and anti-MEV iceberg orders with mathematically verified zero-knowledge proofs. Trade secrets stay client-side — settlement is proven on-chain.
           </motion.p>
 
+          {/* CTAs */}
           <motion.div
-            className="flex items-center gap-4 sm:gap-6 flex-wrap"
+            className="flex items-center gap-3 sm:gap-4 flex-wrap"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
           >
-            <motion.button
+            <button
               onClick={walletConnected ? onEnterDashboard : onConnectWallet}
-              className="px-8 py-4 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold text-sm transition-all duration-300 hover:from-orange-400 hover:to-red-400 cursor-pointer shadow-lg hover:shadow-xl flex items-center gap-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="px-6 py-3 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold text-sm transition-all cursor-pointer shadow-lg shadow-cyan-500/20 flex items-center gap-2"
             >
-              {walletConnected ? 'Launch Dashboard' : 'Connect 1AM Wallet'}
+              <span>{walletConnected ? 'Enter Trading Terminal' : 'Connect 1AM Wallet'}</span>
               <ArrowRight className="w-4 h-4" />
-            </motion.button>
-            <motion.a
-              href="https://midnight.network"
+            </button>
+            <a
+              href="https://preprod.midnightexplorer.com/contracts/0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7"
               target="_blank"
               rel="noreferrer"
-              className="px-8 py-4 rounded-full bg-transparent border border-white/30 text-white font-medium text-sm transition-all duration-300 hover:light-glass/10 hover:border-orange-400/50 hover:text-orange-100 cursor-pointer backdrop-blur-sm flex items-center gap-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="px-5 py-3 rounded-lg bg-[#111622] hover:bg-[#161D2C] border border-white/[0.08] hover:border-cyan-500/30 text-zinc-200 hover:text-white font-mono text-xs transition-all cursor-pointer flex items-center gap-2"
             >
-              <Shield className="w-4 h-4" />
-              Featured by Midnight
-            </motion.a>
+              <Shield className="w-4 h-4 text-cyan-400" />
+              <span>Verify On-Chain (0xbe69…)</span>
+            </a>
           </motion.div>
         </div>
       </main>
