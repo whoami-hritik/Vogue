@@ -1,43 +1,40 @@
 import React from 'react';
+import { GradientWave } from './gradient-wave';
 
 export function GradientBackground({ className }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 pointer-events-none overflow-hidden bg-[#07090E] ${className || ''}`}
+      className={`fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#0C0C0C] ${className || ''}`}
     >
-      {/* 1. Subtle Midnight Cyan Ambient Aura */}
+      {/* Liquid Dark Mesh Wave (AIRA Dark Mode Proven Architecture) */}
+      <div className="absolute inset-0 opacity-40">
+        <GradientWave
+          key="dashboard-dark-wave"
+          isPlaying={true}
+          colors={["#0c1427", "#0284c7", "#1e1035", "#6366f1", "#075985", "#080c16"]}
+          className="w-full h-full"
+          shadowPower={4}
+          darkenTop={true}
+        />
+      </div>
+
+      {/* Luminous Ambient Aurora Glows */}
+      <div className="absolute -top-48 left-1/2 -translate-x-1/2 w-[900px] h-[550px] rounded-full bg-gradient-to-tr from-[#38bdf8]/15 via-[#818cf8]/15 to-transparent blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/3 -left-48 w-[600px] h-[600px] rounded-full bg-[#38bdf8]/10 blur-[150px] pointer-events-none" />
+      <div className="absolute top-2/3 -right-48 w-[600px] h-[600px] rounded-full bg-[#818cf8]/10 blur-[150px] pointer-events-none" />
+
+      {/* Subtle Precision Engineering Dot Grid */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 opacity-[0.05] pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 90% 60% at 50% -10%, rgba(56, 189, 248, 0.08), rgba(99, 102, 241, 0.03) 50%, transparent 80%)',
+          backgroundImage: `radial-gradient(currentColor 1px, transparent 1px)`,
+          backgroundSize: '28px 28px',
         }}
       />
 
-      {/* 2. Secondary Emerald Accent Aura on bottom right */}
-      <div
-        className="absolute bottom-0 right-0 w-[500px] h-[500px] pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.03) 0%, transparent 70%)',
-        }}
-      />
-
-      {/* 3. Subtle Engineered Technical Grid */}
-      <div
-        className="absolute inset-0 opacity-[0.035]"
-        style={{
-          backgroundImage: 'linear-gradient(to right, #FFFFFF 1px, transparent 1px), linear-gradient(to bottom, #FFFFFF 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
-
-      {/* 4. Soft Micro-Vignette */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(7, 9, 14, 0.8) 100%)',
-        }}
-      />
+      {/* Smooth Vignette Mask to blend sections naturally */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0C0C0C]/25 to-[#0C0C0C] pointer-events-none" />
     </div>
   );
 }

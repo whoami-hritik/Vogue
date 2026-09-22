@@ -17,7 +17,9 @@ import {
   Rocket,
   ExternalLink,
   Lock,
-  ChevronRight
+  ChevronRight,
+  PanelLeft,
+  PanelLeftClose
 } from 'lucide-react';
 import { WalletConnect } from './WalletConnect';
 import type { DetectedWallet } from '../lib/lace-wallet';
@@ -79,6 +81,7 @@ export const Layout: React.FC<LayoutProps> = ({
   onDisconnect
 }) => {
   const [deployerModalOpen, setDeployerModalOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const activeContract = getActiveContractAddress(networkId);
   const shortContract = `${activeContract.substring(0, 6)}…${activeContract.substring(activeContract.length - 4)}`;
 
@@ -116,15 +119,25 @@ export const Layout: React.FC<LayoutProps> = ({
   ];
 
   return (
-    <div className="min-h-screen relative text-zinc-100 flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-200 bg-[#07090E]">
+    <div className="min-h-screen relative text-zinc-100 flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-200 bg-[#0C0C0C]">
       <GradientBackground />
 
       {/* Top Trading Terminal Header */}
-      <header className="w-full sticky top-0 z-50 bg-[#0A0D14]/90 backdrop-blur-xl border-b border-white/[0.08]">
+      <header className="w-full sticky top-0 z-50 bg-[#0C0C0C]/85 backdrop-blur-xl border-b border-white/[0.08]">
         <div className="max-w-[1560px] mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-3">
           
-          {/* Brand + Network + Contract Status */}
-          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+          {/* Brand + Sidebar Toggle + Network + Contract Status */}
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            {/* Sidebar Toggle in Top Header */}
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/15 text-zinc-200 hover:text-white transition-colors cursor-pointer"
+              title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-label="Toggle navigation sidebar"
+            >
+              <PanelLeft className="w-4 h-4" />
+            </button>
+
             <button
               onClick={() => setActiveTab('landing')}
               className="flex items-center gap-2.5 group cursor-pointer text-left"
@@ -263,32 +276,51 @@ export const Layout: React.FC<LayoutProps> = ({
       </div>
 
       {/* Main Terminal Grid with Sidebar */}
-      <div className="w-full max-w-[1560px] mx-auto flex-1 flex overflow-hidden p-3 sm:p-5 gap-5">
-        {/* Desktop Terminal Sidebar */}
-        <aside className="w-64 bg-[#0D111A] border border-white/[0.08] rounded-xl hidden md:flex flex-col justify-between p-3.5 shrink-0 shadow-xl">
-          <div className="space-y-4">
+      <div className="w-full max-w-[1560px] mx-auto flex-1 flex overflow-hidden p-3 sm:p-5 gap-5 relative z-10">
+        {/* Desktop Terminal Sidebar (Always Visible, Liquid Glass with high contrast) */}
+        <aside
+          className={`liquid-glass shrink-0 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-2xl border border-white/[0.12] ${
+            isSidebarCollapsed
+              ? 'w-16 min-w-[4rem] p-2.5 items-center'
+              : 'w-64 min-w-[16rem] p-4'
+          }`}
+        >
+          <div className="space-y-3 w-full">
             {/* Quick Home Switcher */}
-            <button
-              onClick={() => setActiveTab('landing')}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                activeTab === 'landing'
-                  ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.03] border border-transparent'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
-                <span>Studio Home</span>
-              </div>
-              <ChevronRight className="w-3.5 h-3.5 opacity-40" />
-            </button>
+            <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-white/[0.08]">
+              <button
+                onClick={() => setActiveTab('landing')}
+                className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'landing'
+                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-[inset_0_1px_1px_rgba(56,189,248,0.2)]'
+                    : 'text-zinc-200 hover:text-white hover:bg-white/[0.06] border border-transparent'
+                } ${isSidebarCollapsed ? 'justify-center !px-2' : ''}`}
+                title="Studio Home"
+              >
+                <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
+                {!isSidebarCollapsed && <span>Studio Home</span>}
+              </button>
+
+              {!isSidebarCollapsed && (
+                <button
+                  onClick={() => setIsSidebarCollapsed(true)}
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+                  title="Collapse sidebar"
+                  aria-label="Collapse sidebar"
+                >
+                  <PanelLeftClose className="w-4 h-4" />
+                </button>
+              )}
+            </div>
 
             {/* Categorized Navigation */}
             {navCategories.map((group, groupIdx) => (
-              <div key={groupIdx} className="space-y-1">
-                <div className="px-2.5 pb-1 text-[10px] font-mono uppercase tracking-wider text-zinc-500">
-                  {group.category}
-                </div>
+              <div key={groupIdx} className="space-y-1 w-full">
+                {!isSidebarCollapsed && (
+                  <div className="px-3 pt-2 pb-1 text-[10px] font-mono uppercase tracking-widest text-zinc-400 font-bold">
+                    {group.category}
+                  </div>
+                )}
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
@@ -296,21 +328,22 @@ export const Layout: React.FC<LayoutProps> = ({
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                      title={isSidebarCollapsed ? item.label : undefined}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                         isActive
-                          ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 shadow-[inset_0_1px_0_0_rgba(56,189,248,0.15)] font-semibold'
-                          : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.03] border border-transparent'
-                      }`}
+                          ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/30 shadow-[inset_0_1px_1px_rgba(56,189,248,0.25)] font-semibold'
+                          : 'text-zinc-300 hover:text-white hover:bg-white/[0.06] border border-transparent'
+                      } ${isSidebarCollapsed ? 'justify-center !px-2' : ''}`}
                     >
                       <div className="flex items-center gap-2.5 truncate">
-                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-cyan-400' : 'text-zinc-500'}`} />
-                        <span className="truncate">{item.label}</span>
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-cyan-400' : 'text-zinc-400'}`} />
+                        {!isSidebarCollapsed && <span className="truncate">{item.label}</span>}
                       </div>
-                      {item.badge && (
-                        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0 ${
+                      {!isSidebarCollapsed && item.badge && (
+                        <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 font-bold ${
                           isActive
-                            ? 'bg-cyan-400/20 text-cyan-200'
-                            : 'bg-white/[0.04] text-zinc-500'
+                            ? 'bg-cyan-400/20 text-cyan-300 border border-cyan-400/30'
+                            : 'bg-white/[0.06] text-zinc-400 border border-white/10'
                         }`}>
                           {item.badge}
                         </span>
@@ -323,29 +356,41 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
 
           {/* Sidebar Terminal Telemetry */}
-          <div className="mt-4 pt-3 border-t border-white/[0.08] space-y-2.5 font-mono text-[11px]">
-            <div className="p-3 bg-[#111622] rounded-lg border border-white/[0.06] space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-zinc-500">ZK Engine</span>
-                <span className="text-zinc-300 font-semibold">Compact v0.5.2</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-zinc-500">Circuits</span>
-                <span className="text-emerald-400 font-semibold">8 Core Verified</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-zinc-500">Proof Model</span>
-                <span className="text-cyan-400 font-semibold">Client-Side ZK</span>
-              </div>
-            </div>
+          <div className="mt-4 pt-3 border-t border-white/[0.08] space-y-2.5 font-mono text-[11px] w-full">
+            {!isSidebarCollapsed ? (
+              <>
+                <div className="p-3 bg-white/[0.03] backdrop-blur-md rounded-xl border border-white/[0.08] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-400">ZK Engine</span>
+                    <span className="text-zinc-200 font-bold">Compact v0.5.2</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-400">Circuits</span>
+                    <span className="text-emerald-400 font-bold">8 Core Verified</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-400">Proof Model</span>
+                    <span className="text-cyan-400 font-bold">Client-Side ZK</span>
+                  </div>
+                </div>
 
-            <button
-              onClick={() => setDeployerModalOpen(true)}
-              className="w-full py-2 px-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-300 hover:text-white text-[11px] font-mono flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-            >
-              <Rocket className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Manage Preprod Contract</span>
-            </button>
+                <button
+                  onClick={() => setDeployerModalOpen(true)}
+                  className="w-full py-2 px-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/15 text-zinc-200 hover:text-white text-[11px] font-mono flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                >
+                  <Rocket className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Manage Preprod Contract</span>
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setDeployerModalOpen(true)}
+                className="w-full py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/15 text-cyan-400 flex items-center justify-center transition-all cursor-pointer"
+                title="Manage Preprod Contract"
+              >
+                <Rocket className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </aside>
 
@@ -356,7 +401,7 @@ export const Layout: React.FC<LayoutProps> = ({
       </div>
 
       {/* Footer Ticker */}
-      <footer className="bg-[#080B10] border-t border-white/[0.08] py-2 px-4 sm:px-6 text-[11px] font-mono text-zinc-400">
+      <footer className="bg-[#0C0C0C]/85 backdrop-blur-md border-t border-white/[0.08] py-2 px-4 sm:px-6 text-[11px] font-mono text-zinc-400 relative z-10">
         <div className="max-w-[1560px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
             <div className="flex items-center gap-1.5 text-zinc-200">
