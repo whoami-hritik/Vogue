@@ -46,7 +46,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const handleAction = walletConnected ? onEnterDashboard : onConnectWallet;
 
   return (
-    <div className="min-h-screen text-slate-100 font-sans selection:bg-white/20 selection:text-white bg-[#030508]">
+    <div className="min-h-screen text-slate-100 font-sans selection:bg-white/20 selection:text-white bg-[#0C0C0C]">
       {/* SECTION 1: HERO (Dynamic Monochromatic WebGL Liquid Caustics & Transparent Liquid Glass Hero) */}
       <ShaderShowcase 
         onConnectWallet={onConnectWallet} 

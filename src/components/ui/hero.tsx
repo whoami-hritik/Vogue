@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Water } from "@paper-design/shaders-react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Shield, ExternalLink, Sparkles, Terminal, Activity } from "lucide-react";
+import { ArrowRight, Shield } from "lucide-react";
 import { LiquidGlassButton } from "./LiquidGlassButton";
+import { GradientWave } from "./gradient-wave";
 
 interface ShaderShowcaseProps {
   onConnectWallet: () => void;
@@ -19,7 +19,6 @@ export default function ShaderShowcase({
   walletAddress,
   children,
 }: ShaderShowcaseProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -30,111 +29,42 @@ export default function ShaderShowcase({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Interactive liquid glass cursor refraction
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
-
-    const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    const pointer = {
-      x: width / 2,
-      y: height / 2,
-      targetX: width / 2,
-      targetY: height / 2,
-      radius: 280,
-    };
-
-    const handlePointerMove = (e: MouseEvent) => {
-      pointer.targetX = e.clientX;
-      pointer.targetY = e.clientY;
-    };
-
-    window.addEventListener("mousemove", handlePointerMove);
-
-    const render = () => {
-      pointer.x += (pointer.targetX - pointer.x) * 0.06;
-      pointer.y += (pointer.targetY - pointer.y) * 0.06;
-
-      ctx.clearRect(0, 0, width, height);
-
-      // Subtle dynamic specular refraction under cursor (pure white / silver, NO color gradient)
-      const gradient = ctx.createRadialGradient(
-        pointer.x,
-        pointer.y,
-        0,
-        pointer.x,
-        pointer.y,
-        pointer.radius
-      );
-      gradient.addColorStop(0, "rgba(255, 255, 255, 0.05)");
-      gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.015)");
-      gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
-
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(pointer.x, pointer.y, pointer.radius, 0, Math.PI * 2);
-      ctx.fill();
-
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    render();
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", handlePointerMove);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
   const handleAction = walletConnected ? onEnterDashboard : onConnectWallet;
 
   return (
-    <div className="relative w-full min-h-screen bg-[#030508] overflow-hidden text-slate-100 font-sans selection:bg-white/20 selection:text-white">
-      {/* 1. Monochromatic WebGL Liquid Caustics Background (ZERO Color Gradients) */}
-      <div className="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-45">
-        <Water
-          className="w-full h-full"
-          colorBack="#030508"
-          colorHighlight="#ffffff"
-          highlights={0.14}
-          waves={0.32}
-          caustic={0.18}
-          speed={0.28}
-          size={0.7}
-          layering={0.25}
-          edges={0.65}
-          fit="cover"
+    <div className="relative w-full min-h-screen bg-[#0C0C0C] overflow-hidden text-slate-100 font-sans selection:bg-white/20 selection:text-white">
+      {/* Ambient Premium Dynamic Background Layer (AIRA Dark Mode Proven Architecture) */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Luminous Dark Mode Atmosphere with Soft Aurora Glow & Dark GradientWave */}
+        <div className="absolute inset-0">
+          {/* Liquid Dark Mesh Wave */}
+          <div className="absolute inset-0 opacity-40">
+            <GradientWave
+              key="landing-dark-wave"
+              isPlaying={true}
+              colors={["#0c1427", "#0284c7", "#1e1035", "#6366f1", "#075985", "#080c16"]}
+              className="w-full h-full"
+              shadowPower={4}
+              darkenTop={true}
+            />
+          </div>
+          <div className="absolute -top-48 left-1/2 -translate-x-1/2 w-[900px] h-[550px] rounded-full bg-gradient-to-tr from-[#38bdf8]/15 via-[#818cf8]/15 to-transparent blur-[140px] pointer-events-none" />
+          <div className="absolute top-1/3 -left-48 w-[600px] h-[600px] rounded-full bg-[#38bdf8]/10 blur-[150px] pointer-events-none" />
+          <div className="absolute top-2/3 -right-48 w-[600px] h-[600px] rounded-full bg-[#818cf8]/10 blur-[150px] pointer-events-none" />
+        </div>
+
+        {/* Subtle Precision Engineering Dot Grid */}
+        <div
+          className="absolute inset-0 opacity-[0.05] pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(currentColor 1px, transparent 1px)`,
+            backgroundSize: '28px 28px',
+          }}
         />
+
+        {/* Smooth Vignette Mask to blend sections naturally */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0C0C0C]/25 to-[#0C0C0C] pointer-events-none" />
       </div>
-
-      {/* 2. Interactive Cursor Refraction Canvas */}
-      <canvas
-        ref={canvasRef}
-        className="fixed inset-0 w-full h-full pointer-events-none z-1"
-      />
-
-      {/* 3. Liquid Glass Depth Vignette */}
-      <div
-        className="fixed inset-0 pointer-events-none z-2"
-        style={{
-          background:
-            "radial-gradient(ellipse at 50% 25%, transparent 30%, rgba(3, 5, 8, 0.8) 100%)",
-        }}
-      />
 
       {/* 4. Floating Liquid Glass Navigation Dock */}
       <header className="sticky top-0 z-50 pt-4 px-4 sm:px-8 max-w-[1440px] mx-auto w-full transition-all duration-300">
