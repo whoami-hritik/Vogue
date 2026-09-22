@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react"
-import { MeshGradient, PulsingBorder } from "@paper-design/shaders-react"
-import { motion } from "framer-motion"
-import { ArrowRight, Shield } from "lucide-react"
+import React, { useEffect, useRef, useState } from "react";
+import { Water } from "@paper-design/shaders-react";
+import { motion } from "framer-motion";
+import { ArrowRight, Shield, ExternalLink, Sparkles, Terminal, Activity } from "lucide-react";
+import { LiquidGlassButton } from "./LiquidGlassButton";
 
 interface ShaderShowcaseProps {
   onConnectWallet: () => void;
@@ -16,294 +17,274 @@ export default function ShaderShowcase({
   onEnterDashboard,
   walletConnected,
   walletAddress,
-  children
+  children,
 }: ShaderShowcaseProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [isActive, setIsActive] = useState(false)
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleMouseEnter = () => setIsActive(true)
-    const handleMouseLeave = () => setIsActive(false)
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    const container = containerRef.current
-    if (container) {
-      container.addEventListener("mouseenter", handleMouseEnter)
-      container.addEventListener("mouseleave", handleMouseLeave)
-    }
+  // Interactive liquid glass cursor refraction
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    const pointer = {
+      x: width / 2,
+      y: height / 2,
+      targetX: width / 2,
+      targetY: height / 2,
+      radius: 280,
+    };
+
+    const handlePointerMove = (e: MouseEvent) => {
+      pointer.targetX = e.clientX;
+      pointer.targetY = e.clientY;
+    };
+
+    window.addEventListener("mousemove", handlePointerMove);
+
+    const render = () => {
+      pointer.x += (pointer.targetX - pointer.x) * 0.06;
+      pointer.y += (pointer.targetY - pointer.y) * 0.06;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Subtle dynamic specular refraction under cursor (pure white / silver, NO color gradient)
+      const gradient = ctx.createRadialGradient(
+        pointer.x,
+        pointer.y,
+        0,
+        pointer.x,
+        pointer.y,
+        pointer.radius
+      );
+      gradient.addColorStop(0, "rgba(255, 255, 255, 0.05)");
+      gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.015)");
+      gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(pointer.x, pointer.y, pointer.radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
 
     return () => {
-      if (container) {
-        container.removeEventListener("mouseenter", handleMouseEnter)
-        container.removeEventListener("mouseleave", handleMouseLeave)
-      }
-    }
-  }, [])
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", handlePointerMove);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  const handleAction = walletConnected ? onEnterDashboard : onConnectWallet;
 
   return (
-    <div ref={containerRef} className="relative w-full bg-black">
-      {/* Hero Section Container */}
-      <div className="relative w-full min-h-screen overflow-hidden">
-      <svg className="absolute inset-0 w-0 h-0">
-        <defs>
-          <filter id="glass-effect" x="-50%" y="-50%" width="200%" height="200%">
-            <feTurbulence baseFrequency="0.005" numOctaves="1" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.3" />
-            <feColorMatrix
-              type="matrix"
-              values="1 0 0 0 0.02
-                      0 1 0 0 0.02
-                      0 0 1 0 0.05
-                      0 0 0 0.9 0"
-              result="tint"
-            />
-          </filter>
-          <filter id="gooey-filter" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
-            <feColorMatrix
-              in="blur"
-              mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
-              result="gooey"
-            />
-            <feComposite in="SourceGraphic" in2="gooey" operator="atop" />
-          </filter>
-          <filter id="logo-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#06b6d4" />
-            <stop offset="50%" stopColor="#ffffff" />
-            <stop offset="100%" stopColor="#0891b2" />
-          </linearGradient>
-          <linearGradient id="hero-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" />
-            <stop offset="30%" stopColor="#f26522" />
-            <stop offset="70%" stopColor="#f97316" />
-            <stop offset="100%" stopColor="#ffffff" />
-          </linearGradient>
-          <filter id="text-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-      </svg>
-
-      <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
-        <MeshGradient
+    <div className="relative w-full min-h-screen bg-[#030508] overflow-hidden text-slate-100 font-sans selection:bg-white/20 selection:text-white">
+      {/* 1. Monochromatic WebGL Liquid Caustics Background (ZERO Color Gradients) */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-45">
+        <Water
           className="w-full h-full"
-          colors={["#000000", "#111111", "#1a1a1a", "#2a1508", "#f26522"]}
-          speed={0.3}
-          {...({ backgroundColor: "#000000" } as any)}
-        />
-        <MeshGradient
-          className="absolute inset-0 w-full h-full opacity-60"
-          colors={["#000000", "#ffffff", "#f26522", "#f97316"]}
-          speed={0.2}
-          {...({ wireframe: true, backgroundColor: "transparent" } as any)}
+          colorBack="#030508"
+          colorHighlight="#ffffff"
+          highlights={0.14}
+          waves={0.32}
+          caustic={0.18}
+          speed={0.28}
+          size={0.7}
+          layering={0.25}
+          edges={0.65}
+          fit="cover"
         />
       </div>
 
-      <header className="relative z-50 pt-4 px-4 sm:px-6 max-w-[1440px] mx-auto w-full">
-        <div className="rounded-xl px-4 py-3 flex items-center justify-between bg-[#0D111A]/90 border border-white/[0.08] backdrop-blur-xl shadow-xl">
-          
+      {/* 2. Interactive Cursor Refraction Canvas */}
+      <canvas
+        ref={canvasRef}
+        className="fixed inset-0 w-full h-full pointer-events-none z-1"
+      />
+
+      {/* 3. Liquid Glass Depth Vignette */}
+      <div
+        className="fixed inset-0 pointer-events-none z-2"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 25%, transparent 30%, rgba(3, 5, 8, 0.8) 100%)",
+        }}
+      />
+
+      {/* 4. Floating Liquid Glass Navigation Dock */}
+      <header className="sticky top-0 z-50 pt-4 px-4 sm:px-8 max-w-[1440px] mx-auto w-full transition-all duration-300">
+        <div
+          className={`rounded-full px-5 py-3 flex items-center justify-between transition-all duration-300 ${
+            scrolled
+              ? "bg-white/[0.04] backdrop-blur-2xl border border-white/[0.16] shadow-[inset_0_1px_1px_rgba(255,255,255,0.35),0_16px_40px_rgba(0,0,0,0.6)]"
+              : "bg-white/[0.02] backdrop-blur-xl border border-white/[0.1] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.4)]"
+          }`}
+        >
+          {/* Brand */}
           <div className="flex items-center gap-6">
-            {/* Logo */}
             <motion.div
-              className="flex items-center gap-3 group cursor-pointer"
+              className="flex items-center gap-3 cursor-pointer select-none"
               whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              onClick={handleAction}
             >
-              <div className="w-9 h-9 rounded-lg overflow-hidden border border-white/10 bg-[#111622] flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-8 h-8 rounded-full border border-white/20 bg-white/[0.05] backdrop-blur-md flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
                 <img
                   src="/vogue-logo.svg"
-                  alt="Vogue Trade"
-                  className="w-6 h-6 object-contain group-hover:scale-105 transition-transform"
+                  alt="Vogue Protocol"
+                  className="w-5 h-5 object-contain"
                 />
               </div>
               <div className="flex flex-col">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-extrabold text-white tracking-tight leading-none font-mono">VOGUE</span>
-                  <span className="text-[10px] text-cyan-400 font-mono tracking-wider font-semibold uppercase">PROTOCOL</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-extrabold tracking-tight text-white leading-none">
+                    VOGUE
+                  </span>
+                  <span className="text-[10px] text-zinc-400 font-mono tracking-widest uppercase">
+                    PROTOCOL
+                  </span>
                 </div>
-                <span className="text-[10px] text-zinc-500 font-mono mt-0.5">Private moves. Public proof.</span>
               </div>
             </motion.div>
 
             {/* Nav Links */}
-            <nav className="hidden md:flex items-center space-x-1 border-l border-white/[0.08] pl-6 ml-2 text-xs font-medium">
-              <a href="#pipeline" className="text-zinc-400 hover:text-white px-3 py-1.5 rounded-md hover:bg-white/[0.04] transition-colors">
+            <nav className="hidden md:flex items-center space-x-1 border-l border-white/[0.1] pl-6 ml-2 text-xs font-medium">
+              <a
+                href="#pipeline"
+                className="text-zinc-400 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/[0.06] transition-colors"
+              >
                 ZK Pipeline
               </a>
-              <a href="#modules" className="text-zinc-400 hover:text-white px-3 py-1.5 rounded-md hover:bg-white/[0.04] transition-colors">
-                Institutional Modules
+              <a
+                href="#modules"
+                className="text-zinc-400 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/[0.06] transition-colors"
+              >
+                Institutional Pillars
               </a>
-              <a href="#circuits" className="text-zinc-400 hover:text-white px-3 py-1.5 rounded-md hover:bg-white/[0.04] transition-colors">
-                Verified Circuits
+              <a
+                href="#circuits"
+                className="text-zinc-400 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/[0.06] transition-colors"
+              >
+                Circuit Registry
               </a>
               <a
                 href="https://preprod.midnightexplorer.com/contracts/0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7"
                 target="_blank"
                 rel="noreferrer"
-                className="text-cyan-400 hover:text-cyan-300 px-3 py-1.5 rounded-md hover:bg-cyan-500/10 transition-colors flex items-center gap-1 font-mono text-[11px]"
+                className="text-zinc-300 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/[0.06] transition-colors flex items-center gap-1 font-mono text-[11px]"
               >
-                Contract Explorer <ArrowRight className="w-3 h-3 -rotate-45 opacity-70" />
+                <span>Contract Explorer</span>
+                <ArrowRight className="w-3 h-3 -rotate-45 opacity-60" />
               </a>
             </nav>
           </div>
 
+          {/* Right Status + Liquid Glass Button */}
           <div className="flex items-center gap-3">
-            {/* Status Pill */}
-            <div className="hidden lg:flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Preprod Verified</span>
-              </div>
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.1] text-zinc-300 text-xs font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Midnight Preprod</span>
             </div>
 
-            {/* Launch Button */}
-            <button 
-              onClick={walletConnected ? onEnterDashboard : onConnectWallet}
-              className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs transition-all shadow-sm shadow-cyan-500/20 cursor-pointer"
-            >
-              <span>{walletConnected ? 'Open Trading Terminal' : 'Launch Vogue Terminal'}</span>
+            {/* Transparent Liquid Glass Button */}
+            <LiquidGlassButton onClick={handleAction} variant="primary">
+              <span>{walletConnected ? "Enter Terminal" : "Launch Terminal"}</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            </LiquidGlassButton>
           </div>
-
         </div>
       </header>
 
-      <main className="absolute bottom-10 left-6 sm:left-12 md:left-16 lg:left-20 z-20 max-w-3xl pr-6">
-        <div className="text-left">
-          {/* Institutional Badge */}
-          <motion.div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#111622]/90 border border-white/[0.08] mb-6 shadow-sm"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+      {/* 5. Monumental Centered Hero */}
+      <section className="relative z-10 pt-20 sm:pt-28 pb-16 px-4 sm:px-8 max-w-5xl mx-auto text-center flex flex-col items-center">
+        {/* Liquid Glass Badge */}
+        <motion.div
+          className="liquid-glass-pill px-4 py-1.5 inline-flex items-center gap-2 mb-8 select-none"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+          <span className="text-zinc-200 text-xs font-mono tracking-wider uppercase font-semibold">
+            Midnight Preprod • 8 ZK Circuits Live & Verified
+          </span>
+        </motion.div>
+
+        {/* Headline: Clean, monumental, pure white with specular glow, NO cheap color gradients */}
+        <motion.h1
+          className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-[-0.03em] leading-[1.06] mb-6 max-w-4xl"
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+        >
+          The Zero-Knowledge
+          <span className="block text-zinc-200 font-light mt-1">
+            Algorithmic Execution Layer
+          </span>
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          className="text-base sm:text-xl text-zinc-300 max-w-2xl mx-auto leading-relaxed mb-10 font-normal"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.25 }}
+        >
+          Execute algorithmic trading strategies, anti-MEV iceberg orders, and private cross-chain intents with mathematically verified zero-knowledge proofs. All trade secrets remain client-side — state transitions are proven on Midnight.
+        </motion.p>
+
+        {/* Dual Transparent Liquid Glass Buttons */}
+        <motion.div
+          className="flex items-center justify-center gap-4 flex-wrap"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+        >
+          <LiquidGlassButton onClick={handleAction} variant="primary">
+            <span>{walletConnected ? "Open Trading Terminal" : "Connect 1AM Wallet"}</span>
+            <ArrowRight className="w-4 h-4" />
+          </LiquidGlassButton>
+
+          <LiquidGlassButton
+            href="https://preprod.midnightexplorer.com/contracts/0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7"
+            target="_blank"
+            rel="noreferrer"
+            variant="secondary"
+            icon={<Shield className="w-4 h-4 text-zinc-300" />}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-            <span className="text-zinc-300 text-xs font-mono tracking-wider uppercase">
-              Midnight Preprod • 8 ZK-SNARK Circuits Live
-            </span>
-          </motion.div>
+            <span>Verify Contract (0xbe69…)</span>
+          </LiquidGlassButton>
+        </motion.div>
+      </section>
 
-          {/* Heading */}
-          <motion.h1
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 leading-[1.08] tracking-tight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-          >
-            <span>The Zero-Knowledge</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-200 to-indigo-300 font-extrabold">
-              Algorithmic Execution Layer
-            </span>
-            <span className="block text-zinc-400 text-3xl sm:text-4xl font-normal mt-1">
-              on Midnight Network.
-            </span>
-          </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p
-            className="text-base sm:text-lg text-zinc-400 mb-8 leading-relaxed max-w-2xl font-normal"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            Execute algorithmic strategies, cross-chain dark pool intents, and anti-MEV iceberg orders with mathematically verified zero-knowledge proofs. Trade secrets stay client-side — settlement is proven on-chain.
-          </motion.p>
-
-          {/* CTAs */}
-          <motion.div
-            className="flex items-center gap-3 sm:gap-4 flex-wrap"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-          >
-            <button
-              onClick={walletConnected ? onEnterDashboard : onConnectWallet}
-              className="px-6 py-3 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold text-sm transition-all cursor-pointer shadow-lg shadow-cyan-500/20 flex items-center gap-2"
-            >
-              <span>{walletConnected ? 'Enter Trading Terminal' : 'Connect 1AM Wallet'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <a
-              href="https://preprod.midnightexplorer.com/contracts/0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7"
-              target="_blank"
-              rel="noreferrer"
-              className="px-5 py-3 rounded-lg bg-[#111622] hover:bg-[#161D2C] border border-white/[0.08] hover:border-cyan-500/30 text-zinc-200 hover:text-white font-mono text-xs transition-all cursor-pointer flex items-center gap-2"
-            >
-              <Shield className="w-4 h-4 text-cyan-400" />
-              <span>Verify On-Chain (0xbe69…)</span>
-            </a>
-          </motion.div>
-        </div>
-      </main>
-
-      <div className="hidden md:block absolute bottom-12 right-12 lg:bottom-16 lg:right-16 z-30">
-        <div className="relative w-32 h-32 flex items-center justify-center">
-          <PulsingBorder
-            colors={["#f26522", "#f97316", "#ff8c00", "#ffffff", "#aaaaaa", "#333333", "#000000"]}
-            colorBack="#00000000"
-            speed={1.5}
-            roundness={1}
-            thickness={0.1}
-            softness={0.2}
-            intensity={5}
-            style={{
-              width: "100px",
-              height: "100px",
-              borderRadius: "50%",
-            }}
-            {...({
-              spotsPerColor: 5,
-              spotSize: 0.1,
-              pulse: 0.1,
-              smoke: 0.5,
-              smokeSize: 4,
-              scale: 0.65,
-              rotation: 0,
-              frame: 9161408
-            } as any)}
-          />
-
-          <motion.svg
-            className="absolute inset-0 w-full h-full"
-            viewBox="0 0 100 100"
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: 20,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
-            }}
-            style={{ transform: "scale(1.4)" }}
-          >
-            <defs>
-              <path id="circle" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0" />
-            </defs>
-            <text className="text-[10px] fill-white/80 font-medium uppercase tracking-widest">
-              <textPath href="#circle" startOffset="0%">
-                Zero Knowledge • Privacy Trade • Vogue Protocol • Midnight Network •
-              </textPath>
-            </text>
-          </motion.svg>
-        </div>
-      </div>
-      
-      </div>
-
-      {/* Children Container */}
-      <div className="relative z-20 w-full pb-20">
+      {/* 6. Children Sections (Rendered over the same dynamic liquid atmosphere) */}
+      <div className="relative z-10 w-full pb-24">
         {children}
       </div>
     </div>
-  )
+  );
 }

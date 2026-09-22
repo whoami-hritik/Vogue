@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
 import {
-  Activity,
   ShieldCheck,
   AlertCircle,
   Info,
   Terminal,
-  Trash2,
-  CheckCircle2,
-  Cpu,
   Radio
 } from 'lucide-react';
 import { formatISTTime } from '../utils/time';
@@ -37,30 +33,30 @@ export const ProtocolLog: React.FC<ProtocolLogProps> = ({ logs, networkId = 'pre
   });
 
   return (
-    <div className="light-glass border border-gray-200/80 rounded-2xl p-5 space-y-4 font-sans shadow-sm sticky top-6">
+    <div className="liquid-glass p-5 space-y-4 font-sans sticky top-6">
       {/* Log Header */}
-      <div className="space-y-3 pb-3 border-b border-gray-100">
+      <div className="space-y-3 pb-3 border-b border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="relative flex items-center justify-center">
-              <Radio className="w-4 h-4 text-orange-500 animate-pulse" />
-              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+              <Radio className="w-3.5 h-3.5 text-white animate-pulse" />
+              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
             </div>
-            <h3 className="text-xs font-extrabold text-gray-900 uppercase tracking-wider">
+            <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
               Protocol Telemetry
             </h3>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 font-mono font-bold">
+            <span className="liquid-glass-pill px-2 py-0.5 text-[10px] text-zinc-300 font-mono font-bold">
               {logs.length}
             </span>
           </div>
 
-          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-200 uppercase tracking-wider">
+          <span className="liquid-glass-pill px-2.5 py-0.5 text-emerald-400 text-[10px] font-mono font-bold uppercase tracking-wider">
             IST LIVE
           </span>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-200/60 text-[10px]">
+        <div className="flex items-center gap-1 liquid-glass-pill p-1 text-[10px]">
           {(
             [
               { key: 'all', label: 'All' },
@@ -72,10 +68,10 @@ export const ProtocolLog: React.FC<ProtocolLogProps> = ({ logs, networkId = 'pre
             <button
               key={item.key}
               onClick={() => setFilter(item.key)}
-              className={`flex-1 py-1 rounded-lg font-bold transition-all cursor-pointer text-center ${
+              className={`flex-1 py-1 rounded-full font-mono font-bold transition-all cursor-pointer text-center ${
                 filter === item.key
-                  ? 'light-glass text-gray-900 shadow-xs border border-gray-200/70'
-                  : 'text-gray-500 hover:text-gray-900'
+                  ? 'bg-white text-black shadow-sm'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
               {item.label}
@@ -87,7 +83,7 @@ export const ProtocolLog: React.FC<ProtocolLogProps> = ({ logs, networkId = 'pre
       {/* Log Stream List */}
       <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
         {filteredLogs.length === 0 ? (
-          <div className="p-8 text-center text-xs text-gray-400 bg-gray-50/70 rounded-xl border border-dashed border-gray-200 font-sans">
+          <div className="p-8 text-center text-xs text-zinc-500 rounded-xl border border-dashed border-white/10 font-mono">
             No events match current filter.
           </div>
         ) : (
@@ -98,32 +94,32 @@ export const ProtocolLog: React.FC<ProtocolLogProps> = ({ logs, networkId = 'pre
             return (
               <div
                 key={log.id}
-                className={`p-3 rounded-xl border transition-all text-xs space-y-1 ${
+                className={`p-3 rounded-xl border transition-all text-xs space-y-1.5 ${
                   isError
-                    ? 'bg-red-50/60 border-red-200 text-red-900'
+                    ? 'bg-rose-500/10 border-rose-500/25 text-rose-200'
                     : isSuccess
-                    ? 'bg-emerald-50/50 border-emerald-200/80 text-emerald-950'
-                    : 'bg-gray-50/80 border-gray-200/80 text-gray-900'
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-zinc-200'
+                    : 'bg-white/[0.03] border-white/10 text-zinc-200'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-1.5 font-bold">
                     {isError ? (
-                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
+                      <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
                     ) : isSuccess ? (
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
                     ) : (
-                      <Info className="w-3.5 h-3.5 text-orange-500 shrink-0 mt-0.5" />
+                      <Info className="w-3.5 h-3.5 text-zinc-400 shrink-0 mt-0.5" />
                     )}
-                    <span className="text-[11px] leading-tight font-extrabold">{log.title}</span>
+                    <span className="text-[11px] font-mono leading-tight font-bold text-white">{log.title}</span>
                   </div>
 
-                  <span className="text-[10px] text-gray-500 font-mono shrink-0 whitespace-nowrap">
+                  <span className="text-[10px] text-zinc-500 font-mono shrink-0 whitespace-nowrap">
                     {formatISTTime(log.timestamp)}
                   </span>
                 </div>
 
-                <p className="text-[11px] font-mono text-gray-600 leading-relaxed pl-5 break-all">
+                <p className="text-[11px] font-mono text-zinc-400 leading-relaxed pl-5 break-all">
                   {log.detail.replace(/TX:\s*(0x[a-fA-F0-9]{10})[a-fA-F0-9]{40,54}/g, 'TX: $1…')}
                 </p>
 
@@ -135,12 +131,12 @@ export const ProtocolLog: React.FC<ProtocolLogProps> = ({ logs, networkId = 'pre
                     : `https://explorer.1am.xyz?network=${net}`;
                   const shortTx = directTx ? `${directTx.replace(/^0x/, '').substring(0, 10)}…` : 'TX';
                   return (
-                    <div className="pl-5 pt-1">
+                    <div className="pl-5 pt-0.5">
                       <a
                         href={targetUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-[10px] font-bold text-orange-600 hover:text-orange-700 hover:underline"
+                        className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-zinc-300 hover:text-white hover:underline"
                       >
                         <span>Verify {shortTx} on 1AM {networkId === 'preprod' ? 'Preprod' : 'Preview'} Explorer →</span>
                       </a>
@@ -155,18 +151,17 @@ export const ProtocolLog: React.FC<ProtocolLogProps> = ({ logs, networkId = 'pre
       </div>
 
       {/* Footer Info */}
-      <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-500 font-mono">
+      <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-zinc-500 font-mono">
         <a
           href={explorerBase}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center gap-1 text-gray-500 hover:text-orange-600 transition-colors"
+          className="flex items-center gap-1 text-zinc-400 hover:text-white transition-colors"
         >
-          <Terminal className="w-3 h-3 text-gray-400" /> 1AM {networkId === 'preprod' ? 'Preprod' : 'Preview'} Explorer Live
+          <Terminal className="w-3 h-3 text-zinc-500" /> 1AM {networkId === 'preprod' ? 'Preprod' : 'Preview'} Live
         </a>
-        <span className="text-emerald-700 font-bold">● Synchronized</span>
+        <span className="text-emerald-400 font-bold">● Synchronized</span>
       </div>
     </div>
   );
 };
-
