@@ -51,21 +51,21 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
       <div className="flex items-center gap-2 font-sans">
         <button
           onClick={onOpenModal}
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200/80 border border-gray-300/80 text-left transition-all cursor-pointer shadow-xs"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#111622] hover:bg-[#161D2C] border border-white/[0.08] hover:border-white/[0.14] text-left transition-all cursor-pointer shadow-xs"
         >
-          <span className={`w-2 h-2 rounded-full shrink-0 ${!isNetworkAligned ? 'bg-amber-500 animate-bounce' : 'bg-emerald-500 animate-pulse'}`}></span>
-          <div className="flex items-center gap-1.5 text-xs font-medium text-gray-900">
-            <span className="font-semibold">{walletName}</span>
-            <span className="text-gray-400">•</span>
-            <span className="font-bold text-gray-800">{String(balance)}</span>
+          <span className={`w-2 h-2 rounded-full shrink-0 ${!isNetworkAligned ? 'bg-amber-400 animate-bounce' : 'bg-emerald-400 animate-pulse'}`}></span>
+          <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-200">
+            <span className="font-semibold text-zinc-300">{walletName}</span>
+            <span className="text-zinc-600">•</span>
+            <span className="font-bold text-emerald-400 font-mono">{String(balance)}</span>
           </div>
           {!isNetworkAligned && detected1AMNetwork && (
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
               1AM: {detected1AMNetwork.toUpperCase()}
             </span>
           )}
           {displayAddress && isNetworkAligned && (
-            <span className="text-[11px] font-mono text-gray-600 light-glass px-2 py-0.5 rounded-full border border-gray-200 shadow-2xs">
+            <span className="text-[11px] font-mono text-zinc-400 bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.06]">
               {displayAddress}
             </span>
           )}
@@ -74,7 +74,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
         <button
           onClick={onDisconnect}
           title="Disconnect Wallet"
-          className="w-8 h-8 rounded-full bg-gray-900 hover:bg-black text-white flex items-center justify-center transition-all cursor-pointer shadow-sm"
+          className="w-8 h-8 rounded-lg bg-[#111622] hover:bg-rose-500/10 hover:text-rose-400 border border-white/[0.08] hover:border-rose-500/30 text-zinc-400 flex items-center justify-center transition-all cursor-pointer shadow-sm"
         >
           <LogOut className="w-3.5 h-3.5" />
         </button>
@@ -87,24 +87,24 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
       <button
         onClick={onOpenModal}
         disabled={isConnecting}
-        className="bg-gray-900 hover:bg-black text-white text-xs font-medium rounded-full px-4 py-2 flex items-center gap-2 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+        className="bg-gradient-to-r from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-slate-950 font-bold text-xs rounded-lg px-3.5 py-2 flex items-center gap-2 transition-all cursor-pointer shadow-sm shadow-cyan-500/20 disabled:opacity-50"
       >
         {isConnecting ? (
           <>
-            <RefreshCw className="w-3.5 h-3.5 animate-spin text-orange-400" />
+            <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-950" />
             <span>Connecting…</span>
           </>
         ) : (
           <>
-            <Wallet className="w-3.5 h-3.5 text-orange-400" />
+            <Wallet className="w-3.5 h-3.5 text-slate-950" />
             <span>Connect 1AM Wallet</span>
           </>
         )}
       </button>
 
       {error && (
-        <div className="hidden lg:flex items-center gap-1 text-[11px] text-red-600 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
-          <AlertTriangle className="w-3 h-3 text-red-500 shrink-0" />
+        <div className="hidden lg:flex items-center gap-1.5 text-[11px] text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2.5 py-1 rounded-lg">
+          <AlertTriangle className="w-3 h-3 text-rose-400 shrink-0" />
           <span className="truncate max-w-[120px]">{error}</span>
         </div>
       )}

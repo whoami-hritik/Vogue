@@ -1,125 +1,135 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #0B0E14;
-  --bg-card: #131822;
-  --bg-card-hover: #1A202C;
-  --border-color: #262F40;
-  --accent-purple: #8B5CF6;
-  --accent-purple-glow: rgba(139, 92, 246, 0.15);
-  --accent-teal: #10B981;
-  --accent-red: #EF4444;
-  --text-primary: #F3F4F6;
-  --text-muted: #9CA3AF;
+  --bg-canvas: #07090E;
+  --bg-surface: #0D111A;
+  --bg-card: #111622;
+  --bg-card-hover: #161D2C;
+  --bg-input: rgba(255, 255, 255, 0.03);
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-accent: rgba(56, 189, 248, 0.4);
+
+  --accent-cyan: #38BDF8;
+  --accent-cyan-glow: rgba(56, 189, 248, 0.15);
+  --accent-emerald: #10B981;
+  --accent-emerald-glow: rgba(16, 185, 129, 0.15);
+  --accent-amber: #F59E0B;
+  --accent-ruby: #F43F5E;
+  --accent-purple: #818CF8;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #0B0E14;
-  color: #F3F4F6;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Scrollbars */
+/* Custom Sleek Dark Terminal Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B0E14;
+  background: var(--bg-canvas);
 }
 ::-webkit-scrollbar-thumb {
-  background: #262F40;
-  border-radius: 3px;
+  background: #1E293B;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: #334155;
 }
 
-/* Glow effects */
-.glow-purple {
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.25);
+/* Tabular Numerics for Crypto Figures */
+.text-mono-num {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.02em;
 }
-.glow-teal {
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+
+/* Institutional Terminal Panels */
+.terminal-panel {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 8px 24px -6px rgba(0, 0, 0, 0.45);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
-.border-glow {
-  border: 1px solid rgba(139, 92, 246, 0.4);
+
+.terminal-panel-hover:hover {
+  border-color: var(--border-medium);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+  transform: translateY(-1px);
+}
+
+/* Backward-compatible graceful remapping of .light-glass to sleek dark institutional panel */
+.light-glass {
+  background: rgba(17, 22, 34, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 8px 30px rgba(0, 0, 0, 0.45) !important;
+  color: #F8FAFC !important;
+  border-radius: 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.light-glass:hover {
+  background: rgba(22, 29, 44, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 12px 36px rgba(0, 0, 0, 0.55) !important;
+}
+
+.light-glass-strong {
+  background: rgba(13, 17, 26, 0.95) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 16px 40px rgba(0, 0, 0, 0.6) !important;
+  border-radius: 1rem !important;
+}
+
+.light-glass-sidebar {
+  background: rgba(13, 17, 26, 0.92) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Subtle engineered background grid */
+.grid-engineered {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Glowing Aura Utilities */
+.glow-cyan {
+  box-shadow: 0 0 24px -4px rgba(56, 189, 248, 0.25);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 24px -4px rgba(16, 185, 129, 0.25);
 }
 
 @keyframes pulse-subtle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(0.98); }
 }
+
 .animate-pulse-subtle {
-  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Liquid Glass Utilities */
-.liquid-glass {
-  background: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.05);
-}
-
-.liquid-glass-strong {
-  background: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(50px);
-  -webkit-backdrop-filter: blur(50px);
-  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1);
-}
-
-/* Custom Text Roll Transition */
-.ease-roll {
-  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-/* Light Theme Glass Effects */
-.light-glass {
-  background: rgba(255, 255, 255, 0.6) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.4) !important;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-}
-.light-glass:hover {
-  background: rgba(255, 255, 255, 0.8) !important;
-  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.07), inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
-  transform: translateY(-2px);
-}
-.light-glass-strong {
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08) !important;
-}
-.light-glass-sidebar {
-  background: rgba(255, 255, 255, 0.75) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.8) !important;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.02) !important;
-}
-
-/* Animated Mesh Gradient Background */
-.animated-bg {
-  background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%) !important;
-  background-size: 200% 200% !important;
-  animation: gradientMove 15s ease infinite !important;
-}
-.animated-bg-light {
-  background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%, #e2e8f0 50%, #f1f5f9 100%) !important;
-  background-size: 200% 200% !important;
-  animation: gradientMove 15s ease infinite !important;
-}
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  animation: pulse-subtle 2.5s ease-in-out infinite;
 }
