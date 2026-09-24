@@ -358,7 +358,7 @@ export async function connectOneAm(
       } catch {
         // ignore
       }
-      return toHex(crypto.getRandomValues(new Uint8Array(32)));
+      throw new Error("Transaction submission failed: No valid transaction identifier returned from Midnight node or wallet.");
     },
   };
 

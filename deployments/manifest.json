@@ -1,0 +1,25 @@
+{
+  "contractName": "vogue",
+  "version": "1.0.0",
+  "network": "preprod",
+  "contractAddress": "0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7",
+  "deploymentTxId": "0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43",
+  "compiledContractSource": "contracts/vogue.compact",
+  "sourceHash": "0x811c9dc528a49ef84a7e93c048bc72de512bf6017b2f6412e879a6135f60b4de",
+  "circuits": [
+    "commitStrategy",
+    "executeTrade",
+    "mintVaultBalance",
+    "burnVaultBalance",
+    "unshieldWithdraw",
+    "registerAuthorizedSolver",
+    "commitDarkIntent",
+    "fulfillDarkIntent",
+    "refundDarkIntent"
+  ],
+  "explorer": {
+    "contractUrl": "https://preprod.midnightexplorer.com/contracts/0xbe694ffc83d109ec7587e940a80aae0e7e75d1421cefc4936b593457b484e9e7",
+    "txUrl": "https://preprod.midnightexplorer.com/transactions/0x6f2821acd41d2da77e39ab995a00e2718d76040cb07da0f5fbf62229f0c67b43"
+  },
+  "deployedAt": "2026-09-24T13:45:00.000Z"
+}

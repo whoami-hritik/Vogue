@@ -8,8 +8,8 @@
         "build": "tsc -b && vite build",
         "preview": "vite preview",
         "compile": "node scripts/compile.js",
-        "deploy:contract": "node scripts/deploy-real.cjs",
-        "deploy:register": "node scripts/deploy.js",
+        "deploy": "node scripts/deploy.js",
+        "deploy:contract": "node scripts/deploy.js",
         "test": "vitest run",
         "analytics:export-users": "node scripts/analytics-export-users.js",
         "analytics:setup-table": "node scripts/setup-analytics-table.js"
