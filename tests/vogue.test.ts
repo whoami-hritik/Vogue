@@ -239,6 +239,9 @@ describe('Vogue Compact Smart Contract Privacy & Verification Suite', () => {
     const intentId = '0xintent_103';
     const solverId = '0xsolver_greedy';
 
+    contract.registerAuthorizedSolver(solverId);
+    contract.solverBondRegistry.set(solverId, 500_000n);
+
     contract.commitDarkIntent('0xagent_1', intentId);
 
     // Solver attempts to overcharge at $0.55 (> $0.50 max price limit)
