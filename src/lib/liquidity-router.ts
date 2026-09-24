@@ -242,6 +242,17 @@ export function compareExecutionRoutes(
       routingReason = 'Multi-chain concentrated liquidity across EVM pairs';
     }
 
+    const venueSolverId =
+      venue.id === 'hyperliquid'
+        ? '0xsolver_hyperliquid_alpha'
+        : venue.id === 'uniswap_v3'
+        ? '0xsolver_uniswap_core'
+        : venue.id === 'minswap'
+        ? '0xsolver_minswap_cardano'
+        : venue.id === 'jupiter_solana'
+        ? '0xsolver_solana_jupiter'
+        : '0xsolver_darkpool_p2p';
+
     return {
       venue,
       asset,
@@ -254,7 +265,7 @@ export function compareExecutionRoutes(
       estimatedOutputUnits: netUnits,
       isOptimal: false,
       routingReason,
-      solverId: `0xsolver_${venue.id}_${Math.random().toString(16).substring(2, 6)}`,
+      solverId: venueSolverId,
     };
   });
 
@@ -276,7 +287,7 @@ export function compareExecutionRoutes(
     estimatedOutputUnits: safeAmount / safePrice,
     isOptimal: true,
     routingReason: 'Default optimal route',
-    solverId: '0xsolver_hyperliquid_default',
+    solverId: '0xsolver_hyperliquid_alpha',
   };
 
   return {

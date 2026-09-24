@@ -141,7 +141,7 @@ export function useMidnight() {
   const addLog = useCallback((type: 'success' | 'error' | 'info', title: string, detail: string) => {
     setProtocolLogs((prev) => [
       {
-        id: `log_${Date.now()}_${Math.random().toString(16).substring(2, 6)}`,
+        id: `log_${Date.now()}_${Array.from(crypto.getRandomValues(new Uint8Array(2))).map(b => b.toString(16).padStart(2, '0')).join('')}`,
         type,
         title,
         detail,
@@ -607,21 +607,17 @@ export function useMidnight() {
       const updatedVault = subtractFromLocalVaultBalance(tradeSizeUsd, currentAddr);
       setVaultBalance(updatedVault);
 
-      const isExecuted = tradeSizeUsd <= 5000;
-      const simulatedPnlPct = isExecuted ? Number((Math.random() * 8 + 1.5).toFixed(2)) : 0;
-      const simulatedPnlUsd = isExecuted ? Number(((tradeSizeUsd * simulatedPnlPct) / 100).toFixed(2)) : 0;
-
       const newTrade: TradeRecord = {
-        id: `0xtrade_${Math.random().toString(16).substring(2, 7)}`,
+        id: tradeId,
         timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
         asset,
         type: tradeType,
         sizeUsd: tradeSizeUsd,
         priceUsd: basePrice,
-        pnlUsd: simulatedPnlUsd,
-        pnlPct: simulatedPnlPct,
-        status: isExecuted ? 'executed' : 'rejected',
-        proofTimeMs: Math.floor(350 + Math.random() * 150),
+        pnlUsd: 0,
+        pnlPct: 0,
+        status: 'executed',
+        proofTimeMs: 400,
         commitmentHash: strategy?.commitmentHash || txHash,
         txHash,
         rpcStatus: 'pending',
@@ -718,11 +714,11 @@ export function useMidnight() {
         setDarkIntents(getActiveDarkIntents());
         addLog('success', 'Midnight Settled', `Atomic settlement verified. Escrow paid to solver. TX: ${settleTx}`);
 
-        const pnlPct = Number((Math.random() * 6 + 1.2).toFixed(2));
-        const pnlUsd = Number(((tradeSizeUsd * pnlPct) / 100).toFixed(2));
+        const pnlUsd = Number((chosenRoute.slippageSavedUsd || 0).toFixed(2));
+        const pnlPct = tradeSizeUsd > 0 ? Number(((pnlUsd / tradeSizeUsd) * 100).toFixed(2)) : 0;
 
         const newTrade: TradeRecord = {
-          id: `0xdin_${intent.intentId.substring(8, 15)}`,
+          id: `0xdin_${intent.intentId.substring(2, 12)}`,
           timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
           asset: targetAsset,
           type: 'BUY',

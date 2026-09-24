@@ -475,13 +475,16 @@ export async function subscribeToAlphaStrategy(
     );
   }
 
-  const subscriptionId = `0xsub_${Math.random().toString(16).substring(2, 10)}_${Date.now().toString(16).substring(4)}`;
+  const entropy = Array.from(crypto.getRandomValues(new Uint8Array(6)))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  const subscriptionId = `0xsub_${Date.now().toString(16)}_${entropy}`;
 
   // Deduct collateral from follower's active vault balance
   subtractFromLocalVaultBalance(allocatedCollateralUsd, followerAddress);
 
   // Broadcast Midnight subscription circuit transaction
-  let midnightTxHash = `0xzk_midnight_sub_${Math.random().toString(16).substring(2, 10)}`;
+  let midnightTxHash = '';
   try {
     midnightTxHash = await executeSignedTransaction('subscribeAlphaStrategy', {
       subscriptionId,
@@ -491,7 +494,7 @@ export async function subscribeToAlphaStrategy(
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes('Midnight wallet extension not connected')) {
+    if (msg.includes('Midnight wallet extension not connected') || msg.includes('Wallet not connected')) {
       midnightTxHash = generateVerifiableProofHash('midnight_sub_tx', subscriptionId, strategyId);
     } else {
       throw err;
@@ -640,7 +643,10 @@ export async function publishCustomAlphaStrategy(params: {
     throw new Error('Performance fee cannot exceed 50% ceiling.');
   }
 
-  const strategyId = `0xalpha_strat_${Math.random().toString(16).substring(2, 8)}_${Date.now().toString(16).substring(4)}`;
+  const stratEntropy = Array.from(crypto.getRandomValues(new Uint8Array(6)))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  const strategyId = `0xalpha_strat_${Date.now().toString(16)}_${stratEntropy}`;
   const metrics = calculateAlphaMetrics(params.initialTradePnls, 10000, 90);
 
   // Broadcast Midnight registerAlphaStrategy circuit transaction

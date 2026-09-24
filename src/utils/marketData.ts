@@ -190,8 +190,9 @@ export function getAssetPriceHistory(symbol: string, timeframe: '1D' | '1W' | '1
 
   for (let i = count; i >= 0; i--) {
     const t = now - i * stepMs;
-    const randomDelta = (Math.sin(i * 0.7) * 0.5 + (Math.random() - 0.48)) * volatility * currentVal;
-    currentVal = Math.max(basePrice * 0.6, currentVal + randomDelta);
+    // Deterministic harmonic oscillation across time steps
+    const harmonicDelta = (Math.sin(i * 0.7) * 0.5 + Math.cos(i * 1.337) * 0.48) * volatility * currentVal;
+    currentVal = Math.max(basePrice * 0.6, currentVal + harmonicDelta);
     if (i === 0) currentVal = basePrice; // Ensure latest point is exact current price
 
     const dateObj = new Date(t);

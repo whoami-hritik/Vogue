@@ -69,11 +69,7 @@ export const IcebergMonitor: React.FC<IcebergMonitorProps> = ({
     setActionSuccessMsg(null);
 
     try {
-      // Simulate realistic market execution price around limit price
-      const basePrice =
-        order.assetSymbol === 'BTC' ? 68200 : order.assetSymbol === 'ETH' ? 3520 : order.assetSymbol === 'SOL' ? 152 : 0.90;
-      // Slight favorable jitter
-      const fillPrice = Number((basePrice * (1 - Math.random() * 0.015)).toFixed(2));
+      const fillPrice = Number(order.maxPriceLimitUsd.toFixed(2));
 
       const res = await dispatchIcebergSlice(order.orderId, fillPrice);
       loadOrders();

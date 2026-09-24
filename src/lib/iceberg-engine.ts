@@ -204,7 +204,10 @@ export async function createIcebergOrder(params: {
   const maxSlippageBps = params.maxSlippageBps || 200; // 2% default max slippage
   const dipBuyerActive = params.dipBuyerActive !== undefined ? params.dipBuyerActive : true;
 
-  const orderId = `0xiceberg_${assetSymbol.toLowerCase()}_${Date.now().toString(16).substring(4)}_${Math.random().toString(16).substring(2, 6)}`;
+  const entropy = Array.from(crypto.getRandomValues(new Uint8Array(4)))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  const orderId = `0xiceberg_${assetSymbol.toLowerCase()}_${Date.now().toString(16)}_${entropy}`;
 
   // Deduct collateral from trader's shielded vault
   subtractFromLocalVaultBalance(totalNotionalUsd, traderAddress);

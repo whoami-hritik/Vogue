@@ -438,19 +438,14 @@ export async function signAuthChallenge(
   api: Midnight1AMConnectedAPI,
   challenge: string,
 ): Promise<string> {
-  if (api.signData) {
-    try {
-      const sig = await (api.signData as (data: string, opts?: { encoding: string }) => Promise<unknown>)(
-        challenge,
-        { encoding: "text" },
-      );
-      return `1am_sig_${typeof sig === "string" ? sig : JSON.stringify(sig)}`;
-    } catch (err) {
-      console.warn("[Vogue Wallet] signData fallback used:", err);
-    }
+  if (typeof api.signData !== "function") {
+    throw new Error("Connected wallet does not support cryptographic signing.");
   }
-  const stub = btoa(`${challenge.slice(0, 32)}`).replace(/[+/=]/g, "");
-  return `1am_sig_${stub}`;
+  const sig = await (api.signData as (data: string, opts?: { encoding: string }) => Promise<unknown>)(
+    challenge,
+    { encoding: "text" },
+  );
+  return typeof sig === "string" ? sig : JSON.stringify(sig);
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────

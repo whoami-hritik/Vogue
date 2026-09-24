@@ -183,7 +183,7 @@ describe('Vogue Dark Intent Network (DIN) — Liquidity Router & Solver Suite', 
       fillTimeMs: 120,
       oracleAttestation: '0xattestation_pyth_sol_146_5',
       cryptographicProofHash: '0xproof_hash_sol_001',
-      chainExplorerUrl: 'https://solscan.io/tx/0xmock',
+      chainExplorerUrl: `https://solscan.io/tx/${generateExternalTxHash('jupiter_solana')}`,
     };
 
     const proof = generateCrossChainStateProof(mockReceipt, mockIntent);
@@ -227,7 +227,7 @@ describe('Vogue Dark Intent Network (DIN) — Liquidity Router & Solver Suite', 
       fillTimeMs: 950,
       oracleAttestation: '0xattestation_pyth_ada_0_82',
       cryptographicProofHash: '0xproof_ada_002',
-      chainExplorerUrl: 'https://cardanoscan.io/transaction/0xmock',
+      chainExplorerUrl: `https://cardanoscan.io/transaction/${generateExternalTxHash('minswap')}`,
     };
 
     const proof = generateCrossChainStateProof(mockReceipt, mockIntent);

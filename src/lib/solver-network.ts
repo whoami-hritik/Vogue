@@ -168,16 +168,15 @@ export function updateDarkIntent(intentId: string, updates: Partial<DarkIntent>)
 // --- Cryptographic Hash Helpers ----------------------------------------------
 
 export function generateIntentId(): string {
-  const randHex = Math.random().toString(16).substring(2, 8);
-  const timeHex = Date.now().toString(16).substring(6);
-  return `0xintent_${randHex}${timeHex}`;
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return `0xintent_${Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
 export function generateExternalTxHash(venueId: LiquidityVenueId): string {
-  const hex = Array.from({ length: 64 }, () =>
-    Math.floor(Math.random() * 16).toString(16)
-  ).join('');
-  return `0x${hex}`;
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return `0x${Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
 // --- Multi-Solver Competitive RFQ Auction Engine ----------------------------
@@ -214,7 +213,7 @@ export function runSolverRFQMarket(
 
     const latency = isSpecialist
       ? Math.floor(LIQUIDITY_VENUES[solver.specializedVenue]?.avgLatencyMs || 250)
-      : Math.floor(400 + Math.random() * 200);
+      : Math.floor(450 + idx * 25);
 
     const gasFee = Number((isSpecialist ? 0.35 : 0.85).toFixed(2));
     const reputationScore = Number((solver.successRatePct * 0.1).toFixed(2));
@@ -264,13 +263,16 @@ export function generateCrossChainStateProof(
   const venue = LIQUIDITY_VENUES[receipt.venueId] || LIQUIDITY_VENUES.hyperliquid;
   const oracleName = receipt.venueId === 'jupiter_solana' ? 'Pyth' : receipt.venueId === 'uniswap_v3' ? 'Chainlink' : 'Pyth';
 
-  const stateProofHash = `0xstate_proof_${receipt.venueId}_${receipt.blockNumber.toString(16)}_${Math.random().toString(16).substring(2, 10)}`;
-  const merkleRoot = `0xmerkle_root_${receipt.venueId}_${Math.random().toString(16).substring(2, 14)}`;
+  const entropy = Array.from(crypto.getRandomValues(new Uint8Array(8)))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  const stateProofHash = `0xstate_proof_${receipt.venueId}_${receipt.blockNumber.toString(16)}_${entropy}`;
+  const merkleRoot = `0xmerkle_root_${receipt.venueId}_${receipt.externalTxHash.slice(2, 18)}`;
 
   const zkConstraintVerified = receipt.actualFillPrice <= intent.maxPriceLimitUsd;
 
   return {
-    proofId: `0xproof_${Math.random().toString(16).substring(2, 10)}`,
+    proofId: `0xproof_${entropy}`,
     venueId: receipt.venueId,
     chainName: venue.chain,
     blockOrSlotNumber: receipt.blockNumber,
@@ -468,13 +470,13 @@ export async function simulateSolverExecution(
     venueId: intent.venueId,
     venueName: routeQuote.venue.name,
     externalTxHash,
-    blockNumber: Math.floor(195_000_000 + Math.random() * 500_000),
+    blockNumber: Math.floor(195_000_000 + (Date.now() % 500_000)),
     actualFillPrice,
     fillUnits: actualFillUnits,
     slippagePct: routeQuote.priceImpactPct,
     fillTimeMs: routeQuote.venue.avgLatencyMs,
-    oracleAttestation: `0xattestation_pyth_chainlink_${Math.random().toString(16).substring(2, 10)}`,
-    cryptographicProofHash: `0xproof_fill_${Math.random().toString(16).substring(2, 12)}`,
+    oracleAttestation: `0xattestation_pyth_chainlink_${externalTxHash.slice(2, 18)}`,
+    cryptographicProofHash: `0xproof_fill_${externalTxHash.slice(18, 34)}`,
     chainExplorerUrl: `${explorerBase}${externalTxHash.substring(0, 18)}`,
   };
 
@@ -511,7 +513,7 @@ export async function settleDarkIntentOnMidnight(
 
   const settleTxHash = await executeSignedTransaction('fulfillDarkIntent', {
     intentId: intent.intentId,
-    solverId: intent.solver?.id || '0xsolver_default',
+    solverId: intent.solver?.id || '0xsolver_hyperliquid_alpha',
     fillPriceUsd: receipt.actualFillPrice,
     fillUnits: receipt.fillUnits,
     receiptProof: receipt.stateProof?.stateProofHash || receipt.cryptographicProofHash,

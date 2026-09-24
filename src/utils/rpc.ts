@@ -38,11 +38,10 @@ export function getRpcConfig(network: 'preview' | 'preprod' = 'preview'): RpcEnd
 
 export async function checkTransactionStatus(
   txHash: string,
-  network: 'preview' | 'preprod' = 'preview'
+  network: 'preview' | 'preprod' = 'preprod'
 ): Promise<TransactionRpcStatus> {
-  // If hash is generated via client signData or local proof, resolve confirmed gracefully
-  if (!txHash || txHash.startsWith('1am_sig_')) {
-    return 'confirmed';
+  if (!txHash) {
+    return 'failed';
   }
 
   const cleanHash = txHash.startsWith('0x') ? txHash : `0x${txHash}`;
@@ -50,7 +49,7 @@ export async function checkTransactionStatus(
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2500);
+    const timeout = setTimeout(() => controller.abort(), 3500);
 
     const res = await fetch(`${config.rpcUrl}/api/v1/tx/${cleanHash}`, {
       signal: controller.signal,
@@ -62,36 +61,53 @@ export async function checkTransactionStatus(
 
     clearTimeout(timeout);
 
-    if (!res || res.status === 404) {
-      return 'confirmed'; // Treat as confirmed since 1AM ProofStation zero-dust sponsored TX was broadcast
+    if (!res) {
+      return 'pending';
+    }
+
+    if (res.status === 404) {
+      return 'pending';
     }
 
     if (!res.ok) {
-      return 'confirmed';
+      return 'pending';
     }
 
     const data = await res.json().catch(() => null);
     if (data && data.tx) {
-      if (data.tx.status === 'SUCCESS' || data.tx.status === 'EXPIRED') {
+      if (data.tx.status === 'SUCCESS') {
         return 'confirmed';
       }
       if (data.tx.status === 'FAILED') {
         return 'failed';
       }
+      if (data.tx.status === 'PENDING') {
+        return 'pending';
+      }
     }
     return 'confirmed';
   } catch {
-    return 'confirmed';
+    return 'pending';
   }
 }
 
 export async function confirmTransaction(
   txHash: string,
-  network: 'preview' | 'preprod' = 'preview',
+  network: 'preview' | 'preprod' = 'preprod',
   maxAttempts: number = 3,
   intervalMs: number = 2000
 ): Promise<TransactionRpcStatus> {
-  // Graceful confirmation delay
-  await new Promise((r) => setTimeout(r, 1500));
-  return 'confirmed';
+  if (!txHash) return 'failed';
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const status = await checkTransactionStatus(txHash, network);
+    if (status === 'confirmed' || status === 'failed') {
+      return status;
+    }
+    if (attempt < maxAttempts) {
+      await new Promise((r) => setTimeout(r, intervalMs));
+    }
+  }
+
+  return 'pending';
 }

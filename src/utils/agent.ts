@@ -149,7 +149,7 @@ export async function monitorPriceNode(state: AgentState): Promise<Partial<Agent
 
 // ----------------------------------------------------------------------------
 // NODE 3: DecideTrade
-// Checks mock/live price against strategy bounds (stop-loss, max pos, expiry)
+// Checks live price against strategy bounds (stop-loss, max pos, expiry)
 // ----------------------------------------------------------------------------
 export async function decideTradeNode(state: AgentState): Promise<Partial<AgentState>> {
   const params = state.strategyParams;
@@ -206,7 +206,10 @@ export async function executeTradeNode(state: AgentState): Promise<Partial<Agent
   const agentId = '0xagent_langgraph_01';
   contract.commitStrategy(agentId);
 
-  const tradeId = `0xtrade_${Math.random().toString(16).substring(2, 7)}`;
+  const entropy = Array.from(crypto.getRandomValues(new Uint8Array(4)))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  const tradeId = `0xtrade_${Date.now().toString(16)}_${entropy}`;
   const currentTimestamp = BigInt(Math.floor(Date.now() / 1000));
 
   const result = contract.executeTrade(agentId, tradeId, currentTimestamp);

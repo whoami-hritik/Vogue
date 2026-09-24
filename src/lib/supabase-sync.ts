@@ -210,14 +210,14 @@ export async function fetchPersistedTrades(agentId?: string): Promise<TradeRecor
 
       if (!error && Array.isArray(data) && data.length > 0) {
         return data.map((d: any) => ({
-          id: d.trade_id || `0xtrade_${Math.random().toString(16).substring(2, 7)}`,
+          id: d.trade_id || d.id || d.tx_hash || '0xtrade_unknown',
           timestamp: d.timestamp || (d.created_at ? new Date(d.created_at).toLocaleString() : new Date().toLocaleString()),
           asset: d.asset || 'ADA',
           type: (d.type || 'BUY') as 'BUY' | 'STOP_LOSS',
           sizeUsd: d.size_usd || 1200,
           priceUsd: d.price_usd || (d.asset === 'BTC' ? 61250 : d.asset === 'ETH' ? 3300 : d.asset === 'SOL' ? 145 : 0.421),
-          pnlUsd: d.pnl_usd !== undefined ? d.pnl_usd : 114.5,
-          pnlPct: d.pnl_pct !== undefined ? d.pnl_pct : 9.54,
+          pnlUsd: d.pnl_usd !== undefined ? d.pnl_usd : 0,
+          pnlPct: d.pnl_pct !== undefined ? d.pnl_pct : 0,
           status: d.status === 'rejected' ? 'rejected' : 'executed',
           proofTimeMs: d.proof_time_ms || 390,
           commitmentHash: d.commitment_hash || d.tx_hash,
@@ -231,7 +231,7 @@ export async function fetchPersistedTrades(agentId?: string): Promise<TradeRecor
   }
 
   return _memTrades.map((d: any) => ({
-    id: d.trade_id || `0xtrade_${Math.random().toString(16).substring(2, 7)}`,
+    id: d.trade_id || d.id || d.tx_hash || '0xtrade_unknown',
     timestamp: d.timestamp || new Date().toLocaleString(),
     asset: d.asset || 'ADA',
     type: (d.type || 'BUY') as 'BUY' | 'STOP_LOSS',
