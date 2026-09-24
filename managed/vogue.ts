@@ -44,11 +44,14 @@ export interface StrategyWitnesses {
 export class VogueContractSimulator {
   // Public Ledger State
   public agentCommitment = new Map<string, string>(); // agentId -> strategyHash
+  public strategyOwner = new Map<string, string>();   // agentId -> owner authorization commitment
   public tradeStatus = new Map<string, number>();      // tradeId -> status (1=executed, 2=rejected, 3=withdrawn)
+  public tradeNullifiers = new Map<string, boolean>(); // tradeNullifier -> true (replay protection)
   public tradeCount: number = 0;
   public darkIntentCommitment = new Map<string, string>(); // intentId -> intentHash
   public darkIntentStatus = new Map<string, number>();     // intentId -> status (1=committed, 2=filled, 3=refunded)
   public darkIntentCount: number = 0;
+  public authorizedSolvers = new Map<string, boolean>();   // solverId -> true (authorized solver)
   public solverBondRegistry = new Map<string, bigint>();   // solverId -> bonded collateral USD
   public solverSlashCount: number = 0;
   public alphaStrategyRegistry = new Map<string, string>(); // strategyId -> profile hash
@@ -77,6 +80,18 @@ export class VogueContractSimulator {
     this.solverBondRegistry.set('0xsolver_minswap_cardano', 250_000n);
     this.solverBondRegistry.set('0xsolver_solana_jupiter', 750_000n);
     this.solverBondRegistry.set('0xsolver_darkpool_p2p', 1_000_000n);
+
+    // Pre-seed authorized solvers matching registered network
+    this.authorizedSolvers.set('0xsolver_hyperliquid_01', true);
+    this.authorizedSolvers.set('0xsolver_hyperliquid_alpha', true);
+    this.authorizedSolvers.set('0xsolver_uniswap_core', true);
+    this.authorizedSolvers.set('0xsolver_minswap_cardano', true);
+    this.authorizedSolvers.set('0xsolver_solana_jupiter', true);
+    this.authorizedSolvers.set('0xsolver_darkpool_p2p', true);
+  }
+
+  public registerAuthorizedSolver(solverId: string): void {
+    this.authorizedSolvers.set(solverId, true);
   }
 
   // Hash calculation matching persistentHash([maxPos, stopLoss, expiry])
@@ -102,11 +117,36 @@ export class VogueContractSimulator {
 
     const strategyHash = this.calculateStrategyHash(maxPos, stopLoss, expiry);
     this.agentCommitment.set(agentId, strategyHash);
+
+    // Cryptographic owner authorization commitment
+    const callerKey = this.witnesses.localSecretKey ? this.witnesses.localSecretKey() : '0xdefault_key';
+    const ownerCommitment = `0xowner_${callerKey}_${agentId}`;
+    this.strategyOwner.set(agentId, ownerCommitment);
+
     return strategyHash;
   }
 
   public executeTrade(agentId: string, tradeId: string, currentTime: bigint): { status: 'executed' | 'rejected'; reason?: string } {
     try {
+      // 1. Cryptographic caller authorization
+      const callerKey = this.witnesses.localSecretKey ? this.witnesses.localSecretKey() : '0xdefault_key';
+      const callerCommitment = `0xowner_${callerKey}_${agentId}`;
+      if (this.strategyOwner.has(agentId) && this.strategyOwner.get(agentId) !== callerCommitment) {
+        this.tradeStatus.set(tradeId, 2);
+        throw new Error('unauthorized caller for strategy');
+      }
+
+      // 2. Replay protection and trade nullifier check
+      if (this.tradeStatus.has(tradeId)) {
+        throw new Error('trade already executed');
+      }
+      const nullifier = `0xnullifier_${callerKey}_${tradeId}`;
+      if (this.tradeNullifiers.has(nullifier)) {
+        throw new Error('trade nullifier already spent');
+      }
+      this.tradeNullifiers.set(nullifier, true);
+
+      // 3. Strategy integrity & bounds check
       const maxPos = this.witnesses.getMaxPositionPct();
       const stopLoss = this.witnesses.getStopLossPct();
       const expiry = this.witnesses.getStrategyExpiry();
@@ -153,6 +193,9 @@ export class VogueContractSimulator {
   }
 
   public mintVaultBalance(agentId: string, depositId: string): { success: boolean; reason?: string } {
+    if (this.tradeStatus.has(depositId)) {
+      return { success: false, reason: 'deposit already processed' };
+    }
     const depositAmount = this.witnesses.getDepositTNightAmount ? this.witnesses.getDepositTNightAmount() : 0n;
     const priceUsd = this.witnesses.getTNightPriceUsd ? this.witnesses.getTNightPriceUsd() : 0n;
 
@@ -168,6 +211,9 @@ export class VogueContractSimulator {
   }
 
   public burnVaultBalance(agentId: string, burnId: string, withdrawUsdcAmount: bigint): { success: boolean; reason?: string } {
+    if (this.tradeStatus.has(burnId)) {
+      return { success: false, reason: 'burn already processed' };
+    }
     const portfolioVal = this.witnesses.getPortfolioValue();
     const priceUsd = this.witnesses.getTNightPriceUsd ? this.witnesses.getTNightPriceUsd() : 0n;
 
@@ -250,6 +296,7 @@ export class VogueContractSimulator {
       }
       const existing = this.solverBondRegistry.get(solverId) || 0n;
       this.solverBondRegistry.set(solverId, existing + bondAmountUsd);
+      this.authorizedSolvers.set(solverId, true);
       return { status: 'registered' };
     } catch (err: any) {
       return { status: 'rejected', reason: err.message };
@@ -279,6 +326,16 @@ export class VogueContractSimulator {
 
   public fulfillDarkIntent(intentId: string, solverId: string, fillPriceUsd: bigint, currentTime: bigint): { status: 'filled' | 'rejected'; reason?: string } {
     try {
+      const escrow = this.witnesses.getEscrowVusdAmount ? this.witnesses.getEscrowVusdAmount() : 2000n;
+      const solverBond = this.solverBondRegistry.get(solverId) || 0n;
+      if (solverBond < escrow) {
+        throw new Error('solver insufficient bond coverage');
+      }
+
+      if (!this.authorizedSolvers.get(solverId)) {
+        throw new Error('unauthorized solver');
+      }
+
       const status = this.darkIntentStatus.get(intentId);
       if (status !== 1) {
         throw new Error('intent not in committed state');
@@ -292,12 +349,6 @@ export class VogueContractSimulator {
       const maxPrice = this.witnesses.getMaxPriceLimit ? this.witnesses.getMaxPriceLimit() : 1000n;
       if (fillPriceUsd > maxPrice) {
         throw new Error('fill price exceeds max price limit');
-      }
-
-      const escrow = this.witnesses.getEscrowVusdAmount ? this.witnesses.getEscrowVusdAmount() : 2000n;
-      const solverBond = this.solverBondRegistry.get(solverId) || 0n;
-      if (solverBond < escrow) {
-        throw new Error('solver insufficient bond coverage');
       }
 
       const stateProof = this.witnesses.getCrossChainStateProof ? this.witnesses.getCrossChainStateProof() : '0xstate_proof_valid_merkle';
@@ -590,3 +641,7 @@ export class VogueContractSimulator {
     return { status: 'cancelled' };
   }
 }
+
+// Re-export authoritative Midnight Compact generated contract and ledger
+export { Contract, ledger } from '../contracts/managed/vogue/contract/index.js';
+

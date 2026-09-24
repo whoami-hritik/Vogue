@@ -34,11 +34,14 @@ export type ImpureCircuits<PS> = {
   unshieldWithdraw(context: __compactRuntime.CircuitContext<PS>,
                    agentId_0: Uint8Array,
                    amountUsd_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  registerAuthorizedSolver(context: __compactRuntime.CircuitContext<PS>,
+                           solverId_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   commitDarkIntent(context: __compactRuntime.CircuitContext<PS>,
                    agentId_0: Uint8Array,
                    intentId_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   fulfillDarkIntent(context: __compactRuntime.CircuitContext<PS>,
                     intentId_0: Uint8Array,
+                    solverId_0: Uint8Array,
                     fillPriceUsd_0: bigint,
                     currentTime_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   refundDarkIntent(context: __compactRuntime.CircuitContext<PS>,
@@ -63,11 +66,14 @@ export type ProvableCircuits<PS> = {
   unshieldWithdraw(context: __compactRuntime.CircuitContext<PS>,
                    agentId_0: Uint8Array,
                    amountUsd_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  registerAuthorizedSolver(context: __compactRuntime.CircuitContext<PS>,
+                           solverId_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   commitDarkIntent(context: __compactRuntime.CircuitContext<PS>,
                    agentId_0: Uint8Array,
                    intentId_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   fulfillDarkIntent(context: __compactRuntime.CircuitContext<PS>,
                     intentId_0: Uint8Array,
+                    solverId_0: Uint8Array,
                     fillPriceUsd_0: bigint,
                     currentTime_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   refundDarkIntent(context: __compactRuntime.CircuitContext<PS>,
@@ -95,11 +101,14 @@ export type Circuits<PS> = {
   unshieldWithdraw(context: __compactRuntime.CircuitContext<PS>,
                    agentId_0: Uint8Array,
                    amountUsd_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  registerAuthorizedSolver(context: __compactRuntime.CircuitContext<PS>,
+                           solverId_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   commitDarkIntent(context: __compactRuntime.CircuitContext<PS>,
                    agentId_0: Uint8Array,
                    intentId_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   fulfillDarkIntent(context: __compactRuntime.CircuitContext<PS>,
                     intentId_0: Uint8Array,
+                    solverId_0: Uint8Array,
                     fillPriceUsd_0: bigint,
                     currentTime_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   refundDarkIntent(context: __compactRuntime.CircuitContext<PS>,
@@ -115,12 +124,26 @@ export type Ledger = {
     lookup(key_0: Uint8Array): Uint8Array;
     [Symbol.iterator](): Iterator<[Uint8Array, Uint8Array]>
   };
+  strategyOwner: {
+    isEmpty(): boolean;
+    size(): bigint;
+    member(key_0: Uint8Array): boolean;
+    lookup(key_0: Uint8Array): Uint8Array;
+    [Symbol.iterator](): Iterator<[Uint8Array, Uint8Array]>
+  };
   tradeStatus: {
     isEmpty(): boolean;
     size(): bigint;
     member(key_0: Uint8Array): boolean;
     lookup(key_0: Uint8Array): bigint;
     [Symbol.iterator](): Iterator<[Uint8Array, bigint]>
+  };
+  tradeNullifiers: {
+    isEmpty(): boolean;
+    size(): bigint;
+    member(key_0: Uint8Array): boolean;
+    lookup(key_0: Uint8Array): boolean;
+    [Symbol.iterator](): Iterator<[Uint8Array, boolean]>
   };
   readonly tradeCount: bigint;
   darkIntentCommitment: {
@@ -138,6 +161,13 @@ export type Ledger = {
     [Symbol.iterator](): Iterator<[Uint8Array, bigint]>
   };
   readonly darkIntentCount: bigint;
+  authorizedSolvers: {
+    isEmpty(): boolean;
+    size(): bigint;
+    member(key_0: Uint8Array): boolean;
+    lookup(key_0: Uint8Array): boolean;
+    [Symbol.iterator](): Iterator<[Uint8Array, boolean]>
+  };
 }
 
 export type ContractReferenceLocations = any;

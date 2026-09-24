@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 console.log('──────────────────────────────────────────────────────────────────────────');
-console.log('⚡ Vogue Compact v1.0 — Smart Contract Compilation & Artifact Verification');
+console.log('⚡ Vogue Compact — Authoritative Smart Contract Compilation & Artifact Sync');
 console.log('──────────────────────────────────────────────────────────────────────────');
 
 const REQUIRED_CIRCUITS = [
@@ -12,6 +12,7 @@ const REQUIRED_CIRCUITS = [
   'mintVaultBalance',
   'burnVaultBalance',
   'unshieldWithdraw',
+  'registerAuthorizedSolver',
   'commitDarkIntent',
   'fulfillDarkIntent',
   'refundDarkIntent',
@@ -21,17 +22,49 @@ const contractPath = path.resolve('./contracts/vogue.compact');
 const managedDir = path.resolve('./contracts/managed/vogue');
 const publicZkDir = path.resolve('./public/zk/vogue');
 
-// 1. Attempt native compilation if compact compiler is available in PATH
+// 1. Attempt native or WSL compilation if compact compiler is available
 let compiledFresh = false;
 try {
-  execSync('compact --version', { stdio: 'ignore' });
-  console.log('🔧 Found compact CLI compiler. Compiling contracts/vogue.compact...');
-  execSync(`compact compile "${contractPath}" "${managedDir}"`, { stdio: 'inherit' });
-  compiledFresh = true;
-  console.log('✅ Compact contract compiled successfully with compact CLI.');
-} catch {
-  // Not installed natively or in non-Linux CI environment
-  console.log('ℹ️  Native compact CLI not in PATH. Verifying pre-compiled ZK artifacts...');
+  // Check direct Linux/CI or WSL path
+  let compileCmd = '';
+  if (process.platform === 'win32') {
+    try {
+      execSync('wsl /home/div1912/.local/bin/compact --version', { stdio: 'ignore' });
+      compileCmd = `wsl /home/div1912/.local/bin/compact compile "${contractPath.replace(/\\/g, '/').replace('D:', '/mnt/d').replace('C:', '/mnt/c')}" "${managedDir.replace(/\\/g, '/').replace('D:', '/mnt/d').replace('C:', '/mnt/c')}"`;
+    } catch {
+      // Check if compactc or compact is in PATH via wsl
+      try {
+        execSync('wsl compact --version', { stdio: 'ignore' });
+        compileCmd = `wsl compact compile "${contractPath.replace(/\\/g, '/').replace('D:', '/mnt/d').replace('C:', '/mnt/c')}" "${managedDir.replace(/\\/g, '/').replace('D:', '/mnt/d').replace('C:', '/mnt/c')}"`;
+      } catch {
+        // no wsl compact
+      }
+    }
+  } else {
+    // Non-Windows (Linux/CI/macOS)
+    try {
+      execSync('compact --version', { stdio: 'ignore' });
+      compileCmd = `compact compile "${contractPath}" "${managedDir}"`;
+    } catch {
+      try {
+        execSync('compactc --version', { stdio: 'ignore' });
+        compileCmd = `compactc "${contractPath}" "${managedDir}"`;
+      } catch {
+        // compact compiler not in PATH
+      }
+    }
+  }
+
+  if (compileCmd) {
+    console.log(`🔧 Found compact compiler. Compiling contracts/vogue.compact...`);
+    execSync(compileCmd, { stdio: 'inherit' });
+    compiledFresh = true;
+    console.log('✅ Compact contract compiled successfully with authoritative compact compiler.');
+  } else {
+    console.log('ℹ️  Native compact compiler not in PATH. Verifying pre-compiled ZK artifacts...');
+  }
+} catch (compileErr) {
+  console.warn('⚠️ Compilation note, falling back to verifying pre-compiled ZK artifacts:', compileErr.message);
 }
 
 // 2. Verify Contract Bindings
@@ -65,25 +98,25 @@ const pubZkirDir = path.join(publicZkDir, 'zkir');
 fs.mkdirSync(pubKeysDir, { recursive: true });
 fs.mkdirSync(pubZkirDir, { recursive: true });
 
-// Copy/sync if compiled fresh or missing
+// Copy/sync all keys and zkir
 const zkirDir = path.join(managedDir, 'zkir');
 for (const circuit of REQUIRED_CIRCUITS) {
   for (const ext of ['.prover', '.verifier']) {
     const src = path.join(keysDir, `${circuit}${ext}`);
     const dest = path.join(pubKeysDir, `${circuit}${ext}`);
-    if (fs.existsSync(src) && (!fs.existsSync(dest) || compiledFresh)) {
+    if (fs.existsSync(src)) {
       fs.copyFileSync(src, dest);
     }
   }
   for (const ext of ['.zkir', '.bzkir']) {
     const src = path.join(zkirDir, `${circuit}${ext}`);
     const dest = path.join(pubZkirDir, `${circuit}${ext}`);
-    if (fs.existsSync(src) && (!fs.existsSync(dest) || compiledFresh)) {
+    if (fs.existsSync(src)) {
       fs.copyFileSync(src, dest);
     }
   }
 }
-console.log(`✅ Public ZK assets synchronized to public/zk/vogue/`);
+console.log(`✅ Public ZK assets synchronized to public/zk/vogue/ (${REQUIRED_CIRCUITS.length} circuits)`);
 console.log('──────────────────────────────────────────────────────────────────────────');
 console.log(`🚀 Compact contract & ZK circuit suite ready for deployment & testing.`);
 console.log('──────────────────────────────────────────────────────────────────────────\n');
